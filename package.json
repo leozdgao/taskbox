@@ -1,0 +1,23 @@
+{
+  "name": "chatbox",
+  "version": "0.1.0",
+  "description": "playground for socket.io",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leozdgao/chatbox.git"
+  },
+  "author": "leozdgao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leozdgao/chatbox/issues"
+  },
+  "homepage": "https://github.com/leozdgao/chatbox#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "socket.io": "^1.3.7"
+  }
+}
