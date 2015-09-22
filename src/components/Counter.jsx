@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react'
 
 
 export default class Counter extends Component {
@@ -11,8 +11,8 @@ export default class Counter extends Component {
     counter: PropTypes.number.isRequired
   }
 
-  render() {
-    const { increment, incrementIfOdd, incrementAsync, decrement, counter } = this.props;
+  render () {
+    const { increment, incrementIfOdd, incrementAsync, decrement, counter } = this.props
     return (
       <p>
         Clicked: {counter} times
@@ -25,6 +25,6 @@ export default class Counter extends Component {
         {' '}
         <button onClick={() => incrementAsync()}>Increment async</button>
       </p>
-    );
+    )
   }
 }
