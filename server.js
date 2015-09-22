@@ -1,34 +1,31 @@
-// import modules
-var http = require('http')
+/* eslint-disable */
 var path = require('path')
 var express = require('express')
-var socketio = require('socket.io')
+var webpack = require('webpack')
+var config = require('./webpack.config')
 
-// init app
 var app = express()
-var server = http.createServer(app)
-var port = 3000
+var compiler = webpack(config)
 
-// serve static
-app.use('/', express.static(path.join(__dirname, './static')))
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath,
+  stats: {
+    colors: true
+  }
+}))
 
-// server listen
-server.listen(port, function () {
-  console.log('Server is listening to port ' + port)
+app.use(require('webpack-hot-middleware')(compiler))
+
+app.get('*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-// socket io bind
-var io = socketio.listen(server)
-io.on('connection', function (socket) {
-  console.log('user connected')
-  // register custom events when connected
-  socket.on('chat', function (msg) {
-    console.log(msg)
-    io.emit('chat', msg)
-  })
+app.listen(3000, 'localhost', function (err) {
+  if (err) {
+    console.log(err)
+    return
+  }
 
-  // disconnect event
-  socket.on('disconnect', function () {
-    console.log('user disconnected')
-  })
+  console.log('Listening at http://localhost:3000')
 })

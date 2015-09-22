@@ -1,23 +1,73 @@
 {
   "name": "chatbox",
   "version": "0.1.0",
-  "description": "playground for socket.io",
-  "main": "index.js",
-  "scripts": {
-    "start": "node server"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/leozdgao/chatbox.git"
-  },
-  "author": "leozdgao",
+  "description": "My module",
+  "main": "lib/index.js",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/leozdgao/chatbox/issues"
+  "repository": "leozdgao/chatbox",
+  "scripts": {
+    "start": "node server.js",
+    "clean": "rimraf lib dist coverage",
+    "lint": "eslint src test",
+    "test": "mocha --compilers js:babel/register --recursive",
+    "test:watch": "npm test -- --watch",
+    "test:cov": "babel-node $(npm bin)/isparta cover $(npm bin)/_mocha -- --recursive",
+    "check": "npm run lint && npm run test ",
+    "build": "webpack src/index.js --config webpack.config.production.js",
+    "preversion": "npm run clean && npm run check",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags && npm run clean",
+    "prepublish": "npm run clean && npm run build"
   },
-  "homepage": "https://github.com/leozdgao/chatbox#readme",
+  "author": {
+    "name": "leozdgao",
+    "email": "gzdleo0816@gmail.com",
+    "url": "no"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "keywords": [
+    "redux",
+    "chatbox"
+  ],
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.24",
+    "babel-eslint": "^4.1.3",
+    "babel-loader": "^5.3.2",
+    "babel-plugin-react-transform": "^1.0.3",
+    "chai": "^3.2.0",
+    "eslint": "^1.4.3",
+    "eslint-config-airbnb": "^0.0.8",
+    "eslint-plugin-react": "^3.4.1",
+    "isparta": "^3.0.3",
+    "jsdom": "^6.1.0",
+    "mocha": "*",
+    "mocha-jsdom": "^1.0.0",
+    "proxyquire": "^1.7.2",
+    "react-addons-test-utils": "^0.14.0-rc1",
+    "react-transform-catch-errors": "^0.1.1",
+    "react-transform-hmr": "^1.0.0",
+    "redbox-react": "^1.0.1",
+    "redux-devtools": "^2.1.2",
+    "rimraf": "^2.4.3",
+    "sinon": "^1.16.1",
+    "webpack": "^1.11.0",
+    "webpack-dev-middleware": "^1.2.0",
+    "webpack-hot-middleware": "^2.0.0"
+  },
   "dependencies": {
     "express": "^4.13.3",
+    "history": "^1.9.1",
+    "react": "^0.14.0-rc1",
+    "react-dom": "^0.14.0-rc1",
+    "react-redux": "^2.1.2",
+    "react-router": "^1.0.0-rc1",
+    "redux": "^3.0.0",
+    "redux-logger": "^1.0.8",
+    "redux-promise": "^0.5.0",
+    "redux-thunk": "^1.0.0",
     "socket.io": "^1.3.7"
   }
 }
