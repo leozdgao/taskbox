@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { createHistory } from 'history'
 import { Provider } from 'react-redux'
 import { Router, PropTypes as RouterPropTypes } from 'react-router'
-import configureStore from './store/configureStore'
+import configureStore from './redux/configureStore'
 import routes from './routes'
 
 // init store

@@ -22,19 +22,27 @@ module.exports = {
         screw_ie8: true,
         warnings: false
       }
-    })
+    }),
+    new ExtractTextPlugin('[name].bundle.css'),
   ],
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: [ '', '.js', '.jsx' ]
   },
   module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      loaders: ['babel'],
-      exclude: /node_modules/
-    }]
+    loaders: [
+      {
+        test: /\.jsx?$/,
+        loader: 'babel',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.less$/,
+        loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=2&sourceMap!autoprefixer?browsers=last 2 versions!less'),
+        exclude: /node_modules/
+      }
+    ]
   },
   externals: {
-    io: 'io'
+    socketIO: 'io'
   }
 }

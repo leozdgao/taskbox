@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux'
-import counter from './counter'
+import chats from './chat'
 
 
 const rootReducer = combineReducers({
-  counter
+  chats
 })
 
 

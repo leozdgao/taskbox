@@ -1,0 +1,11 @@
+html, body { height: 100%; }
+:global(#root) {
+  min-height: 100%;
+
+  >:global(.cb-container) {
+    margin: auto;
+    overflow: hidden;
+    width: 600px;
+    height: 100%;
+  }
+}
