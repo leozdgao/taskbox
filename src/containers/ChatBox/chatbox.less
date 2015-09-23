@@ -1,13 +1,47 @@
 :global(.ui).chatbox {
   margin: 1em 0 !important;
-}
-.chatpanel {
-  height: 400px;
-  overflow: auto;
-}
-.chatinput {
 
-}
-.chatentry {
-  padding: 0 10px;
+  .chatpanel {
+    height: 400px;
+    overflow: auto;
+    padding: 10px;
+
+    :global(.item) { margin: .5em 0; }
+  }
+  .chatinput {
+
+  }
+  .chatentry {
+    margin: 0 2.5em 0 0;
+
+    :global(.avatar) {
+      float: left;
+    }
+
+    .chatcontent {
+      margin: 0 0.72em 0 3.22em;
+      padding: 0.8em 1em;
+      word-break: break-all;
+      background-color: #f7f8fa;
+
+      .frominfo {
+        display: inline-block;
+        margin-bottom: .5em;
+      }
+    }
+
+    &.me {
+      margin: 0 0 0 2.5em;
+
+      :global(.avatar) {
+        float: right;
+      }
+
+      .chatcontent {
+        margin-right: 3.22em;
+        margin-left: 0.72em;
+        text-align: right;
+      }
+    }
+  }
 }

@@ -16,8 +16,7 @@
     "build": "webpack src/index.js --config webpack.config.production.js",
     "preversion": "npm run clean && npm run check",
     "version": "npm run build",
-    "postversion": "git push && git push --tags && npm run clean",
-    "prepublish": "npm run clean && npm run build"
+    "postversion": "git push && git push --tags && npm run clean"
   },
   "author": {
     "name": "leozdgao",

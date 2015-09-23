@@ -42,14 +42,18 @@ export default class Counter extends Component {
 
   _renderPanel () {
     const { chats } = this.props
-    const { chatpanel, chatentry } = Styles
+    const { chatpanel, chatentry, chatcontent, me, frominfo } = Styles
 
     const items = chats.map(({ from, msg }, i) => {
       const isMe = (from === 'me')
       return (
         <div className='item'>
-          <div className={cNames([ { right: isMe }, { floated: isMe }, 'content', chatentry ])}>
-            {msg}
+          <div className={cNames([ { [me]: isMe }, 'content', chatentry ])}>
+            <img className='ui avatar image' src='http://semantic-ui.com/images/avatar2/small/matthew.png' />
+            <div className={chatcontent}>
+              <b className={frominfo}>{from} said</b>
+              <p>{msg}</p>
+            </div>
           </div>
         </div>
       )
@@ -86,6 +90,9 @@ export default class Counter extends Component {
 
   _handleKeyDown (e) {
     // Ctrl + ENTER
-    if (e.keyCode === 13 && e.ctrlKey) this._sendMessage()
+    if (e.keyCode === 13 && e.ctrlKey) {
+      e.preventDefault()
+      this._sendMessage()
+    }
   }
 }
