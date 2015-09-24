@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import IO from 'socketIO'
 import cNames from 'classnames'
 import { ChatActions } from '../../redux/modules'
+import { Toggle, ScrollPanel } from '../../components'
 import Styles from './chatbox.less'
 
 @connect(
@@ -14,7 +15,7 @@ import Styles from './chatbox.less'
     ...bindActionCreators(ChatActions, dispatch)
   })
 )
-export default class Counter extends Component {
+export default class ChatBox extends Component {
 
   static propTypes = {
     receiveMessage: PropTypes.func.isRequired,
@@ -47,7 +48,7 @@ export default class Counter extends Component {
     const items = chats.map(({ from, msg }, i) => {
       const isMe = (from === 'me')
       return (
-        <div className='item'>
+        <div className='item' key={i}>
           <div className={cNames([ { [me]: isMe }, 'content', chatentry ])}>
             <img className='ui avatar image' src='http://semantic-ui.com/images/avatar2/small/matthew.png' />
             <div className={chatcontent}>
@@ -60,19 +61,24 @@ export default class Counter extends Component {
     })
 
     return (
-      <div className={`ui list ${chatpanel}`}>
+      <ScrollPanel className={`ui list ${chatpanel}`}>
         {items}
-      </div>
+      </ScrollPanel>
     )
   }
 
   _renderInput () {
+    const { chatinput } = Styles
+
     return (
       <div className='ui form'>
         <div className='field'>
           <textarea ref='input' rows='3' placeholder='Say something...' onKeyDown={this._handleKeyDown.bind(this)}></textarea>
         </div>
-        <div className='ui submit button' onClick={this._sendMessage.bind(this)}>Submit</div>
+        <div className={cNames('field', chatinput)}>
+          <div className='ui left floated submit button' onClick={this._sendMessage.bind(this)}>Submit</div>
+          <Toggle ref='toggle' checked>Send message by <kbd>Crtl + Enter</kbd></Toggle>
+        </div>
       </div>
     )
   }
@@ -90,7 +96,7 @@ export default class Counter extends Component {
 
   _handleKeyDown (e) {
     // Ctrl + ENTER
-    if (e.keyCode === 13 && e.ctrlKey) {
+    if (this.refs.toggle.isChecked() && e.keyCode === 13 && e.ctrlKey) {
       e.preventDefault()
       this._sendMessage()
     }
