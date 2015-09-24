@@ -13,9 +13,7 @@ export default class ScrollPanel extends Component {
     super(props)
 
     this.state = {
-      position: {
-        top: 0, left: 0
-      }
+      top: 0, left: 0
     }
   }
 
@@ -24,11 +22,19 @@ export default class ScrollPanel extends Component {
 
     return (
       <div className={cNames(scrollpanel, this.props.className)} onWheel={this._handleWheel.bind(this)}>
-        <div style={this.state.position}>
+        <div ref='content' style={this.state}>
           {this.props.children}
         </div>
       </div>
     )
+  }
+
+  getContentHeight () {
+
+  }
+
+  getPanelHeight () {
+
   }
 
   _handleWheel (e) {
@@ -37,5 +43,10 @@ export default class ScrollPanel extends Component {
     console.log(e.deltaY)
     console.log(e.deltaZ)
     console.log(e.deltaMode)
+
+    // need scrollbar
+    if (e.deltaY && this.getContentHeight() > this.getPanelHeight()) {
+      this.setState({ top: this.state.top + e.deltaY, left: this.state.left })
+    }
   }
 }
