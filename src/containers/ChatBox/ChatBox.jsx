@@ -29,6 +29,12 @@ export default class ChatBox extends Component {
     this._socket.on('chat', receiveMessage)
   }
 
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.chats.length !== this.props.chats.length) {
+      this.refs.scrollPanel.scrollToBottom()
+    }
+  }
+
   render () {
     const { chatbox, chatinput } = Styles
 
@@ -61,7 +67,7 @@ export default class ChatBox extends Component {
     })
 
     return (
-      <ScrollPanel className={`ui list ${chatpanel}`}>
+      <ScrollPanel ref='scrollPanel' className={`ui list ${chatpanel}`}>
         {items}
       </ScrollPanel>
     )
@@ -73,7 +79,7 @@ export default class ChatBox extends Component {
     return (
       <div className='ui form'>
         <div className='field'>
-          <textarea ref='input' rows='3' placeholder='Say something...' onKeyDown={this._handleKeyDown.bind(this)}></textarea>
+          <textarea ref='input' rows='4' placeholder='Say something...' onKeyDown={this._handleKeyDown.bind(this)}></textarea>
         </div>
         <div className={cNames('field', chatinput)}>
           <div className='ui left floated submit button' onClick={this._sendMessage.bind(this)}>Submit</div>
