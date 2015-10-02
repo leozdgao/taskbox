@@ -6,7 +6,7 @@ export default function (state = [], action) {
   case SEND_MESSAGE: {
     return [
       ...state,
-      { from: 'me', msg: action.payload }
+      { from: '$$me', msg: action.payload }
     ]
   }
   case RECIEVE_MESSAGE: {

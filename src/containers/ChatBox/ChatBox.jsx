@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import IO from 'socketIO'
+import IO from 'socket.io-client'
 import cNames from 'classnames'
 import { ChatActions } from '../../redux/modules'
 import { Toggle, ScrollPanel } from '../../components'
 import Styles from './chatbox.less'
+
+const socket = IO()
 
 @connect(
   state => ({
@@ -25,8 +27,8 @@ export default class ChatBox extends Component {
 
   componentDidMount () {
     const { receiveMessage } = this.props
-    this._socket = IO()
-    this._socket.on('chat', receiveMessage)
+
+    socket.on('chat', receiveMessage)
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -52,13 +54,13 @@ export default class ChatBox extends Component {
     const { chatpanel, chatentry, chatcontent, me, frominfo } = Styles
 
     const items = chats.map(({ from, msg }, i) => {
-      const isMe = (from === 'me')
+      const isMe = (from === '$$me')
       return (
         <div className='item' key={i}>
           <div className={cNames([ { [me]: isMe }, 'content', chatentry ])}>
             <img className='ui avatar image' src='http://semantic-ui.com/images/avatar2/small/matthew.png' />
             <div className={chatcontent}>
-              <b className={frominfo}>{from} said</b>
+              <b className={frominfo}>{isMe ? 'I' : from} said</b>
               <p>{msg}</p>
             </div>
           </div>
@@ -67,7 +69,9 @@ export default class ChatBox extends Component {
     })
 
     return (
-      <ScrollPanel ref='scrollPanel' className={`ui list ${chatpanel}`}>
+      <ScrollPanel ref='scrollPanel' className={`ui list ${chatpanel}`}
+        onScrollTop={() => { console.log('top') }}
+        onScrollBottom={() => { console.log('bottom') }}>
         {items}
       </ScrollPanel>
     )
@@ -96,7 +100,8 @@ export default class ChatBox extends Component {
     if (val) {
       sendMessage(val)
       this.refs.input.value = ''
-      this._socket.emit('chat', val)
+
+      socket.emit('chat', val)
     }
   }
 

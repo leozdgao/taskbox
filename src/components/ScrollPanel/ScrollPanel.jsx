@@ -2,11 +2,26 @@ import React, { Component, PropTypes } from 'react'
 import cNames from 'classnames'
 import Styles from './scrollpanel.less'
 
+const noop = () => {}
+const range = (min, max) => (val) => {
+  if (val < min) return min
+  if (val > max) return max
+
+  return val
+}
+
 export default class ScrollPanel extends Component {
 
   static propTypes = {
     className: PropTypes.string,
-    children: PropTypes.any
+    children: PropTypes.any,
+    onScrollTop: PropTypes.func,
+    onScrollBottom: PropTypes.func
+  }
+
+  static defaultProps = {
+    onScrollTop: noop,
+    onScrollBottom: noop
   }
 
   constructor (props) {
@@ -38,8 +53,23 @@ export default class ScrollPanel extends Component {
     }
 
     if (this._needScrollY()) {
-      if (prevState.scrollYStyles.display === 'none' || prevState.scrollYStyles.height !== this._getScrollYHeight()) {
+      const { display, height, top } = prevState.scrollYStyles
+      if (display === 'none' || height !== this._getScrollYHeight()) {
         this._showScrollY()
+      }
+
+      // emit top
+      if (display !== 'none' &&
+        !this._isScrollTop(prevState.scrollYStyles) &&
+        this._isScrollTop(this.state.scrollYStyles)) {
+        this.props.onScrollTop()
+      }
+
+      // emit bottom
+      if (display !== 'none' &&
+        !this._isScrollBottom(prevState.scrollYStyles) &&
+        this._isScrollBottom(this.state.scrollYStyles)) {
+        this.props.onScrollBottom()
       }
     }
     else {
@@ -72,7 +102,17 @@ export default class ScrollPanel extends Component {
   //
   scrollToTop () {
     if (this._needScrollY()) {
-
+      this.setState({
+        contentStyles: {
+          top: 0,
+          left: this.state.contentStyles.left
+        },
+        scrollYStyles: {
+          height: this._getScrollYHeight(),
+          display: 'block',
+          top: 0
+        }
+      })
     }
   }
 
@@ -91,6 +131,14 @@ export default class ScrollPanel extends Component {
         }
       })
     }
+  }
+
+  hasScrolledToTop () {
+    return this._isScrollTop(this.state.scrollYStyles)
+  }
+
+  hasScrolledToBottom () {
+    return this._isScrollBottom(this.state.scrollYStyles)
   }
 
   //
@@ -146,11 +194,13 @@ export default class ScrollPanel extends Component {
   _handleWheel (e) {
     // need scrollY
     if (e.deltaY && this._needScrollY()) {
+      e.preventDefault()
+
       this.refs.scrollY.classList.add('hover')
       if (this._ltr) clearTimeout(this._ltr)
       this._ltr = setTimeout(() => {
         this.refs.scrollY.classList.remove('hover')
-      }, 1000)
+      }, 500)
 
       this._scrollByContent(e.deltaY)
     }
@@ -163,7 +213,6 @@ export default class ScrollPanel extends Component {
     document.addEventListener('mousemove', this._handleMouseMove)
 
     this.refs.scrollY.classList.add('hover')
-    this.refs.scrollY.classList.add('down')
     this._mouseY = e.clientY
   }
 
@@ -172,7 +221,6 @@ export default class ScrollPanel extends Component {
     document.removeEventListener('mousemove', this._handleMouseMove)
 
     this.refs.scrollY.classList.remove('hover')
-    this.refs.scrollY.classList.remove('down')
   }
 
   _handleMouseMove (e) {
@@ -183,12 +231,21 @@ export default class ScrollPanel extends Component {
     this._mouseY = e.clientY
   }
 
+  _isScrollTop ({ top }) {
+    return top === 0
+  }
+
+  _isScrollBottom ({ top, height }) {
+    const styles = window.getComputedStyle(this.refs.scrollY)
+    return top + height === parseInt(styles.height, 10)
+  }
+
   // content deltaY
   _scrollByContent (deltaY) {
     let top = this.state.contentStyles.top - deltaY
     const maxScroll = this._contentHeight - this._panelHeight
-    if (top > 0) top = 0
-    if (top < - maxScroll) top = - maxScroll
+
+    top = range(- maxScroll, 0)(top)
 
     this.setState({
       contentStyles: {
@@ -206,8 +263,8 @@ export default class ScrollPanel extends Component {
   _scrollByScroll (deltaY) {
     let top = this.state.scrollYStyles.top + deltaY
     const maxScroll = this._panelHeight - this._getScrollYHeight()
-    if (top < 0) top = 0
-    if (top > maxScroll) top = maxScroll
+
+    top = range(0, maxScroll)(top)
 
     this.setState({
       contentStyles: {

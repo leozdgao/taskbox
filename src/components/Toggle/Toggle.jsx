@@ -36,7 +36,8 @@ export default class Toggle extends Component {
   render () {
     return (
       <div className={cNames('ui toggle checkbox', this.props.className)}>
-        <input ref='checkbox' id={this.props.id} type='checkbox' className='hidden' checked={this.state.checked} onChange={this._handleChange.bind(this)} />
+        <input ref='checkbox' id={this.props.id} type='checkbox' className='hidden'
+          checked={this.state.checked} onChange={this._handleChange.bind(this)} />
         <label htmlFor={this.props.id}>{this.props.text || this.props.children}</label>
       </div>
     )
