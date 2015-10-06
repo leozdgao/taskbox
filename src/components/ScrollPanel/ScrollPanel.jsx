@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import cNames from 'classnames'
-import Styles from './scrollpanel.less'
+import './scrollpanel.less'
 
 const noop = () => {}
 const range = (min, max) => (val) => {
@@ -81,17 +81,15 @@ export default class ScrollPanel extends Component {
   }
 
   render () {
-    const { scrollpanel, scrollbar, content, x, y } = Styles
-
     return (
-      <div ref='panel' className={cNames(scrollpanel, this.props.className)} onWheel={this._handleWheel.bind(this)}>
-        <div ref='content' className={content} style={this.state.contentStyles}>
+      <div ref='panel' className={cNames('scrollpanel', this.props.className)} onWheel={::this._handleWheel}>
+        <div ref='content' className='scrollcontent' style={this.state.contentStyles}>
           {this.props.children}
         </div>
-        <div className={cNames(scrollbar, x)}></div>
-        <div ref='scrollY' className={cNames(scrollbar, y)} style={{ display: this.state.scrollYStyles.display }}>
+        <div className='scrollbar x'></div>
+        <div ref='scrollY' className='scrollbar, y' style={{ display: this.state.scrollYStyles.display }}>
           <div style={this.state.scrollYStyles}
-            onMouseDown={this._handleScrollMouseDown.bind(this)}></div>
+            onMouseDown={::this._handleScrollMouseDown}></div>
         </div>
       </div>
     )

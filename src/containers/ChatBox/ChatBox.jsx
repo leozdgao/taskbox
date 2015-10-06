@@ -5,7 +5,7 @@ import IO from 'socket.io-client'
 import cNames from 'classnames'
 import { ChatActions } from '../../redux/modules'
 import { Toggle, ScrollPanel } from '../../components'
-import Styles from './chatbox.less'
+import './chatbox.less'
 
 const socket = IO()
 
@@ -38,10 +38,8 @@ export default class ChatBox extends Component {
   }
 
   render () {
-    const { chatbox, chatinput } = Styles
-
     return (
-      <div className={`ui segment ${chatbox}`}>
+      <div className='ui segment chatbox'>
         <h3>Chat Box</h3>
         {this._renderPanel()}
         {this._renderInput()}
@@ -51,16 +49,15 @@ export default class ChatBox extends Component {
 
   _renderPanel () {
     const { chats } = this.props
-    const { chatpanel, chatentry, chatcontent, me, frominfo } = Styles
 
     const items = chats.map(({ from, msg }, i) => {
       const isMe = (from === '$$me')
       return (
         <div className='item' key={i}>
-          <div className={cNames([ { [me]: isMe }, 'content', chatentry ])}>
+          <div className={cNames([ { me: isMe }, 'content', 'chatentry' ])}>
             <img className='ui avatar image' src='http://semantic-ui.com/images/avatar2/small/matthew.png' />
-            <div className={chatcontent}>
-              <b className={frominfo}>{isMe ? 'I' : from} said</b>
+            <div className='chatcontent'>
+              <b className='frominfo'>{isMe ? 'I' : from} said</b>
               <p>{msg}</p>
             </div>
           </div>
@@ -69,7 +66,7 @@ export default class ChatBox extends Component {
     })
 
     return (
-      <ScrollPanel ref='scrollPanel' className={`ui list ${chatpanel}`}
+      <ScrollPanel ref='scrollPanel' className='ui list chatpanel'
         onScrollTop={() => { console.log('top') }}
         onScrollBottom={() => { console.log('bottom') }}>
         {items}
@@ -78,15 +75,13 @@ export default class ChatBox extends Component {
   }
 
   _renderInput () {
-    const { chatinput } = Styles
-
     return (
       <div className='ui form'>
         <div className='field'>
-          <textarea ref='input' rows='4' placeholder='Say something...' onKeyDown={this._handleKeyDown.bind(this)}></textarea>
+          <textarea ref='input' rows='4' placeholder='Say something...' onKeyDown={::this._handleKeyDown}></textarea>
         </div>
-        <div className={cNames('field', chatinput)}>
-          <div className='ui left floated submit button' onClick={this._sendMessage.bind(this)}>Submit</div>
+        <div className={cNames('field', 'chatinput')}>
+          <div className='ui left floated submit button' onClick={::this._sendMessage}>Submit</div>
           <Toggle ref='toggle' checked>Send message by <kbd>Crtl + Enter</kbd></Toggle>
         </div>
       </div>

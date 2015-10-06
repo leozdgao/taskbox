@@ -33,7 +33,7 @@ module.exports = {
       },
       {
         test: /\.less$/,
-        loader: 'style!css?modules&importLoaders=2&sourceMap&localIdentName=[local]___[hash:base64:5]!autoprefixer?browsers=last 2 versions!less',
+        loader: 'style!css?importLoaders=2&sourceMap!autoprefixer?browsers=last 2 versions!less',
         exclude: /node_modules/
       }
     ]

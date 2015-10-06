@@ -1,0 +1,47 @@
+.ui.modal {
+  display: block;
+  transition: all 0.2s;
+
+  &.dialog {
+    top: 30%;
+    @media only screen and (min-width: 768px) {
+      margin: 0 0 0 -300px;
+      width: 600px;
+    }
+  }
+}
+
+.ui.dimmer {
+  display: block;
+  opacity: 1;
+  transition: all 0.2s;
+  background-color: rgba(0, 0, 0, .7);
+  z-index: 1000;
+}
+
+// transition mixins
+.modalIn() {
+  &.dimmer {
+    opacity: 0;
+  }
+
+  .modal {
+    transform: scale(0.7);
+  }
+}
+
+.modalOut() {
+  &.dimmer {
+    opacity: 1;
+  }
+
+  .modal {
+    transform: scale(1);
+  }
+}
+
+.fade-enter { .modalIn() }
+.fade-enter.fade-enter-active { .modalOut() }
+
+.fade-leave { .modalOut() }
+.fade-leave.fade-leave-active { .modalIn() }

@@ -1,4 +1,4 @@
-:global(.ui).chatbox {
+.ui.chatbox {
   // margin: 1em 0 !important;
 
   .chatpanel {
@@ -6,12 +6,12 @@
     overflow: auto;
     padding: 0 10px;
 
-    :global(.item) { margin: .5em 0; }
+    .item { margin: .5em 0; }
   }
   .chatinput {
     overflow: hidden;
 
-    :global(.toggle) {
+    .toggle {
       float: right;
       padding: 0.535em 0;
     }
@@ -19,7 +19,7 @@
   .chatentry {
     margin: 0 2.5em 0 0;
 
-    :global(.avatar) {
+    .avatar {
       float: left;
       background-color: #eee;
     }
@@ -39,7 +39,7 @@
     &.me {
       margin: 0 0 0 2.5em;
 
-      :global(.avatar) {
+      .avatar {
         float: right;
       }
 
