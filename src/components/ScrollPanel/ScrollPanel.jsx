@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import update from 'react-addons-update'
 import cNames from 'classnames'
 import './scrollpanel.less'
 
@@ -87,7 +88,7 @@ export default class ScrollPanel extends Component {
           {this.props.children}
         </div>
         <div className='scrollbar x'></div>
-        <div ref='scrollY' className='scrollbar, y' style={{ display: this.state.scrollYStyles.display }}>
+        <div ref='scrollY' className='scrollbar y' style={{ display: this.state.scrollYStyles.display }}>
           <div style={this.state.scrollYStyles}
             onMouseDown={::this._handleScrollMouseDown}></div>
         </div>
@@ -100,34 +101,16 @@ export default class ScrollPanel extends Component {
   //
   scrollToTop () {
     if (this._needScrollY()) {
-      this.setState({
-        contentStyles: {
-          top: 0,
-          left: this.state.contentStyles.left
-        },
-        scrollYStyles: {
-          height: this._getScrollYHeight(),
-          display: 'block',
-          top: 0
-        }
-      })
+      this.setState(this._constructScrollYUpdateState(0, 0))
     }
   }
 
   scrollToBottom () {
     if (this._needScrollY()) {
       const maxScroll = this._contentHeight - this._panelHeight
-      this.setState({
-        contentStyles: {
-          top: - maxScroll,
-          left: this.state.contentStyles.left
-        },
-        scrollYStyles: {
-          height: this._getScrollYHeight(),
-          display: 'block',
-          top: this._panelHeight * maxScroll / this._contentHeight
-        }
-      })
+      this.setState(
+        this._constructScrollYUpdateState(- maxScroll, this._panelHeight * maxScroll / this._contentHeight)
+      )
     }
   }
 
@@ -171,11 +154,9 @@ export default class ScrollPanel extends Component {
 
   _showScrollY () {
     this.setState({
-      scrollYStyles: {
-        height: this._getScrollYHeight(),
-        display: 'block',
-        top: this.state.scrollYStyles.top
-      }
+      scrollYStyles: update(this.state.scrollYStyles, {
+        display: { $set: 'block' }
+      })
     })
   }
 
@@ -200,7 +181,9 @@ export default class ScrollPanel extends Component {
         this.refs.scrollY.classList.remove('hover')
       }, 500)
 
-      this._scrollByContent(e.deltaY)
+      const delta = e.deltaY > 0 ? 100 : -100
+
+      this._scrollByContent(delta)
     }
   }
 
@@ -239,23 +222,15 @@ export default class ScrollPanel extends Component {
   }
 
   // content deltaY
-  _scrollByContent (deltaY) {
+  _scrollByContent (deltaY) {console.log(deltaY)
     let top = this.state.contentStyles.top - deltaY
     const maxScroll = this._contentHeight - this._panelHeight
 
     top = range(- maxScroll, 0)(top)
 
-    this.setState({
-      contentStyles: {
-        top,
-        left: this.state.contentStyles.left
-      },
-      scrollYStyles: {
-        height: this._getScrollYHeight(),
-        display: 'block',
-        top: this._mapContentToScroll(top)
-      }
-    })
+    this.setState(
+      this._constructScrollYUpdateState(top, this._mapContentToScroll(top))
+    )
   }
 
   _scrollByScroll (deltaY) {
@@ -264,17 +239,9 @@ export default class ScrollPanel extends Component {
 
     top = range(0, maxScroll)(top)
 
-    this.setState({
-      contentStyles: {
-        top: this._mapScrollToContent(top),
-        left: this.state.contentStyles.left
-      },
-      scrollYStyles: {
-        height: this._getScrollYHeight(),
-        display: 'block',
-        top
-      }
-    })
+    this.setState(
+      this._constructScrollYUpdateState(this._mapScrollToContent(top), top)
+    )
   }
 
   _mapContentToScroll (top) {
@@ -283,5 +250,17 @@ export default class ScrollPanel extends Component {
 
   _mapScrollToContent (top) {
     return - this._contentHeight * top / this._panelHeight
+  }
+
+  _constructScrollYUpdateState (contentTop, scrollTop) {
+    return {
+      contentStyles: update(this.state.contentStyles, {
+        top: { $set: contentTop }
+      }),
+      scrollYStyles: update(this.state.scrollYStyles, {
+        height: { $set: this._getScrollYHeight() },
+        top: { $set: scrollTop }
+      })
+    }
   }
 }
