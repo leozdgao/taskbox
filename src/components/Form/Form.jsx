@@ -4,6 +4,7 @@ import validator from 'validator'
 import any from 'lodash/collection/any'
 import all from 'lodash/collection/all'
 import reduce from 'lodash/collection/reduce'
+import forEach from 'lodash/collection/forEach'
 import Input from './Input'
 
 class Form extends Component {
@@ -22,6 +23,7 @@ class Form extends Component {
     super(props)
 
     this.inputs = {}
+    this.initValue = {}
 
     this.state = {
       isValid: true
@@ -72,12 +74,28 @@ class Form extends Component {
     })
   }
 
-  reset () {
+  // actually, this method just set all input to dirty to make
+  // sure the invalid message showed
+  validate () {
+    forEach(this.inputs, (component) => {
+      if (!component.state.isDirty) component.setState({ isDirty: true })
+    })
+  }
 
+  reset () {
+    forEach(this.inputs, (component) => {
+      component.setState({
+        value: this.initValue[component.props.name],
+        isDirty: false
+      }, () => {
+        component.props.validate(component)
+      })
+    })
   }
 
   _attachInput (component) {
     this.inputs[component.props.name] = component
+    this.initValue[component.props.name] = component.state.value
   }
 
   _detachInput (component) {
@@ -98,14 +116,12 @@ class Form extends Component {
         if (isValid !== component.state.isValid) {
           component.setState({
             isValid
-          }, this._validateForm.bind(this))
+          }, () => {
+            this.setState({ isValid: this.isValid })
+          })
         }
       }
     }
-  }
-
-  _validateForm () {
-    this.setState({ isValid: this.isValid })
   }
 }
 

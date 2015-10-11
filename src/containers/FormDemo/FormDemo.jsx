@@ -11,6 +11,7 @@ export default class FormDemo extends Component {
           title='Name' placeholder='Your Name' invalidClassName='error'
           errMsg='Your name should be longer than 3 and shorter than 6.' />
         <button onClick={::this._handleClick}>Submit</button>
+        <button onClick={::this._handleReset}>Reset</button>
       </Form>
     )
   }
@@ -19,11 +20,19 @@ export default class FormDemo extends Component {
     e.preventDefault()
 
     const form = this.refs.form
+    form.validate()
+
     if (form.isValid) {
       request.post('/api/task', form.body)
         .then(({ body }) => {
           console.log(body)
         })
     }
+  }
+
+  _handleReset (e) {
+    e.preventDefault()
+
+    this.refs.form.reset()
   }
 }

@@ -31,26 +31,29 @@ export default class Input extends Component {
 
   constructor (props) {
     super(props)
-
-    this.props.attach(this)
-
+    
     this.state = {
       value: this.props.value || '',
       isValid: true,
       isDirty: false
     }
+
+    this.props.attach(this)
   }
 
   componentDidMount () {
     // only do this if input has default value
-    if (this.state.value) this.props.validate(this)
+    this.props.validate(this)
   }
 
   render () {
     return (
       <div className={cNames([
         this.props.className,
-        { dirty: this.state.isDirty, [this.props.invalidClassName]: !this.state.isValid }
+        {
+          dirty: this.state.isDirty,
+          [this.props.invalidClassName]: !this.state.isValid && this.state.isDirty
+        }
       ])}>
         <label>{this.props.title}</label>
         <input type={this.props.type} name={this.props.name}
