@@ -5,12 +5,13 @@ import * as containers from './containers'
 
 const {
   App,
-  ChatBox
+  ChatBox,
+  FormDemo
 } = containers
-
 
 export default (
   <Route component={App}>
     <Route path="/" component={ChatBox} />
+    <Route path="/form" component={FormDemo} />
   </Route>
 )
