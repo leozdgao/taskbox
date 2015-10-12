@@ -14,12 +14,14 @@ class Form extends Component {
     className: T.string,
     invalidClassName: T.string,
     children: T.any,
-    validator: T.object
+    validator: T.object,
+    onValidated: T.func
   }
 
   static defaultProps = {
     invalidClassName: 'invalid',
-    validator
+    validator,
+    onValidated: () => {}
   }
 
   constructor (props) {
@@ -120,20 +122,10 @@ class Form extends Component {
         if (typeof fn === 'function') {
           // check form validation after input state change
           const isValid = fn.apply(this.props.validator, [ value, ...args ])
-
-          // return promise for async
-          // if (typeof isValid === 'object' && typeof isValid.then === 'function') {
-          //   /* eslint-disable no-loop-func*/
-          //   isValid.then((isValid) => {
-          //     this._setComponentValid(component, !!isValid, msg)
-          //   })
-          // }
-          // else {
           this._setComponentValid(component, !!isValid, msg)
 
-            // stop validate if one of validator has already failed
+          // stop validate if one of validator has already failed
           if (isValid === false) return false
-          // }
         }
       })
     }
@@ -146,7 +138,9 @@ class Form extends Component {
   }
 
   _validateForm () {
-    this.setState({ isValid: this.isValid })
+    this.setState({ isValid: this.isValid }, () => {
+      this.props.onValidated(this.isValid)
+    })
   }
 }
 
