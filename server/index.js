@@ -1,6 +1,7 @@
 var path = require('path')
 var app = require('express')()
 var server = require('http').createServer(app)
+var bodyParser = require('body-parser')
 
 var webpack = require('webpack')
 var config = require('../webpack.config')
@@ -16,6 +17,7 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler))
 
+app.use(bodyParser.json())
 app.use('/api', require('./api'))
 
 app.get('*', function (req, res) {

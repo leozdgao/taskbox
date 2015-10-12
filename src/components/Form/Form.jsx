@@ -1,4 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
+import shadowEqual from 'react-addons-shallow-compare'
 import cNames from 'classnames'
 import validator from 'validator'
 import any from 'lodash/collection/any'
@@ -12,11 +13,13 @@ class Form extends Component {
   static propTypes = {
     className: T.string,
     invalidClassName: T.string,
-    children: T.any
+    children: T.any,
+    validator: T.object
   }
 
   static defaultProps = {
-    invalidClassName: 'invalid'
+    invalidClassName: 'invalid',
+    validator
   }
 
   constructor (props) {
@@ -32,7 +35,7 @@ class Form extends Component {
 
   shouldComponentUpdate (nextProps, nextState) {
     // improvement
-    return this.state.isValid !== nextState.isValid
+    return shadowEqual(this, nextProps, nextState)
   }
 
   render () {
@@ -42,11 +45,13 @@ class Form extends Component {
         { [this.props.invalidClassName]: !this.state.isValid }
       ])}>
         {React.Children.map(this.props.children, (child) => {
+          // take the component which has the name props as the input component
           if (child.props.name) {
             return React.cloneElement(child, {
-              attach: this._attachInput.bind(this),
-              detach: this._detachInput.bind(this),
-              validate: this._validate.bind(this)
+              attach: ::this._attachInput,
+              detach: ::this._detachInput,
+              validate: ::this._validateInput,
+              onValidated: ::this._validateForm // private invoked
             })
           }
           else return child
@@ -102,26 +107,46 @@ class Form extends Component {
     delete this.inputs[component.props.name]
   }
 
-  _validate (component) {
+  _validateInput (component) {
     const { validation } = component.props
 
     if (validation) {
       const { value } = component.state
-      const [ method, ...args ] = validation.split(':')
-      const fn = validator[method]
 
-      if (typeof fn === 'function') {
-        // check form validation after input state change
-        const isValid = fn.apply(validator, [ value, ...args ])
-        if (isValid !== component.state.isValid) {
-          component.setState({
-            isValid
-          }, () => {
-            this.setState({ isValid: this.isValid })
-          })
+      forEach(validation, (msg, validator) => {
+        const [ method, ...args ] = validator.split(/\s*:\s*/)
+        const fn = this.props.validator[method]
+
+        if (typeof fn === 'function') {
+          // check form validation after input state change
+          const isValid = fn.apply(this.props.validator, [ value, ...args ])
+
+          // return promise for async
+          // if (typeof isValid === 'object' && typeof isValid.then === 'function') {
+          //   /* eslint-disable no-loop-func*/
+          //   isValid.then((isValid) => {
+          //     this._setComponentValid(component, !!isValid, msg)
+          //   })
+          // }
+          // else {
+          this._setComponentValid(component, !!isValid, msg)
+
+            // stop validate if one of validator has already failed
+          if (isValid === false) return false
+          // }
         }
-      }
+      })
     }
+  }
+
+  _setComponentValid (component, isValid, errMsg) {
+    component.setState({
+      isValid, errMsg
+    }, ::this._validateForm)
+  }
+
+  _validateForm () {
+    this.setState({ isValid: this.isValid })
   }
 }
 
