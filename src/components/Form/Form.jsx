@@ -81,6 +81,13 @@ class Form extends Component {
     })
   }
 
+  get errors () {
+    return reduce(this.inputs, (ret, component, key) => {
+      if (!component.isValid) ret[key] = component.state.errMsg
+      return ret
+    }, {})
+  }
+
   // actually, this method just set all input to dirty to make
   // sure the invalid message showed
   validate () {
@@ -115,18 +122,35 @@ class Form extends Component {
     if (validation) {
       const { value } = component.state
 
-      forEach(validation, (msg, validator) => {
-        const [ method, ...args ] = validator.split(/\s*:\s*/)
-        const fn = this.props.validator[method]
+      forEach(validation, (opt, validatorKey) => {
+        let isValid
+        // "isLength:1:6": "Your lenght should be 1 to 6."
+        if (typeof opt === 'string') {
+          const [ method, ...args ] = validatorKey.split(/\s*:\s*/)
+          const fn = this.props.validator[method]
 
-        if (typeof fn === 'function') {
-          // check form validation after input state change
-          const isValid = fn.apply(this.props.validator, [ value, ...args ])
-          this._setComponentValid(component, !!isValid, msg)
-
-          // stop validate if one of validator has already failed
-          if (isValid === false) return false
+          if (typeof fn === 'function') {
+            // check form validation after input state change
+            isValid = !!fn.apply(this.props.validator, [ value, ...args ])
+            this._setComponentValid(component, !!isValid, opt)
+          }
         }
+        // "isEqualToAnother": {
+        //   msg: "Should equal to another input",
+        //   validator: (val) => {
+        //
+        //   }
+        // }
+        else {
+          const { validator, msg } = opt
+          if (typeof validator === 'function') {
+            isValid = !!validator.call(component, value)
+            this._setComponentValid(component, !!isValid, msg)
+          }
+        }
+
+        // stop validate if one of validator has already failed
+        if (isValid === false) return false
       })
     }
   }

@@ -33,6 +33,18 @@ export default class Input extends Component {
     onChange: () => {}
   }
 
+  get value () {
+    return this.state.value
+  }
+
+  get isDirty () {
+    return this.state.isDirty
+  }
+
+  get isValid () {
+    return this.state.isValid
+  }
+
   constructor (props) {
     super(props)
 
