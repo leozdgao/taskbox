@@ -1,5 +1,6 @@
 var path = require('path')
-var app = require('express')()
+var express = require('express')
+var app = express()
 var server = require('http').createServer(app)
 
 var __IS_DEV__ = process.env['NODE_ENV'] === 'production'
@@ -23,6 +24,8 @@ if (__IS_DEV__) {
 
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
+
+app.use('/assets', express.static(path.join(__dirname, 'assets')))
 
 // mock api
 app.use('/api', require('./api'))
