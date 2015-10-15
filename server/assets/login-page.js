@@ -22,9 +22,11 @@ $(document).ready(function() {
         contentType: 'application/json',
         url: '/login',
         data: JSON.stringify(getFormValue()),
-        beforeSend: function () { $submitBtn.addClass('disabled') }
+        beforeSend: function () {
+          lockForm()
+        }
       }).done(function (res) {
-        if (res) {
+        if (res.code == 0) {
           location.href = '/'
         }
         else {
@@ -32,7 +34,7 @@ $(document).ready(function() {
         }
       }).fail(function () {
         setErrorMsg('Server error, try it later.')
-        $submitBtn.removeClass('disabled')
+        unLockForm()
       }).always(function () {
         requesting = false
       })
@@ -111,5 +113,21 @@ $(document).ready(function() {
     case 'pwd': return $pwdInput
     default: return void 0
     }
+  }
+
+  function lockForm () {
+    $uidInput.prop('disabled', true)
+    $pwdInput.prop('disabled', true)
+
+    $submitBtn.addClass('disabled')
+    $submitBtn.html('<i class="fa fa-circle-o-notch"></i>')
+  }
+
+  function unLockForm () {
+    $uidInput.prop('disabled', false)
+    $pwdInput.prop('disabled', false)
+
+    $submitBtn.removeClass('disabled')
+    $submitBtn.html('Login')
   }
 })

@@ -41,7 +41,7 @@ form .form-control {
 .form-group {
   position: relative;
 }
-.form-group .glyphicon {
+.form-group .fa {
   position: absolute;
   top: 13px;
   left: 13px;
@@ -64,4 +64,17 @@ form .btn-block {
 }
 .field.error {
   text-align: left;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.fa.fa-circle-o-notch {
+  animation: rotate 1s infinite;
 }

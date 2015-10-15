@@ -10,7 +10,7 @@ router.get('/', function (req, res) {
 router.use(bodyParser.json())
 
 router.post('/', function (req, res) {
-  var proxy = request.post(contants.LOGIN_API_URL, { body: req.body, json: true })
+  var proxy = request.post(contants.LOGIN_API_URL, { body: req.body, json: true, timeout: 5000 })
   proxy.pipe(res)
 
   proxy.on('error', function () {
