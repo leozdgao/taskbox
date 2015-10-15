@@ -181,7 +181,8 @@ export default class ScrollPanel extends Component {
         this.refs.scrollY.classList.remove('hover')
       }, 500)
 
-      const delta = e.deltaY > 0 ? 100 : -100
+      let delta = e.deltaY
+      if (navigator.platform !== 'MacIntel') delta = e.deltaY > 0 ? 100 : -100
 
       this._scrollByContent(delta)
     }
@@ -222,7 +223,7 @@ export default class ScrollPanel extends Component {
   }
 
   // content deltaY
-  _scrollByContent (deltaY) {console.log(deltaY)
+  _scrollByContent (deltaY) {
     let top = this.state.contentStyles.top - deltaY
     const maxScroll = this._contentHeight - this._panelHeight
 
