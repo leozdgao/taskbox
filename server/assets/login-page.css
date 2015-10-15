@@ -1,0 +1,67 @@
+html, body { height: 100%; }
+body {
+  background-color: #DADADA;
+  background-image: url('/assets/bkg.jpg');
+}
+body > .grid {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  margin: 0;
+}
+.loginpanel {
+  flex-direction: column;
+  vertical-align: middle;
+  align-self: center;
+  width: 100%;
+  max-width: 450px;
+  padding: 14px;
+  margin-bottom: 100px;
+  text-align: center;
+}
+.loginpanel .panel {
+  margin-bottom: 100px;
+  padding: 1em 1em 1.4em 1em;
+}
+.loginpanel .title {
+  display: inline-block;
+}
+.title .content {
+  font-size: 24px;
+  vertical-align: middle;
+  color: #eee;
+}
+
+form .form-control {
+  padding: 10px 16px;
+  padding-left: 36px;
+  height: 40px;
+}
+.form-group {
+  position: relative;
+}
+.form-group .glyphicon {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  color: rgba(0, 0, 0, 0.3);
+}
+.help-block {
+  text-align: left;
+  font-size: .9em;
+}
+.errormessage {
+  margin-bottom: 0;
+  color: #a94442;
+}
+
+form .btn-block {
+  padding: 12.5714px 24px;
+  /*height: 42px;*/
+  font-weight: bold;
+  line-height: 16px;
+}
+.field.error {
+  text-align: left;
+}

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import cNames from 'classnames'
 import validator from 'validator'
-import request from 'lgutil/common/ajax'
+import { json as request } from 'lgutil/common/ajax'
 import { Form } from '../../components'
 
 export default class FormDemo extends Component {
@@ -9,9 +9,7 @@ export default class FormDemo extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {
-
-    }
+    this.state = { }
   }
 
   render () {
@@ -27,9 +25,9 @@ export default class FormDemo extends Component {
           title='Task' placeholder='Enter Task Name' invalidClassName='error'
           msgClassName='ui basic red pointing prompt label transition visible zoomIn'
           validation={{
-            "isLength:1": "Your name is required.",
+            "isLength:1": 'Please retype your task.',
             "equalTo": {
-              msg: "Two name must be equal.",
+              msg: 'Two name must be equal.',
               validator: (val) => {
                 return val === this.refs.taskInput.value
               }
@@ -55,7 +53,7 @@ export default class FormDemo extends Component {
     console.log(form.errors)
 
     if (form.isValid) {
-      request.json.post('/api/task', form.body)
+      request.post('/api/task', form.body)
         .then(({ body, headers }) => {
           console.log(headers)
           console.log(body)
@@ -84,7 +82,7 @@ export default class FormDemo extends Component {
 
     if (user) {
       this._lrt = setTimeout(() => {
-        this._pending = request.json.post('/api/check', { user })
+        this._pending = request.post('/api/check', { user })
         this._pending.then(({ body }) => {
           nameInput.setValid(body.isValid, 'Your name has already existed.')
         })

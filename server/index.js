@@ -3,7 +3,7 @@ var express = require('express')
 var app = express()
 var server = require('http').createServer(app)
 
-var __IS_DEV__ = process.env['NODE_ENV'] === 'production'
+var __IS_DEV__ = (process.env['NODE_ENV'] !== 'production')
 
 if (__IS_DEV__) {
 
@@ -29,13 +29,10 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')))
 
 // mock api
 app.use('/api', require('./api'))
-
-app.get('/login', function (req, res) {
-  res.render('login')
-})
+app.use('/login', require('./login'))
 
 app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'index.html'))
+  res.render('index')
 })
 
 server.listen(3000, 'localhost', function (err) {
