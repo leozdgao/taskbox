@@ -31,6 +31,7 @@ $(document).ready(function() {
         }
         else {
           setErrorMsg('User does not exist or password miss matched.')
+          unLockForm()
         }
       }).fail(function () {
         setErrorMsg('Server error, try it later.')

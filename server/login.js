@@ -2,9 +2,14 @@ var router = require('express').Router()
 var bodyParser = require('body-parser')
 var request = require('request')
 var contants = require('./constants')
+var checkAuth = require('./checkAuth')
 
 router.get('/', function (req, res) {
-  res.render('login')
+  req.checkAuth(function () {
+    res.redirect('/')
+  }, function () {
+    res.render('login')
+  })
 })
 
 router.use(bodyParser.json())
