@@ -7,12 +7,14 @@ export default class Fade extends Component {
   static propTypes = {
     enterTimeout: PropTypes.number,
     leaveTimeout: PropTypes.number,
+    name: PropTypes.string,
     children: PropTypes.any
   }
 
   static defaultProps = {
     enterTimeout: 500,
-    leaveTimeout: 500
+    leaveTimeout: 500,
+    name: 'animate'
   }
 
   render () {
@@ -20,7 +22,7 @@ export default class Fade extends Component {
       <TimeoutTransitionGroup
         enterTimeout={this.props.enterTimeout}
         leaveTimeout={this.props.leaveTimeout}
-        transitionName='fade'>
+        transitionName={this.props.name}>
         {this.props.children}
       </TimeoutTransitionGroup>
     )

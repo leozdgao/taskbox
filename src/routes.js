@@ -1,18 +1,21 @@
 import React from 'react'
-import { Route } from 'react-router'
+import { IndexRoute, Route } from 'react-router'
 import * as containers from './containers'
 
 const {
   App,
-  ChatBox,
-  FormDemo,
-  DailyTask
+  Dashboard,
+  Task,
+  Team,
+  FormDemo
 } = containers
 
 export default (
-  <Route component={App}>
-    <Route path="/" component={ChatBox} />
+  <Route path="/" component={App}>
+    <IndexRoute component={Dashboard} />
+    <Route path="/task" component={Task} />
+    <Route path="/team" component={Team} />
+    {/* Test Route */}
     <Route path="/form" component={FormDemo} />
-    <Route path="/task" component={DailyTask} />
   </Route>
 )

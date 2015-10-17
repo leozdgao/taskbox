@@ -83,7 +83,7 @@ export default class ScrollPanel extends Component {
 
   render () {
     return (
-      <div ref='panel' className={cNames('scrollpanel', this.props.className)} onWheel={::this._handleWheel}>
+      <div ref='panel' {...this.props} className={cNames('scrollpanel', this.props.className)} onWheel={::this._handleWheel}>
         <div ref='content' className='scrollcontent' style={this.state.contentStyles}>
           {this.props.children}
         </div>

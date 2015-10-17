@@ -94,3 +94,23 @@
 .f-s-14 {
   font-size: 14px !important;
 }
+
+.slideDown-enter {
+  transition: all .5s;
+  transform: translateY(10px);
+  opacity: 0;
+}
+.slideDown-enter.slideDown-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slideDown-leave {
+  transition: all .5s;
+  transform: translateY(0);
+  opacity: 1;
+}
+.slideDown-leave.slideDown-leave-active {
+  transform: translateY(10px);
+  opacity: 0;
+}

@@ -1,6 +1,9 @@
 import React, { Component, PropTypes as T } from 'react'
+import { Link } from 'react-router'
 import cNames from 'classnames'
 import { Dropdown } from '../../components'
+
+import './navbar.less'
 
 export default class Navbar extends Component {
 
@@ -29,10 +32,10 @@ export default class Navbar extends Component {
       <div id='header' className='header navbar navbar-default navbar-fixed-top'>
         <div className='container-fluid'>
           <div className='navbar-header'>
-            <a className='navbar-brand'>
+            <Link className='navbar-brand' to="/">
               <span className='navbar-logo'></span>
               Task Box
-            </a>
+            </Link>
           </div>
           <ul className='nav navbar-nav navbar-right'>
             <li className='dropdown f-s-14'>

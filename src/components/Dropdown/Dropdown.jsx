@@ -1,5 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
-import Fade from '../Animate/Fade'
+import Animate from '../Animate/Animate'
 
 export default class Dropdown extends Component {
 
@@ -25,7 +25,7 @@ export default class Dropdown extends Component {
 
   render () {
     return (
-      <Fade>
+      <Animate name='slideDown'>
         {this.props.open ? (
           <ul ref='list' {...this.props}>
             {React.Children.map(this.props.children, (child) => {
@@ -35,7 +35,7 @@ export default class Dropdown extends Component {
             })}
           </ul>
         ): null}
-      </Fade>
+      </Animate>
     )
   }
 

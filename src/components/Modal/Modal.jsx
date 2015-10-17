@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import Portal from '../Portal/Portal'
 import cNames from 'classnames'
-import Fade from '../Animate/Fade'
+import Animate from '../Animate/Animate'
 import './modal.less'
 
 export default class Modal extends Component {
@@ -23,9 +23,9 @@ export default class Modal extends Component {
 
       return (
         <Portal>
-          <Fade enterTimeout={enterTimeout} leaveTimeout={leaveTimeout}>
+          <Animate enterTimeout={enterTimeout} leaveTimeout={leaveTimeout} name='fade'>
             {this.props.isShowed ? this._getModal() : null}
-          </Fade>
+          </Animate>
         </Portal>
       )
     }

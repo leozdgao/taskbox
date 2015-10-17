@@ -1,5 +1,15 @@
 import React from 'react'
+import { IndexLink, Link } from 'react-router'
 import { ScrollPanel } from '../../components'
+
+import './sidebar.less'
+
+const roleMap = {
+  '-1': 'Administrator',
+  '0': 'Intern',
+  '1': 'Team Member',
+  '2': 'Team Leader'
+}
 
 const Sidebar = ({ user }) => {
   const { avatar, name, role } = user
@@ -14,29 +24,29 @@ const Sidebar = ({ user }) => {
             </div>
             <div className="info">
               {name}
-              <small>Front end developer</small>
+              <small>{roleMap[role] || ''}</small>
             </div>
           </li>
         </ul>
         <ul className="nav">
 					<li className="nav-header">Navigation</li>
-					<li className="active">
-            <a>
+					<li>
+            <IndexLink to='/' activeClassName="active">
               <i className="fa fa-laptop"></i>
               <span>DashBoard</span>
-            </a>
+            </IndexLink>
           </li>
-          <li className="">
-            <a>
+          <li>
+            <Link to='/task' activeClassName="active">
               <i className="fa fa-calendar"></i>
               <span>Task</span>
-            </a>
+            </Link>
           </li>
           <li className="">
-            <a>
+            <Link to='/team' activeClassName="active">
               <i className="fa fa-users"></i>
               <span>Team</span>
-            </a>
+            </Link>
           </li>
 				</ul>
       </ScrollPanel>

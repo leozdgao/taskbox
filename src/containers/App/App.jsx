@@ -1,45 +1,32 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { Modal } from '../../components'
-import Navbar from './Navbar'
-import Sidebar from './Sidebar'
-import './app.less'
-import './navbar.less'
-import './sidebar.less'
+import { Navbar, Sidebar, ScrollPanel } from '../../components'
 
-const user = {
-  name: 'Leo Gao',
-  avatar: 'http://semantic-ui.com/images/avatar2/small/matthew.png',
-  role: 1
-}
+import './app.less'
+
 const msgNum = 3
 
 @connect(
-  state => ({})
+  state => ({
+    user: state.user
+  })
 )
 export default class Main extends Component {
 
   static propTypes = {
-    children: PropTypes.any.isRequired
-  }
-
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      isModalShowed: false
-    }
+    children: PropTypes.any.isRequired,
+    user: PropTypes.object
   }
 
   render () {
     return (
-      <div id='page-container' className='fade page-sidebar-fixed page-header-fixed in'>
-        <Navbar user={user} msgNum={msgNum} />
-        <Sidebar user={user} />
-        <div className='twelve wide stretched column'>
+      <div id='page-container'>
+        <Navbar user={this.props.user} msgNum={msgNum} />
+        <Sidebar user={this.props.user} />
+        <ScrollPanel id='content'>
           {/* this will render the child routes */}
           {React.cloneElement(this.props.children, this.props)}
-        </div>
+        </ScrollPanel>
       </div>
     )
   }
