@@ -24,8 +24,7 @@ export default class Main extends Component {
         <Navbar user={this.props.user} msgNum={msgNum} />
         <Sidebar user={this.props.user} />
         <ScrollPanel id='content'>
-          {/* this will render the child routes */}
-          {React.cloneElement(this.props.children, this.props)}
+          {React.cloneElement(this.props.children, { ...this.props })}
         </ScrollPanel>
       </div>
     )

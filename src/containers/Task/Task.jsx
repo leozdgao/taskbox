@@ -20,19 +20,38 @@ export default class Task extends Component {
     load: T.func
   }
 
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      loading: true
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { task } = nextProps
+    if (task.loading !== this.state.loading) {
+      this.setState({ loading: task.loading })
+    }
+  }
+
   componentDidMount () {
     this.props.load()
+  }
+
+  componentWillUnmount () {
+    TaskActions.dispose()
   }
 
   render () {
     const { task } = this.props
 
     return (
-      <Animate name='taskFade'>
-        {task.loading ? (
-          <Dimmer className='task-dimmer' />
+      <Animate name='fade'>
+        {this.state.loading ? (
+          <Dimmer key={0} className='task-dimmer' />
         ) : (
-          <div style={{ backgroundColor: 'black' }} key={1}>
+          <div style={{ backgroundColor: 'black', height: 200 }}>
             <div>Task</div>
             <div>{task.data.length}</div>
           </div>

@@ -13,9 +13,7 @@ const {
 export default (
   <Route path="/" component={App}>
     <IndexRoute component={Dashboard} />
-    <Route path="/task" component={Task} />
-    <Route path="/team" component={Team} />
-    {/* Test Route */}
-    <Route path="/form" component={FormDemo} />
+    <Route path="task" component={Task} />
+    <Route path="team" component={Team} />
   </Route>
 )

@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react'
 // import TimeoutTransitionGroup from 'timeout-transition-group'
 import TimeoutTransitionGroup from './TimeoutTransitionGroup'
 
+import './animate.less'
+
 export default class Fade extends Component {
 
   static propTypes = {

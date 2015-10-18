@@ -155,7 +155,8 @@ export default class ScrollPanel extends Component {
   _showScrollY () {
     this.setState({
       scrollYStyles: update(this.state.scrollYStyles, {
-        display: { $set: 'block' }
+        display: { $set: 'block' },
+        height: { $set: this._getScrollYHeight() }
       })
     })
   }

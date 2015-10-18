@@ -11,7 +11,7 @@ const roleMap = {
   '2': 'Team Leader'
 }
 
-const Sidebar = ({ user }) => {
+const Sidebar = ({ user = {} }) => {
   const { avatar, name, role } = user
 
   return (
@@ -42,7 +42,7 @@ const Sidebar = ({ user }) => {
               <span>Task</span>
             </Link>
           </li>
-          <li className="">
+          <li>
             <Link to='/team' activeClassName="active">
               <i className="fa fa-users"></i>
               <span>Team</span>

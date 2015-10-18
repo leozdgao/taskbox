@@ -19,7 +19,7 @@ if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {
 const history = createHistory()
 const root = (
   <Provider store={store} key="provider">
-    <Router history={history} children={routes} />
+    <Router history={history} routes={routes} />
   </Provider>
 )
 

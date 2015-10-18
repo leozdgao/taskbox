@@ -5,7 +5,7 @@ import './dimmer.less'
 const Dimmer = (props) => {
   return (
     <div {...props} className={cNames([ 'dimmer', props.className ])}>
-      <div className='ball-clip-rotate'><div></div></div>
+      <div className='spinner'><div></div></div>
     </div>
   )
 }

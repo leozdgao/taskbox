@@ -26,7 +26,7 @@ export default class Navbar extends Component {
   }
 
   render () {
-    const { msgNum, user } = this.props
+    const { msgNum, user = {} } = this.props
     const { avatar, name } = user
     return (
       <div id='header' className='header navbar navbar-default navbar-fixed-top'>
