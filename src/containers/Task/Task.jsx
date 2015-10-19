@@ -47,16 +47,19 @@ export default class Task extends Component {
     const { task } = this.props
 
     return (
-      <Animate name='fade'>
-        {this.state.loading ? (
-          <Dimmer key={0} className='task-dimmer' />
-        ) : (
-          <div style={{ backgroundColor: 'black', height: 200 }}>
-            <div>Task</div>
-            <div>{task.data.length}</div>
-          </div>
-        )}
-      </Animate>
+      <div>
+        <div className="page-header">Task Board</div>
+        <Animate name='fade'>
+          {this.state.loading ? (
+            <Dimmer key={0} className='task-dimmer' />
+          ) : (
+            <div style={{ backgroundColor: 'black', height: 200 }}>
+              <div>Task</div>
+              <div>{task.data.length}</div>
+            </div>
+          )}
+        </Animate>
+      </div>
     )
   }
 }

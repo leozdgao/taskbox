@@ -4,7 +4,7 @@ export default class Team extends Component {
 
   render () {
     return (
-      <div>Team</div>
+      <div className="page-header">Team</div>
     )
   }
 }
