@@ -43,7 +43,7 @@ router.get('/task', function (req, res) {
 
   setTimeout(function () {
     res.json(tasks)
-  }, 3000)
+  }, 1000)
 })
 
 router.post('/check', function (req, res) {

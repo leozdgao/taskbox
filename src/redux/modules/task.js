@@ -19,44 +19,7 @@ const initState = {
 }
 
 let requests = []
-
-// function createDispoableReducer (init, actionHandler) {
-//   let requests = []
-//
-//   return (state = init, action) => {
-//     actionHandler(action)
-//   }
-// }
-//
-
-const middleware = ({ dispatch, getState }) => next => action => {
-
-}
-
-const cachableRequest = (promiseCreator, timeout, promised) => {
-  // cache last time result, omit it if promise rejected
-  let lastResolve
-
-  return (...args) => {
-    if (lastResolve) return Promise.resolve(lastResolve)
-    else {
-      const promise = promiseCreator.apply(promiseCreator, args)
-      promised.call(promised, promise)
-      return promise.then((body) => {
-        lastResolve = body
-
-        // clear cache
-        setTimeout(() => {
-          lastResolve = null
-        }, timeout)
-
-        return body
-      })
-    }
-  }
-}
 const cacheRequest = promise => requests.push(promise)
-const loadTask =  cachableRequest(request.get, 5000, cacheRequest)
 
 export default function (state = initState, action) {
   switch (action.type) {
@@ -86,14 +49,16 @@ export default function (state = initState, action) {
 
 // action for load task
 export function load () {
-  // const pending = request.get(TASK_LOAD_API_URL)
-  const pending  = loadTask(TASK_LOAD_API_URL)
+  // const pending = smartRequest(TASK_LOAD_API_URL)
   return {
     types: [ LOAD_TASK_PENDING, LOAD_TASK_FETCHED, LOAD_TASK_FAILED ],
+    cacheable: true,
     payload: {
-      promise: pending,
-      data: pending
-    }
+      promiseCreator: request.get,
+      args: [ TASK_LOAD_API_URL ]
+    },
+    timeout: 5000,
+    onPromised: cacheRequest
   }
 }
 

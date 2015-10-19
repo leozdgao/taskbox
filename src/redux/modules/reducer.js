@@ -7,7 +7,7 @@ const rootReducer = combineReducers({
   // just hold the state
   user: (state = {}, action) => {
     // set default avatar
-    if (!state.avatar) state.avatar = 'http://semantic-ui.com/images/avatar2/small/matthew.png'
+    if (!state.avatar) state.avatar = '/assets/avatar.png'
     return state
   },
   task
