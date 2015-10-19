@@ -38,6 +38,7 @@ app.use(function (req, res, next) {
 // mock api
 app.use('/api', require('./api'))
 app.use('/login', require('./login'))
+app.use('/logout', require('./logout'))
 
 app.get('*', function (req, res) {
   req.checkAuth(function (body) {

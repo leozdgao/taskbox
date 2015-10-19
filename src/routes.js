@@ -7,13 +7,16 @@ const {
   Dashboard,
   Task,
   Team,
-  FormDemo
+  Page404
 } = containers
 
 export default (
-  <Route path="/" component={App}>
-    <IndexRoute component={Dashboard} />
-    <Route path="task" component={Task} />
-    <Route path="team" component={Team} />
+  <Route>
+    <Route path="/" component={App}>
+      <IndexRoute component={Dashboard} />
+      <Route path="task" component={Task} />
+      <Route path="team" component={Team} />
+    </Route>
+    <Route path="*" component={Page404} />
   </Route>
 )

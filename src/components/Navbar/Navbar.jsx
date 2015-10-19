@@ -53,7 +53,7 @@ export default class Navbar extends Component {
                 <option><a><i className='fa fa-user'></i>Profile</a></option>
                 <option><a><i className='fa fa-cog'></i>Settings</a></option>
                 <option className='divider'></option>
-                <option><a><i className='fa fa-sign-out'></i>Logout</a></option>
+                <option><a href="/logout"><i className='fa fa-sign-out'></i>Logout</a></option>
               </Dropdown>
             </li>
           </ul>
