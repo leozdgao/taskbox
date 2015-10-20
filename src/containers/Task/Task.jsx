@@ -53,12 +53,31 @@ export default class Task extends Component {
           {this.state.loading ? (
             <Dimmer key={0} className='task-dimmer' />
           ) : (
-            <div style={{ backgroundColor: 'black', height: 200 }}>
-              <div>Task</div>
-              <div>{task.data.length}</div>
+            <div>
+              {task.data.map(this.getTaskPanel)}
             </div>
           )}
         </Animate>
+      </div>
+    )
+  }
+
+  getTaskPanel (task) {
+    return (
+      <div key={task.id} className='col-lg-6'>
+        <div className='panel panel-inverse'>
+          <div className='panel-heading'>
+            <div className='panel-btn-heading'>
+              <a className='btn btn-xs btn-icon btn-circle btn-warning'>
+                <i className="fa fa-minus"></i>
+              </a>
+            </div>
+            <h4 className='panel-title'>{task.title}</h4>
+          </div>
+          <div className='panel-body'>
+            
+          </div>
+        </div>
       </div>
     )
   }
