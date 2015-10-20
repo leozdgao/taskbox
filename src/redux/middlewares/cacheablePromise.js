@@ -19,7 +19,7 @@ const cachableRequest = (promiseCreator, timeout, onPromised) => {
       onPromised.call(onPromised, promise)
       return promise.then((body) => {
         cacheMap[cacheKey] = body
-        
+
         // clear cache
         if (timeout > 0) {
           setTimeout(() => {
@@ -33,7 +33,7 @@ const cachableRequest = (promiseCreator, timeout, onPromised) => {
   }
 }
 
-const middleware = ({ dispatch, getState }) => next => action => {
+export default ({ dispatch, getState }) => next => action => {
   const { cacheable, timeout, onPromised, types } = action
   if (cacheable) {
     const { promiseCreator, args } = action.payload || {}
@@ -64,5 +64,3 @@ const middleware = ({ dispatch, getState }) => next => action => {
   }
   else next(action)
 }
-
-export default middleware

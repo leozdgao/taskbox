@@ -2,7 +2,7 @@ import React, { Component, PropTypes as T } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, Toggle, ScrollPanel } from '../../components'
+import { Animate, Dimmer, TaskPanel, Modal } from '../../components'
 import './task.less'
 
 @connect(
@@ -24,7 +24,8 @@ export default class Task extends Component {
     super(props)
 
     this.state = {
-      loading: true
+      loading: true,
+      isModalShowed: false
     }
   }
 
@@ -65,20 +66,18 @@ export default class Task extends Component {
   getTaskPanel (task) {
     return (
       <div key={task.id} className='col-lg-6'>
-        <div className='panel panel-inverse'>
-          <div className='panel-heading'>
-            <div className='panel-btn-heading'>
-              <a className='btn btn-xs btn-icon btn-circle btn-warning'>
-                <i className="fa fa-minus"></i>
-              </a>
-            </div>
-            <h4 className='panel-title'>{task.title}</h4>
-          </div>
-          <div className='panel-body'>
-            
-          </div>
-        </div>
+        <TaskPanel task={task} onClick={::this._handleTaskClick(task.id)} />
+        {/* portal */}
+        <Modal isShowed={this.state.isModalShowed} transitionTimeout={500}>
+
+        </Modal>
       </div>
     )
+  }
+
+  _handleTaskClick (id) {
+    return () => {
+
+    }
   }
 }
