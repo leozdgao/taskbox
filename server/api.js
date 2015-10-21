@@ -1,6 +1,13 @@
 var router = require('express').Router()
 var bodyParser = require('body-parser')
+var request = require('request')
 var contants = require('./constants')
+
+// proxy to rest server
+router.use('/rest', function (req, res) {
+  var url = contants.REST_API_URL + req.path + '?token=' + req.cookies.token || ''
+  req.pipe(request(url)).pipe(res)
+})
 
 router.use(bodyParser.json())
 

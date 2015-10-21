@@ -41,7 +41,7 @@
     object-shorthand: 1
     constructor-super: 2
     no-this-before-super: 2
-    generator-star-spacing: 2
+    generator-star-spacing: 0
 
     # Variables
     no-use-before-define: [2, nofunc]

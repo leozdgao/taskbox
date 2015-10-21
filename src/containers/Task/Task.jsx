@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { TaskActions } from '../../redux/modules'
+import { TaskActions, ResourceActions } from '../../redux/modules'
 import { Animate, Dimmer, TaskPanel, Modal } from '../../components'
 import './task.less'
 
@@ -10,6 +10,9 @@ import './task.less'
     task: state.task
   }),
   dispatch => ({
+    loadResource: () => {
+      dispatch(ResourceActions.load())
+    },
     ...bindActionCreators(TaskActions, dispatch)
   })
 )
@@ -17,7 +20,8 @@ export default class Task extends Component {
 
   static propTypes = {
     task: T.object,
-    load: T.func
+    load: T.func,
+    loadResource: T.func
   }
 
   constructor (props) {
@@ -38,6 +42,7 @@ export default class Task extends Component {
 
   componentDidMount () {
     this.props.load()
+    this.props.loadResource()
   }
 
   componentWillUnmount () {
@@ -55,7 +60,7 @@ export default class Task extends Component {
             <Dimmer key={0} className='task-dimmer' />
           ) : (
             <div>
-              {task.data.map(this.getTaskPanel)}
+              {task.data.map(::this.getTaskPanel)}
             </div>
           )}
         </Animate>

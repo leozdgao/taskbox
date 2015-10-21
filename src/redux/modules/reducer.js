@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import chats from './chat'
 import task from './task'
+import resource from './resource'
 
 
 const rootReducer = combineReducers({
@@ -10,7 +11,8 @@ const rootReducer = combineReducers({
     if (!state.avatar) state.avatar = '/assets/avatar.png'
     return state
   },
-  task
+  task,
+  resource
 })
 
 
