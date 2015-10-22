@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Navbar, Sidebar, ScrollPanel } from '../../components'
 
 import './app.less'
+import './btn.less'
 
 const msgNum = 3
 

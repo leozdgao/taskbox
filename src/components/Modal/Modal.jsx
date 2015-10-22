@@ -10,6 +10,7 @@ export default class Modal extends Component {
     isShowed: T.bool.isRequired,
     dimmerClassName: T.string,
     modalClassName: T.string,
+    animateName: T.string,
     transitionTimeout: T.number,
     enterTimeout: T.number,
     leaveTimeout: T.number,
@@ -20,10 +21,11 @@ export default class Modal extends Component {
     if (this._needTransition()) {
       const enterTimeout = this.props.enterTimeout || this.props.transitionTimeout
       const leaveTimeout = this.props.leaveTimeout || this.props.transitionTimeout
+      const animateName = this.props.animateName
 
       return (
         <Portal>
-          <Animate enterTimeout={enterTimeout} leaveTimeout={leaveTimeout} name='fade'>
+          <Animate enterTimeout={enterTimeout} leaveTimeout={leaveTimeout} name={animateName}>
             {this.props.isShowed ? this._getModal() : null}
           </Animate>
         </Portal>
@@ -45,6 +47,7 @@ export default class Modal extends Component {
   }
 
   _needTransition () {
-    return !!(this.props.transitionTimeout || this.props.enterTimeout || this.props.leaveTimeout)
+    // return !!(this.props.transitionTimeout || this.props.enterTimeout || this.props.leaveTimeout)
+    return !!this.props.animateName
   }
 }

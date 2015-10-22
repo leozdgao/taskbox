@@ -13,6 +13,8 @@
 .panel-btn-heading {
   float: right;
 
+  .btn-icon.btn-xs { line-height: 18px; }
+
   &>a { margin-left: 8px; }
 }
 .panel-title {
@@ -20,6 +22,7 @@
 }
 .panel-title {
   line-height: 20px;
+  font-weight: 700;
 }
 
 .label-brand {
@@ -29,7 +32,6 @@
   padding: 7px 14px 7px 28px;
   margin: 0;
   border-radius: 0 4px 4px 0;
-  border-color: #b21e1e;
   font-size: 12px;
   line-height: 1;
   cursor: default;
@@ -51,5 +53,27 @@
   &.red {
     color: #fff;
     background-color: #db2828;
+    border-color: #b21e1e;
+  }
+
+  &.blue {
+    color: #fff;
+    background-color: #2185d0;
+    border-color: #1a69a4;
+  }
+
+  &.orange {
+    color: #fff;
+    background-color: #f2711c;
+    border-color: #cf590c;
+  }
+
+  &.teal {
+    color: #fff;
+    background-color: #009c95;
+    border-color: #00827c;
   }
 }
+
+.task-body { margin-top: 20px; line-height: 1.5; }
+.task-title { font-size: 14px; font-weight: bold; }

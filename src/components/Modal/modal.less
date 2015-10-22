@@ -1,47 +1,49 @@
-.ui.modal {
+.modal-dimmer {
   display: block;
-  transition: all 0.2s;
-
-  &.dialog {
-    top: 30%;
-    @media only screen and (min-width: 768px) {
-      margin: 0 0 0 -300px;
-      width: 600px;
-    }
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, .3);
+  z-index: 1001;
+  transition: all .3s;
 }
-
-.ui.dimmer {
-  display: block;
-  opacity: 1;
-  transition: all 0.2s;
-  background-color: rgba(0, 0, 0, .7);
-  z-index: 1000;
+.modal-dialog {
+  transition: all .3s;
 }
 
 // transition mixins
 .modalIn() {
-  &.dimmer {
+  &.modal-dimmer {
     opacity: 0;
   }
 
-  .modal {
+  .modal-dialog {
+    opacity: 0;
     transform: scale(0.7);
   }
 }
 
 .modalOut() {
-  &.dimmer {
+  &.modal-dimmer {
     opacity: 1;
   }
 
-  .modal {
+  .modal-dialog {
+    opacity: 1;
     transform: scale(1);
   }
 }
 
-.fade-enter { .modalIn() }
-.fade-enter.fade-enter-active { .modalOut() }
+.modalFade-enter {
+  .modalIn();
+  .modal-dialog { transition-delay: .1s}
+}
+.modalFade-enter.modalFade-enter-active { .modalOut() }
 
-.fade-leave { .modalOut() }
-.fade-leave.fade-leave-active { .modalIn() }
+.modalFade-leave {
+  .modalOut();
+  &.modal-dimmer { transition-delay: .2s}
+}
+.modalFade-leave.modalFade-leave-active { .modalIn() }

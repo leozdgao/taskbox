@@ -1,6 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import findWhere from 'lodash/collection/findWhere'
 import { TaskActions, ResourceActions } from '../../redux/modules'
 import { Animate, Dimmer, TaskPanel, Modal } from '../../components'
 import './task.less'
@@ -10,10 +11,9 @@ import './task.less'
     task: state.task
   }),
   dispatch => ({
-    loadResource: () => {
-      dispatch(ResourceActions.load())
-    },
-    ...bindActionCreators(TaskActions, dispatch)
+    ...bindActionCreators({
+      ...TaskActions
+    }, dispatch)
   })
 )
 export default class Task extends Component {
@@ -29,7 +29,8 @@ export default class Task extends Component {
 
     this.state = {
       loading: true,
-      isModalShowed: false
+      isModalShowed: false,
+      taskIdInModal: -1
     }
   }
 
@@ -42,7 +43,6 @@ export default class Task extends Component {
 
   componentDidMount () {
     this.props.load()
-    this.props.loadResource()
   }
 
   componentWillUnmount () {
@@ -60,7 +60,17 @@ export default class Task extends Component {
             <Dimmer key={0} className='task-dimmer' />
           ) : (
             <div>
-              {task.data.map(::this.getTaskPanel)}
+              {task.data.map((t) =>
+                <div key={t.id} className='col-lg-6'>
+                  <TaskPanel task={t} onSeal={::this._handleTaskSeal(t.id)} onAlert={() => {}} />
+                </div>
+              )}
+              {/* portal */}
+              <Modal isShowed={this.state.isModalShowed}
+                animateName='modalFade' transitionTimeout={500}
+                dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
+                {this._getModalContent()}
+              </Modal>
             </div>
           )}
         </Animate>
@@ -68,21 +78,37 @@ export default class Task extends Component {
     )
   }
 
-  getTaskPanel (task) {
+  _getModalContent () {
     return (
-      <div key={task.id} className='col-lg-6'>
-        <TaskPanel task={task} onClick={::this._handleTaskClick(task.id)} />
-        {/* portal */}
-        <Modal isShowed={this.state.isModalShowed} transitionTimeout={500}>
-
-        </Modal>
+      <div className="modal-content">
+        <div>
+          <div className="modal-header">
+            <button type="button" className="close" onClick={::this._hideModal}>
+              <span aria-hidden="true">×</span>
+            </button>
+            <h4 className="modal-title">
+              Modal title
+            </h4>
+          </div>
+          <div className="modal-body">
+            <p>One fine body…</p>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-sm btn-white" onClick={::this._hideModal}>Close</button>
+            <button type="button" className="btn btn-sm btn-success">Save changes</button>
+          </div>
+        </div>
       </div>
     )
   }
 
-  _handleTaskClick (id) {
+  _handleTaskSeal (id) {
     return () => {
-
+      this.setState({ isModalShowed: true, taskIdInModal: id })
     }
+  }
+
+  _hideModal () {
+    this.setState({ isModalShowed: false })
   }
 }

@@ -41,20 +41,20 @@ export default ({ dispatch, getState }) => next => action => {
       const smartRequest = cachableRequest(promiseCreator, timeout, onPromised)
       const promise = smartRequest.apply(null, args)
 
-      const [ pendingAction, resolvedAction, rejectedAction ] = types
-      next({
-        type: pendingAction,
-        payload: promise
-      })
+      // const [ pendingAction, resolvedAction, rejectedAction ] = types
+      // next({
+      //   type: pendingAction,
+      //   payload: promise
+      // })
 
       promise.then((val) => {
         next({
-          type: resolvedAction,
+          type: action.type,
           payload: val
         })
       }).catch((e) => {
         next({
-          type: rejectedAction,
+          type: action.type,
           payload: e,
           error: true
         })

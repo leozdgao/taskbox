@@ -25,9 +25,9 @@ router.get('/logout', function (req, res) {
 router.get('/task', function (req, res) {
   const tasks = [
     {
-      id: '0', title: 'task name', assignee: [ 20, 21 ],
+      id: '0', title: 'Banc of California - Web Document Transfer to Encompass ', assignee: [ 20, 21 ],
       sealed: false,
-      description: 'new project',
+      description: 'New project',
       checklist: {
         dev: {
           a: 0,
@@ -40,10 +40,12 @@ router.get('/task', function (req, res) {
         }
       },
       activities: [],
+      type: 'SOW',
       tags: []
     },
     {
-      id: '1', title: 'task name', assignee: [ 23, 21 ],
+      id: '1', title: 'Task Box improvement', assignee: [ 23, 21 ],
+      description: 'This Statement of Work ("SOW") supplements, is attached to, and is incorporated into the Encompass Agreement (“Agreement”) by and between Ellie Mae, Inc., a Delaware corporation with principal offices at 4420 Rosewood Drive, Suite 500 Pleasanton CA 94588 (“Ellie Mae”), and Banc of California, N. A. (“Customer”), and describes the work to be per formed by Ellie Mae (”Service”) purchased by Customer.   ',
       checklist: {}
     }
   ]
