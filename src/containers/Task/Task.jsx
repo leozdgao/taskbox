@@ -2,13 +2,14 @@ import React, { Component, PropTypes as T } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import findWhere from 'lodash/collection/findWhere'
-import { TaskActions, ResourceActions } from '../../redux/modules'
+import { TaskActions } from '../../redux/modules'
 import { Animate, Dimmer, TaskPanel, Modal } from '../../components'
 import './task.less'
 
 @connect(
   state => ({
-    task: state.task
+    task: state.task,
+    resource: state.resource.data || [] // only take data, don't care error
   }),
   dispatch => ({
     ...bindActionCreators({
@@ -21,7 +22,7 @@ export default class Task extends Component {
   static propTypes = {
     task: T.object,
     load: T.func,
-    loadResource: T.func
+    checkEntry: T.func,
   }
 
   constructor (props) {
@@ -50,7 +51,7 @@ export default class Task extends Component {
   }
 
   render () {
-    const { task } = this.props
+    const { task, checkEntry } = this.props
 
     return (
       <div>
@@ -60,9 +61,12 @@ export default class Task extends Component {
             <Dimmer key={0} className='task-dimmer' />
           ) : (
             <div>
-              {task.data.map((t) =>
+              {task.data.map((t, i) =>
                 <div key={t.id} className='col-lg-6'>
-                  <TaskPanel task={t} onSeal={::this._handleTaskSeal(t.id)} onAlert={() => {}} />
+                  <TaskPanel task={t}
+                    onSeal={::this._handleTaskSeal(t.id)}
+                    onAlert={() => {}}
+                    onEntryClick={checkEntry.bind(null, i)}/>
                 </div>
               )}
               {/* portal */}
@@ -86,9 +90,7 @@ export default class Task extends Component {
             <button type="button" className="close" onClick={::this._hideModal}>
               <span aria-hidden="true">×</span>
             </button>
-            <h4 className="modal-title">
-              Modal title
-            </h4>
+            <h4 className="modal-title">Modal title</h4>
           </div>
           <div className="modal-body">
             <p>One fine body…</p>

@@ -1,7 +1,7 @@
 /* global __DEVTOOLS__ */
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import promiseMiddleware from 'redux-promise-middleware'
+import promiseMiddleware from 'redux-promise'
 import createLogger from 'redux-logger'
 import cacheablePromise from './middlewares/cacheablePromise'
 import rootReducer from './modules/reducer'

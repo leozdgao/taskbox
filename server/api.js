@@ -25,19 +25,19 @@ router.get('/logout', function (req, res) {
 router.get('/task', function (req, res) {
   const tasks = [
     {
-      id: '0', title: 'Banc of California - Web Document Transfer to Encompass ', assignee: [ 20, 21 ],
+      id: '0', title: 'Banc of California - Web Document Transfer to Encompass', assignee: [ 20, 21 ],
       sealed: false,
       description: 'New project',
       checklist: {
-        dev: {
-          a: 0,
-          b: 1,
-          c: 0
-        },
-        test: {
-          aa: 0,
-          bb: 1
-        }
+        Development: [
+          { title: 'Check react-router', checked: false },
+          { title: 'Emb processOn to project', checked: true },
+          { title: 'Add socket.io', checked: false }
+        ],
+        Test: [
+          { title: 'Write TestReport and Installation', checked: false },
+          { title: 'Upload test case', checked: true }
+        ]
       },
       activities: [],
       type: 'SOW',

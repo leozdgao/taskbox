@@ -1,0 +1,49 @@
+.todolist-container {
+  display: block;
+  color: #333;
+  transition: all .3s;
+  cursor: pointer;
+
+  &:hover, &:focus {
+    background: #fafafa;
+    text-decoration: none;
+
+    .todolist-input i:before {
+      content: '\f14a';
+      opacity: .4;
+      color: #2d353c;
+    }
+  }
+
+  &.active, &.active:focus, &.active:hover {
+    .todolist-input i:before {
+      content: '\f14a';
+      color: #00acac;
+      opacity: 1;
+    }
+    .todolist-title {
+      text-decoration: line-through;
+    }
+  }
+}
+
+.todolist-input, .todolist-title {
+  display: table-cell;
+  padding: 10px;
+}
+
+.todolist-input {
+  text-align: center;
+  font-size: 14px;
+  padding-left: 15px;
+
+  i {
+    display: block;
+    width: 14px;
+    text-align: center;
+  }
+}
+
+.todolist-title {
+  padding-right: 15px;
+}
