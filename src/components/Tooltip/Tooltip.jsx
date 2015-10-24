@@ -1,29 +1,22 @@
 import React, { Component, PropTypes as T } from 'react'
+import cNames from 'classnames'
 import './tooltip.less'
 
 export default class Tooltip extends Component {
 
   static propTypes = {
-    title: T.string,
-    component: T.string,
     placement: T.oneOf([ 'left', 'top', 'right', 'bottom' ]),
-    children: T.any
-  }
-
-  static defaultProps = {
-    component: 'span'
+    className: T.string,
+    children: T.any,
+    style: T.object
   }
 
   render () {
-    const tooltip = this.props.title
-      ? <div className='tooltip'>{this.props.title}</div>
-      : null
-
-    return React.createElement(
-      this.props.component,
-      { className: 'tooltip-container' },
-      React.Children.only(this.props.children),
-      tooltip
+    return (
+      <div style={this.props.style} className={cNames([ 'tooltip', this.props.className, this.props.placement ])}>
+        <div className='tooltip-arrow'></div>
+        <div className='tooltip-inner'>{this.props.children}</div>
+      </div>
     )
   }
 }

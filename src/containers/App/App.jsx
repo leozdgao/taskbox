@@ -11,7 +11,8 @@ const msgNum = 3
 
 @connect(
   state => ({
-    user: state.user
+    user: state.user,
+    resource: state.resource
   }),
   dispatch => ({
     ...bindActionCreators({
@@ -21,10 +22,24 @@ const msgNum = 3
 )
 export default class Main extends Component {
 
+  // define global state
+  static childContextTypes = {
+    currentUser: PropTypes.object,
+    resourceInfo: PropTypes.array
+  }
+
+  getChildContext () {
+    return {
+      currentUser: this.props.user,
+      resourceInfo: Array.isArray(this.props.resource) ? this.props.resource : [] // may error obj
+    }
+  }
+
   static propTypes = {
     children: PropTypes.any.isRequired,
     user: PropTypes.object,
-    loadResource: PropTypes.func
+    loadResource: PropTypes.func,
+    resource: PropTypes.array
   }
 
   componentDidMount () {

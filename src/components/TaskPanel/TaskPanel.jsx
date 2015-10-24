@@ -1,10 +1,12 @@
 import React, { Component, PropTypes as T } from 'react'
+import { Overlay } from 'react-overlays'
 import cNames from 'classnames'
 import map from 'lodash/collection/map'
 import forEach from 'lodash/collection/forEach'
 import countBy from 'lodash/collection/countBy'
 import CheckEntry from '../CheckEntry/CheckEntry'
 import ProgressBar from '../ProgressBar/ProgressBar'
+import OverlayTrigger from '../OverlayTrigger/OverlayTrigger'
 import Tooltip from '../Tooltip/Tooltip'
 import './taskpanel.less'
 
@@ -54,11 +56,18 @@ export default class TaskPanel extends Component {
           <div className='task-body'>
             <h4 className='task-title' style={{ color: '#666' }}>Members</h4>
             <div className='task-members'>
-              {map(assignee, (resourceId, i) =>
-                <Tooltip key={i} component='span'>
-                  <a><img src='http://localhost:3000/assets/avatar.png' /></a>
-                </Tooltip>
-              )}
+              {map(assignee, (resourceId, i) => {
+                const tooltip = (
+                  <Tooltip placement='bottom'>Leo Gao {resourceId}</Tooltip>
+                )
+                return (
+                  <OverlayTrigger key={i} event='hover' placement='bottom' overlay={tooltip}>
+                    <a key={i}>
+                      <img src='/assets/avatar.png' />
+                    </a>
+                  </OverlayTrigger>
+                )
+              })}
             </div>
           </div>
           <div className='task-body'>

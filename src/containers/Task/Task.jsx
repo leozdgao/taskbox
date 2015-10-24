@@ -8,8 +8,7 @@ import './task.less'
 
 @connect(
   state => ({
-    task: state.task,
-    resource: state.resource.data || [] // only take data, don't care error
+    task: state.task
   }),
   dispatch => ({
     ...bindActionCreators({
@@ -19,9 +18,12 @@ import './task.less'
 )
 export default class Task extends Component {
 
+  static contextTypes = {
+    currentUser: T.object
+  }
+
   static propTypes = {
     task: T.object,
-    resource: T.array,
     load: T.func,
     checkEntry: T.func,
   }
@@ -52,7 +54,7 @@ export default class Task extends Component {
   }
 
   render () {
-    const { task, resource, checkEntry } = this.props
+    const { task, checkEntry } = this.props
 
     return (
       <div>
@@ -62,14 +64,7 @@ export default class Task extends Component {
             <Dimmer key={0} className='task-dimmer' />
           ) : (
             <div className='row'>
-              {task.data.map((t, i) =>
-                <div key={t.id} className='col-lg-6'>
-                  <TaskPanel task={t} resource={resource}
-                    onSeal={::this._handleTaskSeal(t.id)}
-                    onAlert={() => {}}
-                    onEntryClick={checkEntry.bind(null, i)} />
-                </div>
-              )}
+              {task.data.map(::this._getTaskPanel)}
               {/* portal */}
               <Modal isShowed={this.state.isModalShowed}
                 animateName='modalFade' transitionTimeout={500}
@@ -79,6 +74,18 @@ export default class Task extends Component {
             </div>
           )}
         </Animate>
+      </div>
+    )
+  }
+
+  _getTaskPanel (t, i) {
+    const { checkEntry } = this.props
+    return (
+      <div key={t.id} className='col-lg-6'>
+        <TaskPanel task={t}
+          onSeal={::this._handleTaskSeal(t.id)}
+          onAlert={() => {}}
+          onEntryClick={checkEntry.bind(null, i)} />
       </div>
     )
   }
