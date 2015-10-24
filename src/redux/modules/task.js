@@ -3,10 +3,6 @@ import { json as request } from 'lgutil/common/ajax'
 
 const TASK_LOAD_API_URL = '/api/task'
 
-// const LOAD_TASK_PENDING = 'LOAD_TASK_PENDING'
-// const LOAD_TASK_FETCHED = 'LOAD_TASK_FETCHED'
-// const LOAD_TASK_FAILED = 'LOAD_TASK_FAILED'
-
 const LOAD_TASK = 'LOAD_TASK'
 const TASK_CHECK_ENTRY = 'TASK_CHECK_ENTRY'
 

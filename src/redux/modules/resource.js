@@ -5,10 +5,6 @@ const RESOURCE_LOAD_API_URL = '/api/rest/resource'
 
 const LOAD_RESOURCE = 'LOAD_RESOURCE'
 
-const LOAD_RESOURCE_PENDING = 'LOAD_RESOURCE_PENDING'
-const LOAD_RESOURCE_FETCHED = 'LOAD_RESOURCE_FETCHED'
-const LOAD_RESOURCE_FAILED = 'LOAD_RESOURCE_FAILED'
-
 const initState = {
   data: [],
   loading: true,
@@ -20,7 +16,7 @@ export default (state = initState, action) => {
   case LOAD_RESOURCE: {
     const field = action.error ? 'error' : 'data'
     return update(state, {
-      [field]: { $set: JSON.parse(action.payload.body) },
+      [field]: { $set: action.payload.body },
       loading: { $set: false }
     })
   }

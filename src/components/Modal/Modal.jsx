@@ -1,5 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
-import Portal from '../Portal/Portal'
+import { Portal } from 'react-overlays'
 import cNames from 'classnames'
 import Animate from '../Animate/Animate'
 import './modal.less'

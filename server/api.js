@@ -6,7 +6,10 @@ var contants = require('./constants')
 // proxy to rest server
 router.use('/rest', function (req, res) {
   var url = contants.REST_API_URL + req.path + '?token=' + req.cookies.token || ''
-  req.pipe(request(url)).pipe(res)
+  req.pipe(request(url))
+    .on('error', function () {
+      res.status(500).json({ error: 1 })
+    }).pipe(res)
 })
 
 router.use(bodyParser.json())

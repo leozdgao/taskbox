@@ -21,6 +21,7 @@ export default class Task extends Component {
 
   static propTypes = {
     task: T.object,
+    resource: T.array,
     load: T.func,
     checkEntry: T.func,
   }
@@ -51,7 +52,7 @@ export default class Task extends Component {
   }
 
   render () {
-    const { task, checkEntry } = this.props
+    const { task, resource, checkEntry } = this.props
 
     return (
       <div>
@@ -60,13 +61,13 @@ export default class Task extends Component {
           {this.state.loading ? (
             <Dimmer key={0} className='task-dimmer' />
           ) : (
-            <div>
+            <div className='row'>
               {task.data.map((t, i) =>
                 <div key={t.id} className='col-lg-6'>
-                  <TaskPanel task={t}
+                  <TaskPanel task={t} resource={resource}
                     onSeal={::this._handleTaskSeal(t.id)}
                     onAlert={() => {}}
-                    onEntryClick={checkEntry.bind(null, i)}/>
+                    onEntryClick={checkEntry.bind(null, i)} />
                 </div>
               )}
               {/* portal */}

@@ -19,19 +19,21 @@ export default class TaskPanel extends Component {
 
   static propTypes = {
     task: T.object.isRequired,
+    resource: T.array,
     onEntryClick: T.func,
     onSeal: T.func,
     onAlert: T.func
   }
 
   static defaultProps = {
+    resource: [],
     onEntryClick: noop,
     onSeal: noop,
     onAlert: noop
   }
 
   render () {
-    const { task } = this.props
+    const { task, resource } = this.props
     const { checklist, assignee } = task
 
     return (

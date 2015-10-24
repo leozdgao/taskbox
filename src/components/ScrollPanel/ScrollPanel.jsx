@@ -127,11 +127,11 @@ export default class ScrollPanel extends Component {
   //
 
   _refreshDOMValue () {
-    this._contentHeight = this._getContentHeight()
-    this._panelHeight = this._getPanelHeight()
+    // this._contentHeight = this._getContentHeight()
+    // this._panelHeight = this._getPanelHeight()
   }
 
-  _getContentHeight () {
+  get _contentHeight () {
     const contentStyles = window.getComputedStyle(this.refs.content)
     const panelStyles = window.getComputedStyle(this.refs.panel)
 
@@ -140,7 +140,7 @@ export default class ScrollPanel extends Component {
      parseInt(panelStyles['padding-top'], 10) + parseInt(panelStyles['padding-bottom'], 10)
   }
 
-  _getPanelHeight () {
+  get _panelHeight () {
     return this.refs.panel.clientHeight
   }
 
