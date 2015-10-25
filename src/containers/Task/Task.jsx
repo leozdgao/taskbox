@@ -1,4 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
+import { Link } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import findWhere from 'lodash/collection/findWhere'
@@ -59,6 +60,10 @@ export default class Task extends Component {
     return (
       <div>
         <div className="page-header">Task Board</div>
+        <ol className="breadcrumb">
+          <li><Link to='/'>Dashboard</Link></li>
+          <li className="active">Task</li>
+        </ol>
         <Animate name='fade'>
           {this.state.loading ? (
             <Dimmer key={0} className='task-dimmer' />

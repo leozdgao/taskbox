@@ -12,7 +12,7 @@ const Fade = (props) => {
       enteredClassName="in"
       enteringClassName="in"
       unmountOnExit={false}
-      transitionAppear={false}
+      transitionAppear
       in={props.in}
     >
       {props.children}

@@ -48,6 +48,12 @@ const Sidebar = ({ user = {} }) => {
               <span>Team</span>
             </Link>
           </li>
+          <li>
+            <Link to='/doc' activeClassName="active">
+              <i className="fa fa-book"></i>
+              <span>Document</span>
+            </Link>
+          </li>
 				</ul>
       </ScrollPanel>
     </div>

@@ -7,6 +7,7 @@ const {
   Dashboard,
   Task,
   Team,
+  Document,
   Page404
 } = containers
 
@@ -16,6 +17,7 @@ export default (
       <IndexRoute component={Dashboard} />
       <Route path="task" component={Task} />
       <Route path="team" component={Team} />
+      <Route path="doc" component={Document} />
     </Route>
     <Route path="*" component={Page404} />
   </Route>

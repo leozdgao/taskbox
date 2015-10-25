@@ -8,3 +8,5 @@ export { default as Dimmer } from './Dimmer/Dimmer'
 export { default as Navbar } from './Navbar/Navbar'
 export { default as Sidebar } from './Sidebar/Sidebar'
 export { default as TaskPanel } from './TaskPanel/TaskPanel'
+
+export { default as Editor } from './Editor/Editor'

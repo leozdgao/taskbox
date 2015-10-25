@@ -62,7 +62,7 @@ export default class TaskPanel extends Component {
                 )
                 return (
                   <OverlayTrigger key={i} event='hover' placement='bottom' overlay={tooltip}>
-                    <a key={i}>
+                    <a href='javascript:;' key={i}>
                       <img src='/assets/avatar.png' />
                     </a>
                   </OverlayTrigger>
