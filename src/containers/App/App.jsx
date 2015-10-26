@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component, PropTypes as T } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { ResourceActions } from '../../redux/modules'
@@ -24,22 +24,22 @@ export default class Main extends Component {
 
   // define global state
   static childContextTypes = {
-    currentUser: PropTypes.object,
-    resourceInfo: PropTypes.array
+    currentUser: T.object,
+    resourceInfo: T.array
   }
 
   getChildContext () {
     return {
       currentUser: this.props.user,
-      resourceInfo: Array.isArray(this.props.resource) ? this.props.resource : [] // may error obj
+      resourceInfo: Array.isArray(this.props.resource.data) ? this.props.resource.data : [] // return empty array if error
     }
   }
 
   static propTypes = {
-    children: PropTypes.any.isRequired,
-    user: PropTypes.object,
-    loadResource: PropTypes.func,
-    resource: PropTypes.array
+    children: T.any.isRequired,
+    user: T.object,
+    loadResource: T.func,
+    resource: T.array
   }
 
   componentDidMount () {

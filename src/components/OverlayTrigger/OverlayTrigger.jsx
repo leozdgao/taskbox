@@ -1,9 +1,28 @@
 import React, { Component, PropTypes as T } from 'react'
 import ReactDOM from 'react-dom'
-import { Overlay } from 'react-overlays'
+import { Overlay, Transition } from 'react-overlays'
 import contains from 'dom-helpers/query/contains'
-import Fade from '../Fade/Fade'
 import { isOneOf, createChainedFunction } from '../utils'
+
+// react-overlays animation
+export const Fade = (props) => {
+  const timeout = props.timeout || 300
+
+  return (
+    <Transition
+      {...props}
+      timeout={timeout}
+      className="fade"
+      enteredClassName="in"
+      enteringClassName="in"
+      unmountOnExit={false}
+      transitionAppear
+      in={props.in}
+    >
+      {props.children}
+    </Transition>
+  )
+}
 
 export default class OverlayTrigger extends Component {
   static propTypes = {

@@ -27,6 +27,10 @@ export default class Task extends Component {
     task: T.object,
     load: T.func,
     checkEntry: T.func,
+    addEntry: T.func,
+    removeEntry: T.func,
+    addCheckList: T.func,
+    removeCheckList: T.func
   }
 
   constructor (props) {
@@ -43,6 +47,7 @@ export default class Task extends Component {
     const { task } = nextProps
     if (task.loading !== this.state.loading) {
       this.setState({ loading: task.loading })
+      // this.setState({ loading: true })
     }
   }
 
@@ -55,7 +60,7 @@ export default class Task extends Component {
   }
 
   render () {
-    const { task, checkEntry } = this.props
+    const { task } = this.props
 
     return (
       <div>
@@ -84,13 +89,17 @@ export default class Task extends Component {
   }
 
   _getTaskPanel (t, i) {
-    const { checkEntry } = this.props
+    const { checkEntry, addEntry, removeEntry, addCheckList, removeCheckList } = this.props
     return (
       <div key={t.id} className='col-lg-6'>
         <TaskPanel task={t}
           onSeal={::this._handleTaskSeal(t.id)}
           onAlert={() => {}}
-          onEntryClick={checkEntry.bind(null, i)} />
+          onEntryClick={this._handleModify(checkEntry.bind(this), i)}
+          onEntryAdd={this._handleModify(addEntry.bind(this), i)}
+          onEntryRemove={this._handleModify(removeEntry.bind(this), i)}
+          onCheckListAdd={this._handleModify(addCheckList.bind(this), i)}
+          onCheckListRemove={this._handleModify(removeCheckList.bind(this), i)} />
       </div>
     )
   }
@@ -125,5 +134,22 @@ export default class Task extends Component {
 
   _hideModal () {
     this.setState({ isModalShowed: false })
+  }
+
+  _handleModify (func, ...args) {
+    const sync = () => {
+      console.log('change')
+      this._syncDone = false
+    }
+
+    return (...others) => {
+      const newArg = [].concat(args, others)
+      func.apply(this, newArg)
+
+      if (!this._syncDone) {
+        this._syncDone = true
+        setTimeout(sync, 2000)
+      }
+    }
   }
 }

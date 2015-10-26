@@ -28,14 +28,14 @@
 }
 
 .todolist-input, .todolist-title {
-  display: table-cell;
   padding: 10px;
 }
 
 .todolist-input {
+  float: left;
   text-align: center;
   font-size: 14px;
-  padding-left: 15px;
+  padding: 12px 15px;
 
   i {
     display: block;
@@ -46,4 +46,9 @@
 
 .todolist-title {
   padding-right: 15px;
+  .fa { padding: 4px 0; opacity: 0; }
+
+  &:hover .fa {
+    opacity: 1;
+  }
 }

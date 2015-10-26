@@ -19,10 +19,18 @@ const noop = () => {}
 
 export default class TaskPanel extends Component {
 
+  static contextTypes = {
+    resourceInfo: T.array
+  }
+
   static propTypes = {
     task: T.object.isRequired,
     resource: T.array,
     onEntryClick: T.func,
+    onEntryAdd: T.func,
+    onEntryRemove: T.func,
+    onCheckListAdd: T.func,
+    onCheckListRemove: T.func,
     onSeal: T.func,
     onAlert: T.func
   }
@@ -30,6 +38,10 @@ export default class TaskPanel extends Component {
   static defaultProps = {
     resource: [],
     onEntryClick: noop,
+    onEntryAdd: noop,
+    onEntryRemove: noop,
+    onCheckListAdd: noop,
+    onCheckListRemove: noop,
     onSeal: noop,
     onAlert: noop
   }
@@ -58,7 +70,7 @@ export default class TaskPanel extends Component {
             <div className='task-members'>
               {map(assignee, (resourceId, i) => {
                 const tooltip = (
-                  <Tooltip placement='bottom'>Leo Gao {resourceId}</Tooltip>
+                  <Tooltip placement='bottom'>{this._getResourceName(resourceId)}</Tooltip>
                 )
                 return (
                   <OverlayTrigger key={i} event='hover' placement='bottom' overlay={tooltip}>
@@ -76,6 +88,12 @@ export default class TaskPanel extends Component {
           </div>
           <div className='task-body'>
             {this._getCheckList(checklist)}
+            <div className='new-checklist'>
+              <i className='fa fa-check-circle-o pull-left'></i>
+              <div>
+                <input type="text" className="form-control lean-control mb-10" placeholder="Add new CheckList..." onKeyDown={::this._handleAddCheckList} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -101,8 +119,13 @@ export default class TaskPanel extends Component {
 
         return (
           <div key={key}>
-            <h4 className='task-title'><i className='fa fa-check-circle-o'></i>{key}</h4>
-            <ProgressBar percantage={percantage} title={percantage + '%'} />
+            <h4 className='task-title'>
+              <i className='fa fa-check-circle-o'></i>
+              {key}
+              <a href='javascript:;' className='pull-right' onClick={this._handleRemoveCheckList.bind(this, key)}>Delete</a>
+            </h4>
+            {isNaN(percantage) ? null : <ProgressBar percantage={percantage} title={percantage + '%'} />}
+            <input type="text" className="form-control lean-control mb-10" placeholder="Add new item..." onKeyDown={this._handleAddItem.bind(this, key)} />
             {this._getTodoList(checklist, key)}
           </div>
         )
@@ -112,18 +135,50 @@ export default class TaskPanel extends Component {
 
   _getTodoList (checklist, key) {
     const obj = checklist[key]
-    // const todos = [], done = []
-    // forEach(obj, (checked, title) => {
-    //   if (checked) done.push(title)
-    //   else todos.push(title)
-    // })
 
     return (
       <div>
         {map(obj, ({ checked, title }, i) =>
-          <CheckEntry key={title} onClick={() => this.props.onEntryClick(key, i)} checked={checked}>{title}</CheckEntry>
+          <CheckEntry key={title} onClick={() => this.props.onEntryClick(key, i)} checked={checked}>
+            {title}
+            <i className='fa fa-times-circle pull-right' onClick={(e) => {
+              e.stopPropagation()
+              this.props.onEntryRemove(key, i)
+            }}></i>
+          </CheckEntry>
         )}
       </div>
     )
+  }
+
+  _getResourceName (resourceId) {
+    const { resourceInfo } = this.context
+
+    for (let i = 0; i < resourceInfo.length; i++) {
+      const resource = resourceInfo[i]
+      if (resource.resourceId === resourceId) {
+        return resource.name
+      }
+    }
+  }
+
+  _handleAddItem (key, e) {
+    const val = e.currentTarget.value.trim()
+    if (e.keyCode === 13 && val) {
+      this.props.onEntryAdd(key, val)
+      e.currentTarget.value = ''
+    }
+  }
+
+  _handleAddCheckList (e) {
+    const val = e.currentTarget.value.trim()
+    if (e.keyCode === 13 && val) {
+      this.props.onCheckListAdd(val)
+      e.currentTarget.value = ''
+    }
+  }
+
+  _handleRemoveCheckList (key, e) {
+    this.props.onCheckListRemove(key)
   }
 }

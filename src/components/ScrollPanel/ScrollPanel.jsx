@@ -187,6 +187,10 @@ export default class ScrollPanel extends Component {
 
       this._scrollByContent(delta)
     }
+    else {
+      // make sure scroll to top if need not scroll any more
+      this.setState(this._constructScrollYUpdateState(0, 0))
+    }
   }
 
   _handleScrollMouseDown (e) {
