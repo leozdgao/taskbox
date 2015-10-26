@@ -173,23 +173,25 @@ export default class ScrollPanel extends Component {
 
   _handleWheel (e) {
     // need scrollY
-    if (e.deltaY && this._needScrollY()) {
-      e.preventDefault()
+    if (e.deltaY) {
+      if (this._needScrollY()) {
+        e.preventDefault()
 
-      this.refs.scrollY.classList.add('hover')
-      if (this._ltr) clearTimeout(this._ltr)
-      this._ltr = setTimeout(() => {
-        this.refs.scrollY.classList.remove('hover')
-      }, 500)
+        this.refs.scrollY.classList.add('hover')
+        if (this._ltr) clearTimeout(this._ltr)
+        this._ltr = setTimeout(() => {
+          this.refs.scrollY.classList.remove('hover')
+        }, 500)
 
-      let delta = e.deltaY
-      if (navigator.platform !== 'MacIntel') delta = e.deltaY > 0 ? 100 : -100
+        let delta = e.deltaY
+        if (navigator.platform !== 'MacIntel') delta = e.deltaY > 0 ? 100 : -100
 
-      this._scrollByContent(delta)
-    }
-    else {
-      // make sure scroll to top if need not scroll any more
-      this.setState(this._constructScrollYUpdateState(0, 0))
+        this._scrollByContent(delta)
+      }
+      else {
+        // make sure scroll to top if need not scroll any more
+        this.setState(this._constructScrollYUpdateState(0, 0))
+      }
     }
   }
 

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import { Link } from 'react-router'
 import cNames from 'classnames'
-import { Dropdown } from '../../components'
+import { DropdownList } from '../../components'
 
 import './navbar.less'
 
@@ -49,12 +49,12 @@ export default class Navbar extends Component {
                 <img src={avatar} />
                 <span className='hidden-xs'>{name}</span><b className='caret'></b>
               </a>
-              <Dropdown className='dropdown-menu' open={this.state.userOpened} onHide={() => this.setState({ userOpened: false })}>
+              <DropdownList className='dropdown-menu' animateName='slideDown' open={this.state.userOpened} onHide={() => this.setState({ userOpened: false })}>
                 <option><a><i className='fa fa-user'></i>Profile</a></option>
                 <option><a><i className='fa fa-cog'></i>Settings</a></option>
                 <option className='divider'></option>
                 <option><a href="/logout"><i className='fa fa-sign-out'></i>Logout</a></option>
-              </Dropdown>
+              </DropdownList>
             </li>
           </ul>
         </div>

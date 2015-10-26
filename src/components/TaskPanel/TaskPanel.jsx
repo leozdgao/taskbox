@@ -1,13 +1,11 @@
 import React, { Component, PropTypes as T } from 'react'
+import update from 'react-addons-update'
 import { Overlay } from 'react-overlays'
 import cNames from 'classnames'
 import map from 'lodash/collection/map'
 import forEach from 'lodash/collection/forEach'
 import countBy from 'lodash/collection/countBy'
-import CheckEntry from '../CheckEntry/CheckEntry'
-import ProgressBar from '../ProgressBar/ProgressBar'
-import OverlayTrigger from '../OverlayTrigger/OverlayTrigger'
-import Tooltip from '../Tooltip/Tooltip'
+import { CheckEntry, ProgressBar, OverlayTrigger, Tooltip, Dropdown } from '../../components'
 import './taskpanel.less'
 
 const styleMap = {
@@ -44,6 +42,23 @@ export default class TaskPanel extends Component {
     onCheckListRemove: noop,
     onSeal: noop,
     onAlert: noop
+  }
+
+  constructor (props) {
+    super(props)
+
+    const init = {}
+    const { task } = props
+    const { checklist } = task
+
+    for (const key in checklist) {
+      if (!checklist.hasOwnProperty(key)) continue
+      init[key] = false
+    }
+
+    this.state = {
+      dropdown: init
+    }
   }
 
   render () {
@@ -122,7 +137,13 @@ export default class TaskPanel extends Component {
             <h4 className='task-title'>
               <i className='fa fa-check-circle-o'></i>
               {key}
-              <a href='javascript:;' className='pull-right' onClick={this._handleRemoveCheckList.bind(this, key)}>Delete</a>
+              <a href='javascript:;' className='pull-right' onClick={this._showDropdown.bind(this, key)}>Delete</a>
+              <Dropdown open={this.state.dropdown[key]} onHide={this._hideDropdown.bind(this, key)}>
+                <div className='rm-dropdown'>
+                  <p>Remove this checkList?</p>
+                  <button className='btn btn-xs btn-danger' onClick={this._handleRemoveCheckList.bind(this, key)}>Remove</button>
+                </div>
+              </Dropdown>
             </h4>
             {isNaN(percantage) ? null : <ProgressBar percantage={percantage} title={percantage + '%'} />}
             <input type="text" className="form-control lean-control mb-10" placeholder="Add new item..." onKeyDown={this._handleAddItem.bind(this, key)} />
@@ -180,5 +201,21 @@ export default class TaskPanel extends Component {
 
   _handleRemoveCheckList (key, e) {
     this.props.onCheckListRemove(key)
+  }
+
+  _hideDropdown (key) {
+    this.setState({
+      dropdown: update(this.state.dropdown, {
+        [key]: { $set: false }
+      })
+    })
+  }
+
+  _showDropdown (key) {
+    this.setState({
+      dropdown: update(this.state.dropdown, {
+        [key]: { $set: true }
+      })
+    })
   }
 }

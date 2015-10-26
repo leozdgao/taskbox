@@ -6,6 +6,7 @@ export default class Dropdown extends Component {
   static propTypes = {
     open: T.bool,
     onHide: T.func,
+    animateName: T.string,
     children: T.any
   }
 
@@ -24,19 +25,17 @@ export default class Dropdown extends Component {
   }
 
   render () {
-    return (
-      <Animate name='slideDown'>
-        {this.props.open ? (
-          <ul ref='list' {...this.props}>
-            {React.Children.map(this.props.children, (child) => {
-              if (child.type === 'option') {
-                return <li {...child.props}>{child.props.children}</li>
-              }
-            })}
-          </ul>
-        ): null}
-      </Animate>
-    )
+    const child = this.props.open ? this.props.children : null
+    const { animateName } = this.props
+
+    if (animateName) {
+      return (
+        <Animate name={animateName}>
+          {child}
+        </Animate>
+      )
+    }
+    else return child
   }
 
   _handleClick () {
