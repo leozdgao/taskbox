@@ -7,6 +7,9 @@ export default class Dropdown extends Component {
     open: T.bool,
     onHide: T.func,
     animateName: T.string,
+    leaveTimeout: T.number,
+    enterTimeout: T.number,
+    transitionTimeout: T.number,
     children: T.any
   }
 
@@ -26,11 +29,13 @@ export default class Dropdown extends Component {
 
   render () {
     const child = this.props.open ? this.props.children : null
-    const { animateName } = this.props
+    const { animateName, enterTimeout, leaveTimeout, transitionTimeout } = this.props
 
     if (animateName) {
       return (
-        <Animate name={animateName}>
+        <Animate name={animateName}
+          enterTimeout={enterTimeout || transitionTimeout}
+          leaveTimeout={leaveTimeout || transitionTimeout}>
           {child}
         </Animate>
       )

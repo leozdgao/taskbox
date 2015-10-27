@@ -72,6 +72,7 @@
     "history": "^1.9.1",
     "lgutil": "^0.2.5",
     "lodash": "^3.10.1",
+    "qs": "^5.2.0",
     "react": "^0.14.0",
     "react-addons-shallow-compare": "^0.14.0",
     "react-addons-transition-group": "^0.14.0",

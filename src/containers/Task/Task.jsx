@@ -20,6 +20,7 @@ import './task.less'
 export default class Task extends Component {
 
   static contextTypes = {
+    socket: T.object,
     currentUser: T.object
   }
 
@@ -30,7 +31,9 @@ export default class Task extends Component {
     addEntry: T.func,
     removeEntry: T.func,
     addCheckList: T.func,
-    removeCheckList: T.func
+    removeCheckList: T.func,
+    syncTask: T.func,
+    updateCheckList: T.func
   }
 
   constructor (props) {
@@ -41,6 +44,8 @@ export default class Task extends Component {
       isModalShowed: false,
       taskIdInModal: -1
     }
+    this._dirtyList = []
+    this._handleSyncTask = this._handleSyncTask.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -52,11 +57,15 @@ export default class Task extends Component {
   }
 
   componentDidMount () {
-    this.props.load()
+    const { currentUser, socket } = this.context
+    this.props.load(currentUser.resourceId)
+    socket.on('syncTask', this._handleSyncTask)
   }
 
   componentWillUnmount () {
+    const { socket } = this.context
     TaskActions.dispose()
+    socket.removeListener('syncTask', this._handleSyncTask)
   }
 
   render () {
@@ -90,16 +99,17 @@ export default class Task extends Component {
 
   _getTaskPanel (t, i) {
     const { checkEntry, addEntry, removeEntry, addCheckList, removeCheckList } = this.props
+    const handleModify = this._handleModify(i)
     return (
-      <div key={t.id} className='col-lg-6'>
+      <div key={t._id} className='col-lg-6'>
         <TaskPanel task={t}
-          onSeal={::this._handleTaskSeal(t.id)}
+          onSeal={::this._handleTaskSeal(t._id)}
           onAlert={() => {}}
-          onEntryClick={this._handleModify(checkEntry.bind(this), i)}
-          onEntryAdd={this._handleModify(addEntry.bind(this), i)}
-          onEntryRemove={this._handleModify(removeEntry.bind(this), i)}
-          onCheckListAdd={this._handleModify(addCheckList.bind(this), i)}
-          onCheckListRemove={this._handleModify(removeCheckList.bind(this), i)} />
+          onEntryClick={handleModify(checkEntry.bind(this), i)}
+          onEntryAdd={handleModify(addEntry.bind(this), i)}
+          onEntryRemove={handleModify(removeEntry.bind(this), i)}
+          onCheckListAdd={handleModify(addCheckList.bind(this), i)}
+          onCheckListRemove={handleModify(removeCheckList.bind(this), i)} />
       </div>
     )
   }
@@ -136,20 +146,32 @@ export default class Task extends Component {
     this.setState({ isModalShowed: false })
   }
 
-  _handleModify (func, ...args) {
-    const sync = () => {
-      console.log('change')
-      this._syncDone = false
-    }
+  _handleModify (taskIndex) {
+    return (func, ...args) => {
+      const { updateCheckList } = this.props
+      const sync = () => {
+        const task = this.props.task.data[taskIndex]
+        updateCheckList(task._id, task.checklist, ({ body }) => {
+          const { socket } = this.context
+          console.log('emit')
+          socket.emit('syncTask', body.new)
+        })
+      }
 
-    return (...others) => {
-      const newArg = [].concat(args, others)
-      func.apply(this, newArg)
+      return (...others) => {
+        const newArg = [].concat(args, others)
+        func.apply(this, newArg)
 
-      if (!this._syncDone) {
-        this._syncDone = true
-        setTimeout(sync, 2000)
+        if (this._dirtyList[taskIndex]) clearTimeout(this._dirtyList[taskIndex])
+
+        const ltr = setTimeout(sync, 1000)
+        this._dirtyList[taskIndex] = ltr
       }
     }
+  }
+
+  _handleSyncTask (task) {
+    const { syncTask } = this.props
+    syncTask(task)
   }
 }

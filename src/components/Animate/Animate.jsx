@@ -4,7 +4,7 @@ import TimeoutTransitionGroup from './TimeoutTransitionGroup'
 
 import './animate.less'
 
-export default class Fade extends Component {
+export default class Animate extends Component {
 
   static propTypes = {
     enterTimeout: PropTypes.number,

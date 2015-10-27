@@ -51,13 +51,13 @@ export default class TaskPanel extends Component {
     const { task } = props
     const { checklist } = task
 
-    for (const key in checklist) {
-      if (!checklist.hasOwnProperty(key)) continue
-      init[key] = false
-    }
+    // for (const key in checklist) {
+    //   if (!checklist.hasOwnProperty(key)) continue
+    //   init[key] = false
+    // }
 
     this.state = {
-      dropdown: init
+      dropdown: checklist.map(() => false)
     }
   }
 
@@ -116,14 +116,14 @@ export default class TaskPanel extends Component {
   }
 
   _getCheckList (checklist) {
-    const checkKeys = Object.keys(checklist)
-    if (checkKeys.length <= 0) {
+    if (checklist.length <= 0) {
       return null
     }
     else {
-      return checkKeys.map((key) => {
+      return checklist.map((list, listIndex) => {
         let i = 0, count = 0
-        forEach(checklist[key], ({ checked }) => {
+        const { name, items } = list
+        forEach(items, ({ checked }) => {
           if (checked) i++
           count ++
         })
@@ -133,38 +133,38 @@ export default class TaskPanel extends Component {
         }
 
         return (
-          <div key={key}>
+          <div key={name}>
             <h4 className='task-title'>
               <i className='fa fa-check-circle-o'></i>
-              {key}
-              <a href='javascript:;' className='pull-right' onClick={this._showDropdown.bind(this, key)}>Delete</a>
-              <Dropdown open={this.state.dropdown[key]} onHide={this._hideDropdown.bind(this, key)}>
+              {name}
+              <a href='javascript:;' className='pull-right' onClick={this._showDropdown.bind(this, listIndex)}>Delete</a>
+              <Dropdown animateName='fade' transitionTimeout={300} open={this.state.dropdown[listIndex]} onHide={this._hideDropdown.bind(this, listIndex)}>
                 <div className='rm-dropdown'>
                   <p>Remove this checkList?</p>
-                  <button className='btn btn-xs btn-danger' onClick={this._handleRemoveCheckList.bind(this, key)}>Remove</button>
+                  <button className='btn btn-xs btn-danger' onClick={this._handleRemoveCheckList.bind(this, listIndex)}>Remove</button>
                 </div>
               </Dropdown>
             </h4>
             {isNaN(percantage) ? null : <ProgressBar percantage={percantage} title={percantage + '%'} />}
-            <input type="text" className="form-control lean-control mb-10" placeholder="Add new item..." onKeyDown={this._handleAddItem.bind(this, key)} />
-            {this._getTodoList(checklist, key)}
+            <input type="text" className="form-control lean-control mb-10" placeholder="Add new item..." onKeyDown={this._handleAddItem.bind(this, listIndex)} />
+            {this._getTodoList(checklist, listIndex)}
           </div>
         )
       })
     }
   }
 
-  _getTodoList (checklist, key) {
-    const obj = checklist[key]
+  _getTodoList (checklist, listIndex) {
+    const { name, items } = checklist[listIndex]
 
     return (
       <div>
-        {map(obj, ({ checked, title }, i) =>
-          <CheckEntry key={title} onClick={() => this.props.onEntryClick(key, i)} checked={checked}>
+        {map(items, ({ checked, title }, i) =>
+          <CheckEntry key={title} onClick={() => this.props.onEntryClick(listIndex, i)} checked={checked}>
             {title}
             <i className='fa fa-times-circle pull-right' onClick={(e) => {
               e.stopPropagation()
-              this.props.onEntryRemove(key, i)
+              this.props.onEntryRemove(listIndex, i)
             }}></i>
           </CheckEntry>
         )}

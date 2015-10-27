@@ -1,4 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
+import IO from 'socket.io-client'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { ResourceActions } from '../../redux/modules'
@@ -8,6 +9,10 @@ import './app.less'
 import './btn.less'
 
 const msgNum = 3
+const socket = IO()
+socket.on('error', (e) => {
+  console.log('socket error')
+})
 
 @connect(
   state => ({
@@ -24,12 +29,14 @@ export default class Main extends Component {
 
   // define global state
   static childContextTypes = {
+    socket: T.object,
     currentUser: T.object,
     resourceInfo: T.array
   }
 
   getChildContext () {
     return {
+      socket,
       currentUser: this.props.user,
       resourceInfo: Array.isArray(this.props.resource.data) ? this.props.resource.data : [] // return empty array if error
     }
@@ -39,7 +46,7 @@ export default class Main extends Component {
     children: T.any.isRequired,
     user: T.object,
     loadResource: T.func,
-    resource: T.array
+    resource: T.object
   }
 
   componentDidMount () {
