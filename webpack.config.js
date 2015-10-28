@@ -42,8 +42,5 @@ module.exports = {
         exclude: /node_modules/
       }
     ]
-  },
-  externals: {
-    socketIO: 'io'
   }
 }

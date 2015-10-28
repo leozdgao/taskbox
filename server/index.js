@@ -1,10 +1,21 @@
 var path = require('path')
+var fs = require('fs')
+var assign = require('object-assign')
 var express = require('express')
 var cookieParser = require('cookie-parser')
 var app = express()
 var server = require('http').createServer(app)
 var checkAuth = require('./checkAuth')
 
+var assetsOutput = path.join(__dirname, 'assets')
+var viewsOutput = path.join(__dirname, 'views')
+var manifest = {}
+;([ 'assets-client.json', 'rev-manifest.json' ]).forEach(function (name) {
+  var content = fs.readFileSync(path.join(assetsOutput, name))
+  try {
+    manifest = assign(manifest, JSON.parse(content))
+  } catch (e) { }
+})
 var __IS_DEV__ = (process.env['NODE_ENV'] !== 'production')
 
 if (__IS_DEV__) {
@@ -25,9 +36,9 @@ if (__IS_DEV__) {
 }
 
 app.set('view engine', 'hbs')
-app.set('views', path.join(__dirname, 'views'))
+app.set('views', viewsOutput)
 
-app.use('/assets', express.static(path.join(__dirname, 'assets')))
+app.use('/assets', express.static(assetsOutput))
 
 app.use(cookieParser())
 app.use(function (req, res, next) {
@@ -45,7 +56,9 @@ app.get('*', function (req, res) {
     res.render('index', {
       data: JSON.stringify({
         user: body.user || {}
-      })
+      }),
+      manifest: manifest,
+      isDev: __IS_DEV__
     })
   }, function () {
     res.redirect('/login')
