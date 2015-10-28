@@ -12,12 +12,12 @@ module.exports = function (server) {
       console.log('user disconnected')
     })
 
-    socket.on('syncTask', function (task) {console.log('sync task');
+    socket.on('syncTask', function (task) {
       socket.broadcast.emit('syncTask', task)
     })
 
     socket.on('error', function () {
-      
+
     })
   })
 }

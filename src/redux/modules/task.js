@@ -10,12 +10,7 @@ const NEW_TASK = 'NEW_TASK'
 const UPDATE_TASK = 'UPDATE_TASK'
 const SYNC_TASK = 'SYNC_TASK'
 
-const TASK_CHECK_ENTRY = 'TASK_CHECK_ENTRY'
-const TASK_ADD_ENTRY = 'TASK_ADD_ENTRY'
-const TASK_REMOVE_ENTRY = 'TASK_REMOVE_ENTRY'
-
-const TASK_ADD_CHECKLIST = 'TASK_ADD_CHECKLIST'
-const TASK_REMOVE_CHECKLIST = 'TASK_REMOVE_CHECKLIST'
+const TASK_MODIFY = 'TASK_MODIFY'
 
 // - abortable
 // - cacheable
@@ -37,6 +32,50 @@ const getToday = () => {
   return d
 }
 
+
+// ======================== actions for task entry===========================
+const applyFunc = {
+  nor: (val) => !val
+}
+const replaceApplyFunc = function replaceApplyFunc (body) {
+  for (const key in body) {
+    if (!body.hasOwnProperty(key)) continue
+
+    const val = body[key]
+    if (typeof val === 'object') body[key] = replaceApplyFunc(val)
+    else body[key] = applyFunc[val]
+  }
+
+  return body
+}
+export const updateBodyMap = {
+  checkEntry: (taskIndex, listIndex, itemIndex) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { [itemIndex]: { checked: { $apply: 'nor' } } } } } } }),
+  addEntry: (taskIndex, listIndex, val) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { $push: [ { checked: false, title: val } ] } } } } }),
+  removeEntry: (taskIndex, listIndex, itemIndex) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { $splice: [ [ itemIndex, 1 ] ] } } } } }),
+  addCheckList: (taskIndex, newList) => ({ [taskIndex]: { checklist: { $push: [ { name: newList, items: [] } ] } } }),
+  removeCheckList: (taskIndex, listIndex) => ({ [taskIndex]: { checklist: { $splice: [ [ listIndex, 1 ] ] } } })
+}
+const taskActionBuilder = (actions, type) => {
+  const ret = {}
+  actions.forEach((actionName) => {
+    const bodyBuilder = updateBodyMap[actionName]
+    if (typeof bodyBuilder === 'function') {
+      ret[actionName] = (...args) => {
+        const body = bodyBuilder.apply(null, args)
+
+        return {
+          type,
+          payload: body
+        }
+      }
+    }
+  })
+
+  return ret
+}
+
+export const taskModifyActionCreators = taskActionBuilder(Object.keys(updateBodyMap), TASK_MODIFY)
+
 export default function (state = initState, action) {
   switch (action.type) {
   case LOAD_TASK: {
@@ -46,51 +85,12 @@ export default function (state = initState, action) {
       loading: { $set: false }
     })
   }
-  case SYNC_TASK: {
-    const { task } = action.payload
-    let taskIndex = -1
-    for (let i = 0; i < state.data.length; i++) {
-      const old = state.data[i]
-      if (old._id === task._id) {
-        taskIndex = i; break
-      }
-    }
+  case TASK_MODIFY: {
+    let updateBody = action.payload
+    updateBody = replaceApplyFunc(updateBody)
 
     return update(state, {
-      data: { [taskIndex]: { $set: task } }
-    })
-  }
-  case TASK_CHECK_ENTRY: {
-    const { taskIndex, listIndex, itemIndex } = action.payload
-    return update(state, {
-      data: { [taskIndex]: { checklist: { [listIndex]: { items: { [itemIndex]: { checked: { $apply: (val) => !val } } } } } } }
-    })
-  }
-  case TASK_ADD_ENTRY: {
-    const { taskIndex, listIndex, val } = action.payload
-    return update(state, {
-      data: { [taskIndex]: { checklist: { [listIndex]: { items: { $push: [ { checked: false, title: val } ] } } } } }
-    })
-  }
-  case TASK_REMOVE_ENTRY: {
-    const { taskIndex, listIndex, itemIndex } = action.payload
-    return update(state, {
-      data: { [taskIndex]: { checklist: { [listIndex]: { items: { $apply: (list) => { list.splice(itemIndex, 1); return list } } } } } }
-    })
-  }
-  case TASK_ADD_CHECKLIST: {
-    const { taskIndex, newList } = action.payload
-    return update(state, {
-      data: { [taskIndex]: { checklist: { $push: [ { name: newList, items: [] } ] } } }
-    })
-  }
-  case TASK_REMOVE_CHECKLIST: {
-    const { taskIndex, listIndex } = action.payload
-    return update(state, {
-      data: { [taskIndex]: { checklist: { $apply: (list) => {
-        list.splice(listIndex, 1)
-        return list
-      } } } }
+      data: updateBody
     })
   }
   default:
@@ -140,61 +140,14 @@ export function updateCheckList (taskId, checklist, ...then) {
   }
 }
 
-export function syncTask (task) {
+export function syncTask (updateBody) {
   return {
-    type: SYNC_TASK,
-    payload: {
-      task
-    }
+    type: TASK_MODIFY,
+    payload: updateBody
   }
 }
 
-// actions for task entry
-export function checkEntry (taskIndex, listIndex, itemIndex) {
-  return {
-    type: TASK_CHECK_ENTRY,
-    payload: {
-      taskIndex, listIndex, itemIndex
-    }
-  }
-}
 
-export function addEntry (taskIndex, listIndex, val) {
-  return {
-    type: TASK_ADD_ENTRY,
-    payload: {
-      taskIndex, listIndex, val
-    }
-  }
-}
-
-export function removeEntry (taskIndex, listIndex, itemIndex) {
-  return {
-    type: TASK_REMOVE_ENTRY,
-    payload: {
-      taskIndex, listIndex, itemIndex
-    }
-  }
-}
-
-// actions for checklist
-export function addCheckList (taskIndex, newList) {
-  return {
-    type: TASK_ADD_CHECKLIST,
-    payload: {
-      taskIndex, newList
-    }
-  }
-}
-
-export function removeCheckList (taskIndex, listIndex) {
-  return {
-    type: TASK_REMOVE_CHECKLIST,
-    payload: {
-      taskIndex, listIndex
-    }
-  }
-}
 
 export function dispose () {
   requests.forEach(r => r.abort())

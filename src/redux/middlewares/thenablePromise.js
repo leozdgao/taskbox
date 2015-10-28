@@ -7,18 +7,24 @@ export default ({ dispatch, getState }) => next => action => {
     const { payload, then } = action
     const thenable = (payload) => {
       then.forEach((func) => {
-        if (typeof func === 'function') func(payload)
+        if (typeof func === 'function') {
+          const ret = func(payload)
+          if (ret.type && ret.payload) dispatch(ret)
+        }
       })
     }
     if (isPromise(payload)) {
       payload.then((ret) => {
-        dispatch({ ...action, payload: ret })
+        dispatch({ type: action.type, payload: ret })
         thenable(ret)
       }, (e) => {
-        dispatch({ ...action, payload: e, error: true })
+        dispatch({ type: action.type, payload: e, error: true })
       })
     }
-    else thenable(payload)
+    else {
+      dispatch({ type: action.type, payload })
+      thenable(payload)
+    }
   }
   else next(action)
 }

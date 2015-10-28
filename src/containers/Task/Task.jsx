@@ -13,7 +13,8 @@ import './task.less'
   }),
   dispatch => ({
     ...bindActionCreators({
-      ...TaskActions
+      ...TaskActions,
+      ...TaskActions.taskModifyActionCreators
     }, dispatch)
   })
 )
@@ -52,7 +53,6 @@ export default class Task extends Component {
     const { task } = nextProps
     if (task.loading !== this.state.loading) {
       this.setState({ loading: task.loading })
-      // this.setState({ loading: true })
     }
   }
 
@@ -105,11 +105,11 @@ export default class Task extends Component {
         <TaskPanel task={t}
           onSeal={::this._handleTaskSeal(t._id)}
           onAlert={() => {}}
-          onEntryClick={handleModify(checkEntry.bind(this), i)}
-          onEntryAdd={handleModify(addEntry.bind(this), i)}
-          onEntryRemove={handleModify(removeEntry.bind(this), i)}
-          onCheckListAdd={handleModify(addCheckList.bind(this), i)}
-          onCheckListRemove={handleModify(removeCheckList.bind(this), i)} />
+          onEntryClick={handleModify(checkEntry.bind(this), 'checkEntry', i)}
+          onEntryAdd={handleModify(addEntry.bind(this), 'addEntry', i)}
+          onEntryRemove={handleModify(removeEntry.bind(this), 'removeEntry', i)}
+          onCheckListAdd={handleModify(addCheckList.bind(this), 'addCheckList', i )}
+          onCheckListRemove={handleModify(removeCheckList.bind(this), 'removeCheckList', i )} />
       </div>
     )
   }
@@ -147,14 +147,13 @@ export default class Task extends Component {
   }
 
   _handleModify (taskIndex) {
-    return (func, ...args) => {
+    return (func, actionName, ...args) => {
       const { updateCheckList } = this.props
-      const sync = () => {
+      const sync = (updateBody) => {
         const task = this.props.task.data[taskIndex]
-        updateCheckList(task._id, task.checklist, ({ body }) => {
+        updateCheckList(task._id, task.checklist, () => {
           const { socket } = this.context
-          console.log('emit')
-          socket.emit('syncTask', body.new)
+          socket.emit('syncTask', updateBody)
         })
       }
 
@@ -164,14 +163,20 @@ export default class Task extends Component {
 
         if (this._dirtyList[taskIndex]) clearTimeout(this._dirtyList[taskIndex])
 
-        const ltr = setTimeout(sync, 1000)
+        const ltr = setTimeout(() => {
+          const updateBodyBuilder = TaskActions.updateBodyMap[actionName]
+          if (typeof updateBodyBuilder === 'function') {
+            const updateBody = updateBodyBuilder.apply(null, newArg)
+            sync(updateBody)
+          }
+        }, 1000)
         this._dirtyList[taskIndex] = ltr
       }
     }
   }
 
-  _handleSyncTask (task) {
+  _handleSyncTask (body) {console.log(body)
     const { syncTask } = this.props
-    syncTask(task)
+    syncTask(body)
   }
 }

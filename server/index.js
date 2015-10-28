@@ -65,7 +65,7 @@ app.get('*', function (req, res) {
   })
 })
 
-server.listen(3000, 'localhost', function (err) {
+server.listen(3000, function (err) {
   if (err) {
     console.log(err)
     return
