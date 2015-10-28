@@ -43,7 +43,9 @@ const replaceApplyFunc = function replaceApplyFunc (body) {
 
     const val = body[key]
     if (typeof val === 'object') body[key] = replaceApplyFunc(val)
-    else body[key] = applyFunc[val]
+    else {
+      if (key === '$apply') body[key] = applyFunc[val]
+    }
   }
 
   return body
@@ -80,8 +82,9 @@ export default function (state = initState, action) {
   switch (action.type) {
   case LOAD_TASK: {
     const field = action.error ? 'error' : 'data'
+
     return update(state, {
-      [field]: { $set: action.payload.body },
+      [field]: { $set: action.payload.body || true },
       loading: { $set: false }
     })
   }

@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import findWhere from 'lodash/collection/findWhere'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, TaskPanel, Modal } from '../../components'
+import { Animate, Dimmer, Spinner, TaskPanel, Modal } from '../../components'
 import './task.less'
 
 @connect(
@@ -42,6 +42,7 @@ export default class Task extends Component {
 
     this.state = {
       loading: true,
+      error: false,
       isModalShowed: false,
       taskIdInModal: -1
     }
@@ -52,7 +53,8 @@ export default class Task extends Component {
   componentWillReceiveProps (nextProps) {
     const { task } = nextProps
     if (task.loading !== this.state.loading) {
-      this.setState({ loading: task.loading })
+      this.setState({ loading: task.loading, error: task.error })
+      // this.setState({ loading: true })
     }
   }
 
@@ -80,17 +82,36 @@ export default class Task extends Component {
         </ol>
         <Animate name='fade'>
           {this.state.loading ? (
-            <Dimmer key={0} className='task-dimmer' />
+            <Spinner key={0} className='task-dimmer' />
           ) : (
-            <div className='row'>
-              {task.data.map(::this._getTaskPanel)}
-              {/* portal */}
-              <Modal isShowed={this.state.isModalShowed}
-                animateName='modalFade' transitionTimeout={500}
-                dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
-                {this._getModalContent()}
-              </Modal>
-            </div>
+            this.state.error ? (
+              <Dimmer className='block-center' style={{ height: 165 }}>
+                <div className='task-free'>
+                  <i className='fa fa-frown-o'></i>
+                  <p>Can't fetch data from server...</p>
+                  <button className='btn btn-success' onClick={::this._reload}>Try again</button>
+                </div>
+              </Dimmer>
+            ) : (
+              task.data.length > 0 ? (
+                <div className='row'>
+                  {task.data.map(::this._getTaskPanel)}
+                  {/* portal */}
+                  <Modal isShowed={this.state.isModalShowed}
+                    animateName='modalFade' transitionTimeout={500}
+                    dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
+                    {this._getModalContent()}
+                  </Modal>
+                </div>
+              ): (
+                <Dimmer className='block-center'>
+                  <div className='task-free'>
+                    <i className='fa fa-file-text-o'></i>
+                    <p>You are free today!</p>
+                  </div>
+                </Dimmer>
+              )
+            )
           )}
         </Animate>
       </div>
@@ -108,8 +129,8 @@ export default class Task extends Component {
           onEntryClick={handleModify(checkEntry.bind(this), 'checkEntry', i)}
           onEntryAdd={handleModify(addEntry.bind(this), 'addEntry', i)}
           onEntryRemove={handleModify(removeEntry.bind(this), 'removeEntry', i)}
-          onCheckListAdd={handleModify(addCheckList.bind(this), 'addCheckList', i )}
-          onCheckListRemove={handleModify(removeCheckList.bind(this), 'removeCheckList', i )} />
+          onCheckListAdd={handleModify(addCheckList.bind(this), 'addCheckList', i)}
+          onCheckListRemove={handleModify(removeCheckList.bind(this), 'removeCheckList', i)} />
       </div>
     )
   }
@@ -175,8 +196,17 @@ export default class Task extends Component {
     }
   }
 
-  _handleSyncTask (body) {console.log(body)
+  _handleSyncTask (body) {
     const { syncTask } = this.props
     syncTask(body)
+  }
+
+  _reload () {
+    this.setState({
+      loading: true, error: false
+    }, () => {
+      const { currentUser } = this.context
+      this.props.load(currentUser.resourceId)
+    })
   }
 }
