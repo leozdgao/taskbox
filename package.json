@@ -73,6 +73,7 @@
     "body-parser": "^1.14.1",
     "classnames": "^2.1.3",
     "cookie-parser": "^1.4.0",
+    "deep-extend": "^0.4.0",
     "dom-helpers": "^2.4.0",
     "express": "^4.13.3",
     "hbs": "^3.1.1",
@@ -94,6 +95,7 @@
     "redux-promise": "^0.5.0",
     "redux-thunk": "^1.0.0",
     "request": "^2.65.0",
+    "responsive_waterfall": "^1.0.0",
     "socket.io": "^1.3.7",
     "socket.io-client": "^1.3.7",
     "validator": "^4.1.0"

@@ -160,7 +160,7 @@ export default class TaskPanel extends Component {
     return (
       <div>
         {map(items, ({ checked, title }, i) =>
-          <CheckEntry key={title} onClick={() => this.props.onEntryClick(listIndex, i)} checked={checked}>
+          <CheckEntry key={title} onClick={() => this.props.onEntryClick(listIndex, i, checked)} checked={checked}>
             {title}
             <i className='fa fa-times-circle pull-right' onClick={(e) => {
               e.stopPropagation()

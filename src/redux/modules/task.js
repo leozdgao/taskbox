@@ -1,6 +1,8 @@
 import update from 'react-addons-update'
 import find from 'lodash/collection/find'
+import forEach from 'lodash/collection/forEach'
 import qs from 'qs'
+import merge from 'deep-extend'
 import { json as request } from 'lgutil/common/ajax'
 
 const TASK_API_URL = '/api/rest/task'
@@ -16,7 +18,7 @@ const TASK_MODIFY = 'TASK_MODIFY'
 // - cacheable
 
 const initState = {
-  data: [],
+  data: {},
   loading: true,
   error: null
 }
@@ -51,7 +53,7 @@ const replaceApplyFunc = function replaceApplyFunc (body) {
   return body
 }
 export const updateBodyMap = {
-  checkEntry: (taskIndex, listIndex, itemIndex) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { [itemIndex]: { checked: { $apply: 'nor' } } } } } } }),
+  checkEntry: (taskIndex, listIndex, itemIndex, checked) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { [itemIndex]: { checked: { $set: !checked } } } } } } }),
   addEntry: (taskIndex, listIndex, val) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { $push: [ { checked: false, title: val } ] } } } } }),
   removeEntry: (taskIndex, listIndex, itemIndex) => ({ [taskIndex]: { checklist: { [listIndex]: { items: { $splice: [ [ itemIndex, 1 ] ] } } } } }),
   addCheckList: (taskIndex, newList) => ({ [taskIndex]: { checklist: { $push: [ { name: newList, items: [] } ] } } }),
@@ -76,24 +78,72 @@ const taskActionBuilder = (actions, type) => {
   return ret
 }
 
+const isActionModifyEntry = (actionName) => {
+  return actionName === 'checkEntry' || actionName === 'addEntry' || actionName === 'removeEntry'
+}
+
+export const mergeActions = (ret = {}, actionName, args, updateBody) => {
+  ret[actionName] || (ret[actionName] = [])
+
+  const [ taskIndex, listIndex, itemIndex ] = args
+  const taskKey = `${taskIndex}$${listIndex}`
+
+  // do not merge if the checklist has been ready for removing
+  if (isActionModifyEntry(actionName)) {
+    if (ret['removeCheckList'] && ret['removeCheckList'].length > 0) {
+      const existedTask = find(ret['removeCheckList'], ({ key }) => {
+        return key === taskKey
+      })
+
+      if (existedTask) return
+    }
+  }
+
+  // push action, ready to merge
+  ret[actionName].push({
+    key: taskKey,
+    body: updateBody
+  })
+
+  return ret
+}
+
+export const extractUpdateObject = (actions) => {
+  let finalUploadObject = {}
+  forEach(actions, (val, key) => {
+    forEach(actions[key], ({ body }) => {
+      finalUploadObject = merge(finalUploadObject, body)
+    })
+  })
+
+  return finalUploadObject
+}
+
 export const taskModifyActionCreators = taskActionBuilder(Object.keys(updateBodyMap), TASK_MODIFY)
 
 export default function (state = initState, action) {
   switch (action.type) {
   case LOAD_TASK: {
-    const field = action.error ? 'error' : 'data'
-
-    return update(state, {
-      [field]: { $set: action.payload.body || true },
-      loading: { $set: false }
-    })
+    if (action.error) {
+      return update(state, {
+        error: { $set: true },
+        loading: { $set: false }
+      })
+    }
+    else {
+      const data = {}
+      action.payload.body.forEach((task) => {
+        data[task._id] = task
+      })
+      return update(state, {
+        data: { $set: data },
+        loading: { $set: false }
+      })
+    }
   }
   case TASK_MODIFY: {
-    let updateBody = action.payload
-    updateBody = replaceApplyFunc(updateBody)
-
     return update(state, {
-      data: updateBody
+      data: action.payload
     })
   }
   default:
@@ -149,8 +199,6 @@ export function syncTask (updateBody) {
     payload: updateBody
   }
 }
-
-
 
 export function dispose () {
   requests.forEach(r => r.abort())

@@ -2,6 +2,7 @@ var socketIO = require('socket.io')
 
 module.exports = function (server) {
   var io = socketIO(server)
+  var canSync = true, ltr
 
   io.on('connection', function (socket) {
     console.log('user connected')
@@ -14,6 +15,15 @@ module.exports = function (server) {
 
     socket.on('syncTask', function (task) {
       socket.broadcast.emit('syncTask', task)
+
+      if (!ltr) {
+        ltr = setTimeout(() => {
+          // do sync
+
+          ltr = (void 0)
+        }, 500)
+      }
+
     })
 
     socket.on('error', function () {

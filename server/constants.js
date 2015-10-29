@@ -1,7 +1,7 @@
 var fp = require('path')
 var url = require('url')
-// var baseOrigin = '10.10.73.208:1339'
-var baseOrigin = 'localhost:1339'
+var baseOrigin = '10.10.73.208:1339'
+// var baseOrigin = 'localhost:1339'
 
 
 function combine(base) {

@@ -3,8 +3,9 @@ import { Link } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import findWhere from 'lodash/collection/findWhere'
+import merge from 'deep-extend'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, Spinner, TaskPanel, Modal } from '../../components'
+import { Animate, Dimmer, Spinner, TaskPanel, Modal, Waterfall } from '../../components'
 import './task.less'
 
 @connect(
@@ -72,6 +73,7 @@ export default class Task extends Component {
 
   render () {
     const { task } = this.props
+    const taskKeys = Object.keys(task.data)
 
     return (
       <div>
@@ -93,16 +95,16 @@ export default class Task extends Component {
                 </div>
               </Dimmer>
             ) : (
-              task.data.length > 0 ? (
-                <div className='row'>
-                  {task.data.map(::this._getTaskPanel)}
+              taskKeys.length > 0 ? (
+                <Waterfall className='row'>
+                  {taskKeys.map(::this._getTaskPanel)}
                   {/* portal */}
                   <Modal isShowed={this.state.isModalShowed}
                     animateName='modalFade' transitionTimeout={500}
                     dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
                     {this._getModalContent()}
                   </Modal>
-                </div>
+                </Waterfall>
               ): (
                 <Dimmer className='block-center'>
                   <div className='task-free'>
@@ -118,19 +120,21 @@ export default class Task extends Component {
     )
   }
 
-  _getTaskPanel (t, i) {
-    const { checkEntry, addEntry, removeEntry, addCheckList, removeCheckList } = this.props
-    const handleModify = this._handleModify(i)
+  _getTaskPanel (taskKey) {
+    const { task, checkEntry, addEntry, removeEntry, addCheckList, removeCheckList } = this.props
+    const t = task.data[taskKey]
+    const handleModify = this._handleModify(t._id)
+
     return (
-      <div key={t._id} className='col-lg-6'>
+      <div key={t._id} className='wf-box'>
         <TaskPanel task={t}
           onSeal={::this._handleTaskSeal(t._id)}
           onAlert={() => {}}
-          onEntryClick={handleModify(checkEntry.bind(this), 'checkEntry', i)}
-          onEntryAdd={handleModify(addEntry.bind(this), 'addEntry', i)}
-          onEntryRemove={handleModify(removeEntry.bind(this), 'removeEntry', i)}
-          onCheckListAdd={handleModify(addCheckList.bind(this), 'addCheckList', i)}
-          onCheckListRemove={handleModify(removeCheckList.bind(this), 'removeCheckList', i)} />
+          onEntryClick={handleModify(checkEntry.bind(this), 'checkEntry', t._id)}
+          onEntryAdd={handleModify(addEntry.bind(this), 'addEntry', t._id)}
+          onEntryRemove={handleModify(removeEntry.bind(this), 'removeEntry', t._id)}
+          onCheckListAdd={handleModify(addCheckList.bind(this), 'addCheckList', t._id)}
+          onCheckListRemove={handleModify(removeCheckList.bind(this), 'removeCheckList', t._id)} />
       </div>
     )
   }
@@ -182,16 +186,19 @@ export default class Task extends Component {
         const newArg = [].concat(args, others)
         func.apply(this, newArg)
 
-        if (this._dirtyList[taskIndex]) clearTimeout(this._dirtyList[taskIndex])
+        const updateBodyBuilder = TaskActions.updateBodyMap[actionName]
+        if (typeof updateBodyBuilder === 'function') {
+          const updateBody = updateBodyBuilder.apply(null, newArg)
+          this._actions = TaskActions.mergeActions(this._actions, actionName, newArg, updateBody)
+        }
 
-        const ltr = setTimeout(() => {
-          const updateBodyBuilder = TaskActions.updateBodyMap[actionName]
-          if (typeof updateBodyBuilder === 'function') {
-            const updateBody = updateBodyBuilder.apply(null, newArg)
-            sync(updateBody)
-          }
+        if (this._ltr) clearTimeout(this._ltr)
+
+        this._ltr = setTimeout(() => {
+          const finalUploadObject = TaskActions.extractUpdateObject(this._actions)
+          sync(finalUploadObject)
+          this._actions = {}
         }, 1000)
-        this._dirtyList[taskIndex] = ltr
       }
     }
   }
