@@ -50,6 +50,7 @@ export default class ScrollPanel extends Component {
 
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.children !== this.props.children) {
+      this.setState(this._constructScrollYUpdateState(0, 0))
       this._refreshDOMValue()
     }
 

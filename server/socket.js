@@ -16,13 +16,13 @@ module.exports = function (server) {
     socket.on('syncTask', function (task) {
       socket.broadcast.emit('syncTask', task)
 
-      if (!ltr) {
-        ltr = setTimeout(() => {
-          // do sync
-
-          ltr = (void 0)
-        }, 500)
-      }
+      // if (!ltr) {
+      //   ltr = setTimeout(() => {
+      //     // do sync
+      //
+      //     ltr = (void 0)
+      //   }, 500)
+      // }
 
     })
 
