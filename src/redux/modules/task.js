@@ -142,8 +142,18 @@ export default function (state = initState, action) {
     }
   }
   case TASK_MODIFY: {
+    const body = action.payload
+    const updatedTaskIds = Object.keys(body)
+    const currentTaskIds = Object.keys(state.data)
+    // filter the tasks that need to be updated
+    updatedTaskIds.forEach((tid) => {
+      if (currentTaskIds.indexOf(tid) < 0) {
+        delete body[tid]
+      }
+    })
+
     return update(state, {
-      data: action.payload
+      data: body
     })
   }
   default:
