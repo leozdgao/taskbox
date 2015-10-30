@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { createHistory } from 'history'
+import createHistory from 'history/lib/createBrowserHistory'
 import { Provider } from 'react-redux'
 import { Router, PropTypes as RouterPropTypes } from 'react-router'
 import configureStore from './redux/configureStore'

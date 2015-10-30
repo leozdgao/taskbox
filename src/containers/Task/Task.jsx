@@ -4,8 +4,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import findWhere from 'lodash/collection/findWhere'
 import merge from 'deep-extend'
+import validator from 'validator'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, Spinner, TaskPanel, Modal, Waterfall } from '../../components'
+import { Animate, Dimmer, Form, Spinner, TaskPanel, Modal, Waterfall, IconInput } from '../../components'
 import './task.less'
 
 @connect(
@@ -78,10 +79,7 @@ export default class Task extends Component {
     return (
       <div>
         <div className="page-header">Task Board</div>
-        <ol className="breadcrumb">
-          <li><Link to='/'>Dashboard</Link></li>
-          <li className="active">Task</li>
-        </ol>
+        {this._getTaskNav()}
         <Animate name='fade'>
           {this.state.loading ? (
             <Spinner key={0} className='task-dimmer' />
@@ -98,12 +96,6 @@ export default class Task extends Component {
               taskKeys.length > 0 ? (
                 <Waterfall className='row'>
                   {taskKeys.map(::this._getTaskPanel)}
-                  {/* portal */}
-                  <Modal isShowed={this.state.isModalShowed}
-                    animateName='modalFade' transitionTimeout={500}
-                    dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
-                    {this._getModalContent()}
-                  </Modal>
                 </Waterfall>
               ): (
                 <Dimmer className='block-center'>
@@ -116,7 +108,30 @@ export default class Task extends Component {
             )
           )}
         </Animate>
+        {/* portal for create new task */}
+        <Modal isShowed={this.state.isModalShowed}
+          animateName='modalFade' transitionTimeout={500}
+          dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
+          {this._getModalContent()}
+        </Modal>
       </div>
+    )
+  }
+
+  _getTaskNav () {
+    return (
+      <nav className="navbar navbar-default task-navbar">
+        <ul className="nav navbar-nav">
+          <li><a href='javascript:;' onClick={::this._showModal}><i className='fa fa-plus'></i>New Task</a></li>
+          <li><a href='javascript:;'><i className='fa fa-calendar'></i>Calender</a></li>
+        </ul>
+        <form className="navbar-form navbar-left" role="search">
+          <div className="form-group">
+            <IconInput icon='filter' className="form-control lean-control" placeholder="Filter your task..." />
+          </div>
+          {/* <a type="submit" className="btn btn-sm btn-white">Submit</a> */}
+        </form>
+      </nav>
     )
   }
 
@@ -147,24 +162,28 @@ export default class Task extends Component {
             <button type="button" className="close" onClick={::this._hideModal}>
               <span aria-hidden="true">×</span>
             </button>
-            <h4 className="modal-title">Modal title</h4>
+            <h4 className="modal-title">Publish a new Task</h4>
           </div>
           <div className="modal-body">
-            <p>One fine body…</p>
+            <Form invalidClassName='error' validator={validator}>
+              <Form.Input name='title' className='form-group' inputClassName='form-control lean-control' title='Title' placeholder='Task title' invalidClassName='error' />
+              <Form.Input name='description' className='form-group' inputClassName='form-control lean-control' title='Description' placeholder='Task description' invalidClassName='error' />
+              <Form.Input name='type' className='form-group' inputClassName='form-control lean-control' title='Type' placeholder='Task type' invalidClassName='error' />
+              <Form.Input name='tag' className='form-group' inputClassName='form-control lean-control' title='Tag' placeholder='Task title' invalidClassName='error' />
+              <Form.Input name='assignee' className='form-group' inputClassName='form-control lean-control' title='Assignee' placeholder='Task title' invalidClassName='error' />
+            </Form>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-sm btn-white" onClick={::this._hideModal}>Close</button>
-            <button type="button" className="btn btn-sm btn-success">Save changes</button>
+            <button type="button" className="btn btn-sm btn-white" onClick={::this._hideModal}>Cancel</button>
+            <button type="button" className="btn btn-sm btn-success">Publish</button>
           </div>
         </div>
       </div>
     )
   }
 
-  _handleTaskSeal (id) {
-    return () => {
-      this.setState({ isModalShowed: true, taskIdInModal: id })
-    }
+  _showModal () {
+    this.setState({ isModalShowed: true })
   }
 
   _hideModal () {
@@ -206,6 +225,12 @@ export default class Task extends Component {
   _handleSyncTask (body) {
     const { syncTask } = this.props
     syncTask(body)
+  }
+
+  _handleTaskSeal (id) {
+    return () => {
+      // this.setState({ isModalShowed: true, taskIdInModal: id })
+    }
   }
 
   _reload () {

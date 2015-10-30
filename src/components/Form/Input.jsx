@@ -14,6 +14,7 @@ export default class Input extends Component {
     onValidated: T.func,
     // custom
     className: T.string,
+    inputClassName: T.string,
     type: T.string,
     title: T.string,
     placeholder: T.string,
@@ -82,6 +83,7 @@ export default class Input extends Component {
       ])}>
         <label>{this.props.title}</label>
         <input type={this.props.type} name={this.props.name}
+          className={this.props.inputClassName}
           placeholder={this.props.placeholder}
           value={this.state.value} onChange={::this._handleChange} onBlur={::this._handleBlur} />
         {(!this.state.isValid && this.state.isDirty && this.state.errMsg) ?

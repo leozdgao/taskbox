@@ -15,5 +15,6 @@ export { default as OverlayTrigger } from './OverlayTrigger/OverlayTrigger'
 export { default as ProgressBar } from './ProgressBar/ProgressBar'
 export { default as Tooltip } from './Tooltip/Tooltip'
 export { default as Waterfall } from './Waterfall/Waterfall'
+export { default as IconInput } from './IconInput/IconInput'
 
 export { default as Editor } from './Editor/Editor'
