@@ -6,7 +6,8 @@ import findWhere from 'lodash/collection/findWhere'
 import merge from 'deep-extend'
 import validator from 'validator'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, Form, Spinner, TaskPanel, Modal, Waterfall, IconInput } from '../../components'
+import { Animate, Dimmer, Form, Spinner, TaskPanel, Waterfall, IconInput } from '../../components'
+import NewTaskModal from './NewTaskModal'
 import './task.less'
 
 @connect(
@@ -109,11 +110,8 @@ export default class Task extends Component {
           )}
         </Animate>
         {/* portal for create new task */}
-        <Modal isShowed={this.state.isModalShowed}
-          animateName='modalFade' transitionTimeout={500}
-          dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
-          {this._getModalContent()}
-        </Modal>
+        <NewTaskModal isShowed={this.state.isModalShowed}
+          onHide={::this._hideModal} />
       </div>
     )
   }
@@ -150,34 +148,6 @@ export default class Task extends Component {
           onEntryRemove={handleModify(removeEntry.bind(this), 'removeEntry', t._id)}
           onCheckListAdd={handleModify(addCheckList.bind(this), 'addCheckList', t._id)}
           onCheckListRemove={handleModify(removeCheckList.bind(this), 'removeCheckList', t._id)} />
-      </div>
-    )
-  }
-
-  _getModalContent () {
-    return (
-      <div className="modal-content">
-        <div>
-          <div className="modal-header">
-            <button type="button" className="close" onClick={::this._hideModal}>
-              <span aria-hidden="true">×</span>
-            </button>
-            <h4 className="modal-title">Publish a new Task</h4>
-          </div>
-          <div className="modal-body">
-            <Form invalidClassName='error' validator={validator}>
-              <Form.Input name='title' className='form-group' inputClassName='form-control lean-control' title='Title' placeholder='Task title' invalidClassName='error' />
-              <Form.Input name='description' className='form-group' inputClassName='form-control lean-control' title='Description' placeholder='Task description' invalidClassName='error' />
-              <Form.Input name='type' className='form-group' inputClassName='form-control lean-control' title='Type' placeholder='Task type' invalidClassName='error' />
-              <Form.Input name='tag' className='form-group' inputClassName='form-control lean-control' title='Tag' placeholder='Task title' invalidClassName='error' />
-              <Form.Input name='assignee' className='form-group' inputClassName='form-control lean-control' title='Assignee' placeholder='Task title' invalidClassName='error' />
-            </Form>
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-sm btn-white" onClick={::this._hideModal}>Cancel</button>
-            <button type="button" className="btn btn-sm btn-success">Publish</button>
-          </div>
-        </div>
       </div>
     )
   }

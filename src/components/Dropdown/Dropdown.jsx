@@ -1,4 +1,6 @@
 import React, { Component, PropTypes as T } from 'react'
+import ReactDOM from 'react-dom'
+import contains from 'dom-helpers/query/contains'
 import Animate from '../Animate/Animate'
 
 export default class Dropdown extends Component {
@@ -10,12 +12,14 @@ export default class Dropdown extends Component {
     leaveTimeout: T.number,
     enterTimeout: T.number,
     transitionTimeout: T.number,
-    children: T.any
+    children: T.any,
+    notHideIfClickEntry: T.bool
   }
 
   static defaultProps = {
     open: false,
-    onHide: () => {}
+    onHide: () => {},
+    notHideIfClickEntry: false
   }
 
   componentDidMount () {
@@ -43,7 +47,16 @@ export default class Dropdown extends Component {
     else return child
   }
 
-  _handleClick () {
-    if (this.props.open) this.props.onHide()
+  _handleClick (e) {
+    if (this.props.open) {
+      const dropdown = ReactDOM.findDOMNode(this)
+      
+      if (this.props.notHideIfClickEntry &&
+        contains(dropdown, e.target)) {
+        return
+      }
+
+      this.props.onHide()
+    }
   }
 }

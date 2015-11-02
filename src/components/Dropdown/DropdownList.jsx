@@ -2,9 +2,9 @@ import React, { Component, PropTypes as T } from 'react'
 import Dropdown from './Dropdown'
 
 const DropdownList = (props) => {
-  const { open, onHide, animateName, ...others } = props
+  const { open, onHide, animateName, notHideIfClickEntry, ...others } = props
   return (
-    <Dropdown animateName={animateName} open={open} onHide={onHide}>
+    <Dropdown animateName={animateName} open={open} onHide={onHide} notHideIfClickEntry={notHideIfClickEntry}>
       <ul {...others}>
         {React.Children.map(props.children, (child) => {
           if (child.type === 'option') {

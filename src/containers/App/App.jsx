@@ -38,7 +38,8 @@ export default class Main extends Component {
     return {
       socket,
       currentUser: this.props.user,
-      resourceInfo: Array.isArray(this.props.resource.data) ? this.props.resource.data : [] // return empty array if error
+      resourceInfo: Array.isArray(this.props.resource.data) ?
+        this.props.resource.data.sort((a, b) => a.resourceId - b.resourceId) : [] // return empty array if error
     }
   }
 

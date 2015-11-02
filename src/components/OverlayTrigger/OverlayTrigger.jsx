@@ -65,10 +65,10 @@ export default class OverlayTrigger extends Component {
 
     this._overlay = this._getOverlay()
 
-    props.onClick = createChainedFunction(triggerProps.onClick, this.props.onClick)
+    props.onClick = createChainedFunction(this, triggerProps.onClick, this.props.onClick)
 
     if (isOneOf(event, 'click')) {
-      props.onClick = createChainedFunction(this.toggle, props.onClick)
+      props.onClick = createChainedFunction(this, this.toggle, props.onClick)
     }
 
     if (isOneOf(event, 'hover')) {
@@ -77,8 +77,8 @@ export default class OverlayTrigger extends Component {
     }
 
     if (isOneOf(event, 'focus')) {
-      props.onFocus = createChainedFunction(this.handleDelayedShow, this.props.onFocus, triggerProps.onFocus)
-      props.onBlur = createChainedFunction(this.handleDelayedHide, this.props.onBlur, triggerProps.onBlur)
+      props.onFocus = createChainedFunction(this, this.handleDelayedShow, this.props.onFocus, triggerProps.onFocus)
+      props.onBlur = createChainedFunction(this, this.handleDelayedHide, this.props.onBlur, triggerProps.onBlur)
     }
 
     return React.cloneElement(

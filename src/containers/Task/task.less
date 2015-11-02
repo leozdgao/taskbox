@@ -46,6 +46,7 @@
     i { margin-right: 8px; }
   }
 
+  // for filter control
   form {
     margin-top: 8px;
     margin-bottom: 8px;
@@ -63,4 +64,33 @@
 
 .modal-dialog {
   width: 450px;
+
+  .form-group>label {
+    font-size: 14px;
+  }
+
+  input, textarea { font-size: 12px; }
+
+  img.avatar {
+    display: inline-block;
+    overflow: hidden;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+
+    margin-right: 8px;
+  }
+
+  .assigner {
+    position: relative;
+
+    .rlist {
+      display: inline-block;
+      margin: 0 8px;
+
+      .avatar {
+        cursor: pointer;
+      }
+    }
+  }
 }
