@@ -37,7 +37,8 @@ export default class Task extends Component {
     addCheckList: T.func,
     removeCheckList: T.func,
     syncTask: T.func,
-    updateCheckList: T.func
+    updateCheckList: T.func,
+    addNewTask: T.func
   }
 
   constructor (props) {
@@ -58,6 +59,10 @@ export default class Task extends Component {
     if (task.loading !== this.state.loading) {
       this.setState({ loading: task.loading, error: task.error })
       // this.setState({ loading: true })
+    }
+    
+    if (task.addNewTaskError) {
+      this.refs.newTaskModal.setMessage('Publish failed. Please retry.')
     }
   }
 
@@ -110,8 +115,8 @@ export default class Task extends Component {
           )}
         </Animate>
         {/* portal for create new task */}
-        <NewTaskModal isShowed={this.state.isModalShowed}
-          onHide={::this._hideModal} />
+        <NewTaskModal ref='newTaskModal' isShowed={this.state.isModalShowed}
+          onHide={::this._hideModal} onSubmit={::this._addTask} />
       </div>
     )
   }
@@ -210,5 +215,9 @@ export default class Task extends Component {
       const { currentUser } = this.context
       this.props.load(currentUser.resourceId)
     })
+  }
+
+  _addTask (body) {
+    this.props.addNewTask(body)
   }
 }

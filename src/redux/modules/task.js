@@ -20,7 +20,8 @@ const TASK_MODIFY = 'TASK_MODIFY'
 const initState = {
   data: {},
   loading: true,
-  error: null
+  error: null, // for loading
+  addNewTaskError: null
 }
 
 let requests = []
@@ -141,6 +142,18 @@ export default function (state = initState, action) {
       })
     }
   }
+  case NEW_TASK: {
+    if (action.error) {
+      return update(state, {
+        addNewTaskError: { $set: true }
+      })
+    }
+    else {
+      return update(state, {
+        addNewTaskError: { $set: false }
+      })
+    }
+  }
   case TASK_MODIFY: {
     const body = action.payload
     const updatedTaskIds = Object.keys(body)
@@ -185,6 +198,15 @@ export function load (resourceId) {
     },
     timeout: 5000, // cache timeout
     onPromised: cacheRequest
+  }
+}
+
+export function addNewTask (body, ...then) {
+  const url = `${TASK_API_URL}`
+  return {
+    type: NEW_TASK,
+    payload: request.post(url, body),
+    then
   }
 }
 

@@ -1,5 +1,4 @@
 import React, { Component, PropTypes as T } from 'react'
-import assign from 'object-assign'
 import { DropdownList, OverlayTrigger, Tooltip } from '../../components'
 
 class ResourceAssigner extends Component {

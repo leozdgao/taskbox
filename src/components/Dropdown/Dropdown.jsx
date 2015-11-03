@@ -27,8 +27,8 @@ export default class Dropdown extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.open && !this.props.open) document.addEventListener('click', this._handler)
-    if (!nextProps.open && this.props.open) document.removeEventListener('click', this._handler)
+    if (nextProps.open && !this.props.open) document.addEventListener('click', this._handler, true)
+    if (!nextProps.open && this.props.open) document.removeEventListener('click', this._handler, true)
   }
 
   render () {
@@ -50,7 +50,7 @@ export default class Dropdown extends Component {
   _handleClick (e) {
     if (this.props.open) {
       const dropdown = ReactDOM.findDOMNode(this)
-      
+
       if (this.props.notHideIfClickEntry &&
         contains(dropdown, e.target)) {
         return
@@ -58,5 +58,15 @@ export default class Dropdown extends Component {
 
       this.props.onHide()
     }
+  }
+
+  _collectOnClickHandler (children, ret = []) {
+    React.Children.forEach(children, (child) => {
+      if (child.props.children) ret = this._collectOnClickHandler(child.props.children, ret)
+
+      if (child.props.onClick) ret.push(child.props.onClick)
+    })
+
+    return ret
   }
 }
