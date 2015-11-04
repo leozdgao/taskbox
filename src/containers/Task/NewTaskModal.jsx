@@ -57,7 +57,7 @@ class NewTaskModal extends Component {
   }
 
   componentWillUnmount () {
-    this.props.dispose()
+    CompanyActions.dispose()
   }
 
   render () {

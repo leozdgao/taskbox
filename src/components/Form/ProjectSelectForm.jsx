@@ -1,6 +1,6 @@
 import React, { Component, PropTypes as T } from 'react'
 import findWhere from 'lodash/collection/findWhere'
-import DropdownInput from './DropdownInput'
+import DropdownInput from './DropDownInput'
 
 class ProjectSelectForm extends Component {
 

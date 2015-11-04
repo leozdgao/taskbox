@@ -66,7 +66,7 @@ export function loadCompany () {
       promiseCreator: request.get,
       args: [ url ]
     },
-    // timeout: 5000, // cache timeout, company do not need cache
+    timeout: 5000, // cache timeout, company do not need cache
     onPromised: cacheRequest
   }
 }
