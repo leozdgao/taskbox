@@ -1,3 +1,5 @@
+import assign from 'object-assign'
+
 export default {
   isOneOf: (one, of) => {
     if (Array.isArray(of)) {

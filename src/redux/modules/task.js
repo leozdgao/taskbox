@@ -132,10 +132,10 @@ export default function (state = initState, action) {
       })
     }
     else {
-      const data = {}
-      action.payload.body.forEach((task) => {
-        data[task._id] = task
-      })
+      const data = action.payload.body.reduce((ret, task) => {
+        ret[task._id] = task
+        return ret
+      }, {})
       return update(state, {
         data: { $set: data },
         loading: { $set: false }
@@ -143,16 +143,13 @@ export default function (state = initState, action) {
     }
   }
   case NEW_TASK: {
-    if (action.error) {
-      return update(state, {
+    return action.error ?
+      update(state, {
         addNewTaskError: { $set: true }
-      })
-    }
-    else {
-      return update(state, {
+      }) :
+      update(state, {
         addNewTaskError: { $set: false }
       })
-    }
   }
   case TASK_MODIFY: {
     const body = action.payload

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import ReactDOM from 'react-dom'
 import contains from 'dom-helpers/query/contains'
-import Animate from '../Animate/Animate'
+import { Animate } from '../../components'
 
 export default class Dropdown extends Component {
 

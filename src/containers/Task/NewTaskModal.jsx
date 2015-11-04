@@ -1,6 +1,21 @@
 import React, { Component, PropTypes as T } from 'react'
-import { Modal, TaskForm } from '../../components'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import map from 'lodash/collection/map'
+import sortBy from 'lodash/collection/sortBy'
+import { CompanyActions } from '../../redux/modules'
+import { Modal, TaskForm, ProjectSelectForm } from '../../components'
 
+@connect(
+  state => ({
+    company: state.company
+  }),
+  dispatch => ({
+    ...bindActionCreators({
+      ...CompanyActions
+    }, dispatch)
+  })
+)
 class NewTaskModal extends Component {
 
   static contextTypes = {
@@ -8,9 +23,12 @@ class NewTaskModal extends Component {
   }
 
   static propTypes = {
+    company: T.object,
     isShowed: T.bool,
     onSubmit: T.func,
-    onHide: T.func
+    onHide: T.func,
+    loadCompany: T.func,
+    dispose: T.func
   }
 
   static defaultProps = {
@@ -34,6 +52,14 @@ class NewTaskModal extends Component {
     }
   }
 
+  componentDidMount () {
+    this.props.loadCompany()
+  }
+
+  componentWillUnmount () {
+    this.props.dispose()
+  }
+
   render () {
     return (
       <Modal isShowed={this.props.isShowed}
@@ -55,6 +81,7 @@ class NewTaskModal extends Component {
   }
 
   _confirmProject () {
+    const companies = sortBy(map(this.props.company.data, c => c), 'name')
     return (
       <div className="modal-content">
         <div className="modal-header">
@@ -63,11 +90,13 @@ class NewTaskModal extends Component {
           </button>
           <h4 className="modal-title">Choose a project</h4>
         </div>
-        <div className="modal-body"></div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
-            <button type="button" className="btn btn-sm btn-info" onClick={::this._onNext}>Next</button>
-          </div>
+        <div className="modal-body">
+          <ProjectSelectForm avaliableCompanies={companies} />
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
+          <button type="button" className="btn btn-sm btn-info" onClick={::this._onNext}>Next</button>
+        </div>
       </div>
     )
   }
@@ -98,7 +127,10 @@ class NewTaskModal extends Component {
   }
 
   _onNext () {
-    this.setState({ step: 1 })
+    this.setState({
+      step: 1,
+      msg: ''
+    })
   }
 
   _onClick () {
