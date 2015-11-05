@@ -6,6 +6,7 @@ import validated, { isRequired, arrayNotEmpty } from './validated'
 class TaskForm extends Component {
 
   static propTypes = {
+    defaultTaskTitle: T.string,
     avaliableResources: T.array
   }
 
@@ -14,7 +15,7 @@ class TaskForm extends Component {
       <form>
         <div className="form-group">
           <label htmlFor="titleInput">Title</label>
-          <input className="form-control" ref="title" name="title" id="titleInput" placeholder="Title" />
+          <input className="form-control" ref="title" name="title" id="titleInput" placeholder="Title" defaultValue={this.props.defaultTaskTitle} />
         </div>
         <div className="form-group">
           <label htmlFor="descriptionInput">Description</label>

@@ -34,27 +34,21 @@ const cachableRequest = (promiseCreator, timeout, onPromised) => {
 }
 
 export default ({ dispatch, getState }) => next => action => {
-  const { cacheable, timeout, onPromised, types } = action
+  const { cacheable, timeout, onPromised, ...others } = action
   if (cacheable) {
     const { promiseCreator, args } = action.payload || {}
     if (typeof promiseCreator === 'function') {
       const smartRequest = cachableRequest(promiseCreator, timeout, onPromised)
       const promise = smartRequest.apply(null, args)
 
-      // const [ pendingAction, resolvedAction, rejectedAction ] = types
-      // next({
-      //   type: pendingAction,
-      //   payload: promise
-      // })
-
       promise.then((val) => {
         next({
-          type: action.type,
+          ...others,
           payload: val
         })
       }).catch((e) => {
         next({
-          type: action.type,
+          ...others,
           payload: e,
           error: true
         })

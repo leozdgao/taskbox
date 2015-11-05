@@ -146,7 +146,8 @@ export default class ScrollPanel extends Component {
   }
 
   _getScrollYHeight () {
-    return this._panelHeight * this._panelHeight / this._contentHeight
+    const height = this._panelHeight * this._panelHeight / this._contentHeight
+    return isNaN(height) ? 0 : height
   }
 
   _needScrollY () {

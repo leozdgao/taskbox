@@ -4,25 +4,25 @@ const isPromise = (maybe) => {
 
 export default ({ dispatch, getState }) => next => action => {
   if (Array.isArray(action.then)) {
-    const { payload, then } = action
+    const { payload, then, ...others } = action
     const thenable = (payload) => {
       then.forEach((func) => {
         if (typeof func === 'function') {
           const ret = func(payload)
-          if (ret.type && ret.payload) dispatch(ret)
+          if (ret && ret.type && ret.payload) dispatch(ret)
         }
       })
     }
     if (isPromise(payload)) {
       payload.then((ret) => {
-        dispatch({ type: action.type, payload: ret })
+        dispatch({ ...others, payload: ret })
         thenable(ret)
       }, (e) => {
-        dispatch({ type: action.type, payload: e, error: true })
+        dispatch({ ...others, payload: e, error: true })
       })
     }
     else {
-      dispatch({ type: action.type, payload })
+      dispatch({ ...others, payload })
       thenable(payload)
     }
   }

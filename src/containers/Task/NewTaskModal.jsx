@@ -3,16 +3,18 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import map from 'lodash/collection/map'
 import sortBy from 'lodash/collection/sortBy'
-import { CompanyActions } from '../../redux/modules'
+import { CompanyActions, ProjectActions } from '../../redux/modules'
 import { Modal, TaskForm, ProjectSelectForm } from '../../components'
 
 @connect(
   state => ({
-    company: state.company
+    company: state.company,
+    project: state.project
   }),
   dispatch => ({
     ...bindActionCreators({
-      ...CompanyActions
+      ...CompanyActions,
+      ...ProjectActions
     }, dispatch)
   })
 )
@@ -24,11 +26,12 @@ class NewTaskModal extends Component {
 
   static propTypes = {
     company: T.object,
+    project: T.object,
     isShowed: T.bool,
     onSubmit: T.func,
     onHide: T.func,
     loadCompany: T.func,
-    dispose: T.func
+    loadProjectByIds: T.func
   }
 
   static defaultProps = {
@@ -42,13 +45,24 @@ class NewTaskModal extends Component {
 
     this.state = {
       msg: '',
-      step: 0
+      step: 0,
+      currentProject: null,
+      currentCompany: null,
+      selectedCid: null,
+      selectedPid: null,
+      avaliableProjects: []
     }
   }
 
   componentWillReceiveProps (nextProps) {
     if (!this.props.isShowed && nextProps.isShowed) {
-      this.setState({ msg: '', step: 0 })
+      this.setState({
+        msg: '',
+        step: 0,
+        currentProject: null,
+        currentCompany: null,
+        avaliableProjects: []
+      })
     }
   }
 
@@ -91,17 +105,28 @@ class NewTaskModal extends Component {
           <h4 className="modal-title">Choose a project</h4>
         </div>
         <div className="modal-body">
-          <ProjectSelectForm avaliableCompanies={companies} />
+          <ProjectSelectForm
+            defaultCompany={this.state.currentCompany}
+            defaultProject={this.state.currentProject}
+            avaliableCompanies={companies}
+            currentProjectItems={this.state.avaliableProjects}
+            onCompanyChange={::this._handleCompanyChange}
+            onProjectChange={::this._handleProjectChange} />
         </div>
         <div className="modal-footer">
           <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
-          <button type="button" className="btn btn-sm btn-info" onClick={::this._onNext}>Next</button>
+          {this.state.currentProject ?
+            <button type="button" className="btn btn-sm btn-info" onClick={::this._onNext}>Next</button>
+            : null
+          }
         </div>
       </div>
     )
   }
 
   _newTaskContent () {
+    const { currentProject, currentCompany } = this.state
+    const defaultTaskTitle = currentProject && currentCompany ? `${currentCompany.name} - ${currentProject.name}` : ''
     return (
       <div className="modal-content">
         <div className="modal-header">
@@ -111,7 +136,10 @@ class NewTaskModal extends Component {
           <h4 className="modal-title">Publish a new Task</h4>
         </div>
         <div className="modal-body">
-          <TaskForm ref='taskform' avaliableResources={this.context.resourceInfo} />
+          <TaskForm
+            ref='taskform'
+            defaultTaskTitle={defaultTaskTitle}
+            avaliableResources={this.context.resourceInfo} />
         </div>
         <div className="modal-footer">
           <span className='help-text text-danger'>{this.state.msg}</span>
@@ -144,12 +172,25 @@ class NewTaskModal extends Component {
     }
     else {
       this.setState({ msg: '' }, () => {
+        body.projectId = this.state.currentProject._id
         this.props.onSubmit(body)
       })
     }
   }
 
+  _handleCompanyChange (company) {
+    this.props.loadProjectByIds(company.projects, ({ body }) => {
+      body = sortBy(body, 'name')
+      this.setState({
+        currentCompany: company,
+        avaliableProjects: body
+      })
+    })
+  }
 
+  _handleProjectChange (project) {
+    this.setState({ currentProject: project })
+  }
 }
 
 export default NewTaskModal

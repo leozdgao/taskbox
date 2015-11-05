@@ -7,6 +7,7 @@ class DropdownInput extends Component {
 
   static propTypes = {
     className: T.string,
+    defaultValue: T.any,
     items: T.array,
     valueMap: T.func,
     nameMap: T.func,
@@ -28,11 +29,14 @@ class DropdownInput extends Component {
   constructor (props) {
     super(props)
 
+    const { defaultValue, nameMap } = this.props
+    const value = defaultValue || {}
+
     this.state = {
-      value: {},
+      value,
       isDropDownShowed: false,
       items: [],
-      inputValue: ''
+      inputValue: nameMap(value)
     }
   }
 

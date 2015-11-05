@@ -3,6 +3,7 @@ import chats from './chat'
 import task from './task'
 import resource from './resource'
 import company from './company'
+import project from './project'
 
 const rootReducer = combineReducers({
   // just hold the state
@@ -11,7 +12,7 @@ const rootReducer = combineReducers({
     if (!state.avatar) state.avatar = '/assets/avatar.png'
     return state
   },
-  task, resource, company
+  task, resource, company, project
 })
 
 

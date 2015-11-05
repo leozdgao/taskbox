@@ -11,7 +11,7 @@ import './taskpanel.less'
 const styleMap = {
   'SOW': 'teal',
   'PCR': 'blue',
-  'Bug': 'red'
+  'Bugfix': 'red'
 }
 const noop = () => {}
 
@@ -49,7 +49,7 @@ export default class TaskPanel extends Component {
 
     const init = {}
     const { task } = props
-    const { checklist } = task
+    const { checklist = [] } = task
 
     // for (const key in checklist) {
     //   if (!checklist.hasOwnProperty(key)) continue
@@ -63,7 +63,7 @@ export default class TaskPanel extends Component {
 
   render () {
     const { task, resource } = this.props
-    const { checklist, assignee } = task
+    const { checklist = [], assignee } = task
 
     return (
       <div className='panel panel-inverse'>
@@ -115,7 +115,7 @@ export default class TaskPanel extends Component {
     )
   }
 
-  _getCheckList (checklist) {
+  _getCheckList (checklist = []) {
     if (checklist.length <= 0) {
       return null
     }

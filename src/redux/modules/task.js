@@ -34,7 +34,11 @@ const getToday = () => {
   d.setMilliseconds(0)
   return d
 }
+const setDefault = (target) => (key, defaultValue) => {
+  if (target[key] == null) target[key] = defaultValue
 
+  return target
+}
 
 // ======================== actions for task entry===========================
 const applyFunc = {
@@ -200,6 +204,12 @@ export function load (resourceId) {
 
 export function addNewTask (body, ...then) {
   const url = `${TASK_API_URL}`
+  const setBodyDefault = setDefault(body)
+  // set default
+  setBodyDefault('startDate', getToday())
+  setBodyDefault('sealed', false)
+  setBodyDefault('checklist', [])
+
   return {
     type: NEW_TASK,
     payload: request.post(url, body),
