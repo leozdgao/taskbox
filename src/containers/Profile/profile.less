@@ -1,0 +1,48 @@
+.profile-image {
+  width: 90px;
+  float: left;
+
+  img {
+    width: 72px;
+    height: 72px;
+
+    &.circle-border {
+      border: 6px solid #FFFFFF;
+      border-radius: 50%;
+    }
+  }
+}
+.profile-info {
+  margin-left: 90px;
+
+  h3 { margin: 8px 0; }
+}
+.profile-panel {
+  width: 100%;
+  margin-top: 20px;
+
+  &>div {
+    overflow: hidden;
+
+    label {
+      display: inline-block;
+      width: 90px;
+      padding: 15px 12px;
+      float: left;
+    }
+  }
+
+  .editable {
+    margin-left: 90px;
+    padding: 15px 0;
+
+    &.editing {
+      padding: 5px 0;
+
+      .form-control {
+        font-size: 12px;
+        height: 37px;
+      }
+    }
+  }
+}

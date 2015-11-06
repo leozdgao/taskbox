@@ -51,11 +51,6 @@ export default class TaskPanel extends Component {
     const { task } = props
     const { checklist = [] } = task
 
-    // for (const key in checklist) {
-    //   if (!checklist.hasOwnProperty(key)) continue
-    //   init[key] = false
-    // }
-
     this.state = {
       dropdown: checklist.map(() => false)
     }

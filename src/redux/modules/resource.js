@@ -4,6 +4,7 @@ import { json as request } from 'lgutil/common/ajax'
 const RESOURCE_LOAD_API_URL = '/api/rest/resource'
 
 const LOAD_RESOURCE = 'LOAD_RESOURCE'
+const UPDATE_RESOURCE = 'UPDATE_RESOURCE'
 
 const initState = {
   data: [],

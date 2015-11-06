@@ -1,15 +1,9 @@
 import React from 'react'
 import { IndexLink, Link } from 'react-router'
 import { ScrollPanel } from '../../components'
+import { roleMap } from '../../auth'
 
 import './sidebar.less'
-
-const roleMap = {
-  '-1': 'Administrator',
-  '0': 'Intern',
-  '1': 'Team Member',
-  '2': 'Team Leader'
-}
 
 const Sidebar = ({ user = {} }) => {
   const { avatar, name, role } = user
@@ -52,6 +46,19 @@ const Sidebar = ({ user = {} }) => {
             <Link to='/doc' activeClassName="active">
               <i className="fa fa-book"></i>
               <span>Document</span>
+            </Link>
+          </li>
+          <li className='splitter'></li>
+          <li>
+            <Link to='/profile' activeClassName="active">
+              <i className="fa fa-user"></i>
+              <span>Profile</span>
+            </Link>
+          </li>
+          <li>
+            <Link to='/settings' activeClassName="active">
+              <i className="fa fa-cog"></i>
+              <span>Settings</span>
             </Link>
           </li>
 				</ul>
