@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { ResourceActions } from '../../redux/modules'
 import { Navbar, Sidebar, ScrollPanel } from '../../components'
+import { isLeader, isAdmin } from '../../auth'
 
 import './app.less'
 import './btn.less'
@@ -43,8 +44,8 @@ export default class Main extends Component {
     return {
       socket,
       currentUser: this.props.user,
-      isLeader: this.props.user.role > 1,
-      isAdmin: this.props.user.role < 0,
+      isLeader: isLeader(this.props.user.role),
+      isAdmin: isAdmin(this.props.user.role),
       resourceInfo
     }
   }

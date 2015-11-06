@@ -4,6 +4,7 @@ import forEach from 'lodash/collection/forEach'
 import qs from 'qs'
 import merge from 'deep-extend'
 import { json as request } from 'lgutil/common/ajax'
+import { isLeader, isAdmin } from '../../auth'
 
 const TASK_API_URL = '/api/rest/task'
 
@@ -174,10 +175,11 @@ export default function (state = initState, action) {
 }
 
 // action for load task
-export function load (resourceId) {
+export function load (resource) {
+  const { resourceId, role } = resource
   const query = {
     conditions: {
-      assignee: resourceId,
+      assignee: !isLeader(role) ? resourceId : void 0,
       startDate: {
         $lte: getToday().toString()
       },

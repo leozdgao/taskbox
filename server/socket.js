@@ -26,6 +26,10 @@ module.exports = function (server) {
 
     })
 
+    socket.on('addTask', function (task) {
+      socket.broadcast.emit('addTask', task)
+    })
+
     socket.on('error', function () {
 
     })

@@ -53,6 +53,7 @@ export default class Task extends Component {
     }
     this._dirtyList = []
     this._handleSyncTask = this._handleSyncTask.bind(this)
+    this._handleAddTask = this._handleAddTask.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -65,14 +66,18 @@ export default class Task extends Component {
 
   componentDidMount () {
     const { currentUser, socket } = this.context
-    this.props.load(currentUser.resourceId)
+    this.props.load(currentUser)
+    // for single task modify
     socket.on('syncTask', this._handleSyncTask)
+    // for task add or remove
+    socket.on('addTask', this._handleAddTask)
   }
 
   componentWillUnmount () {
     const { socket } = this.context
     TaskActions.dispose()
     socket.removeListener('syncTask', this._handleSyncTask)
+    socket.removeListener('addTask', this._handleAddTask)
   }
 
   render () {
@@ -196,8 +201,15 @@ export default class Task extends Component {
   }
 
   _handleSyncTask (body) {
-    const { syncTask } = this.props
-    syncTask(body)
+    this.props.syncTask(body)
+  }
+
+  _handleAddTask (body) {
+    const { assignee } = body
+    const { currentUser } = this.context
+    if (assignee.indexOf(currentUser.resourceId) >= 0) {
+      this.props.addTask(body)
+    }
   }
 
   _handleTaskSeal (id) {
@@ -211,16 +223,17 @@ export default class Task extends Component {
       loading: true, error: false
     }, () => {
       const { currentUser } = this.context
-      this.props.load(currentUser.resourceId)
+      this.props.load(currentUser)
     })
   }
 
   _addTask (body) {
+    const { socket } = this.context
     this.setState({
       isModalShowed: false
     }, () => {
       this.props.addTask(body)
+      socket.emit('addTask', body)
     })
-    // })
   }
 }
