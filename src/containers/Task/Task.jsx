@@ -25,7 +25,8 @@ export default class Task extends Component {
 
   static contextTypes = {
     socket: T.object,
-    currentUser: T.object
+    currentUser: T.object,
+    isLeader: T.bool
   }
 
   static propTypes = {
@@ -38,7 +39,7 @@ export default class Task extends Component {
     removeCheckList: T.func,
     syncTask: T.func,
     updateCheckList: T.func,
-    addNewTask: T.func
+    addTask: T.func
   }
 
   constructor (props) {
@@ -59,10 +60,6 @@ export default class Task extends Component {
     if (task.loading !== this.state.loading) {
       this.setState({ loading: task.loading, error: task.error })
       // this.setState({ loading: true })
-    }
-    
-    if (task.addNewTaskError) {
-      this.refs.newTaskModal.setMessage('Publish failed. Please retry.')
     }
   }
 
@@ -116,16 +113,17 @@ export default class Task extends Component {
         </Animate>
         {/* portal for create new task */}
         <NewTaskModal ref='newTaskModal' isShowed={this.state.isModalShowed}
-          onHide={::this._hideModal} onSubmit={::this._addTask} />
+          onHide={::this._hideModal} onSuccess={::this._addTask} />
       </div>
     )
   }
 
   _getTaskNav () {
+    const { isLeader } = this.context
     return (
       <nav className="navbar navbar-default task-navbar">
         <ul className="nav navbar-nav">
-          <li><a href='javascript:;' onClick={::this._showModal}><i className='fa fa-plus'></i>New Task</a></li>
+          {isLeader ? <li><a href='javascript:;' onClick={::this._showModal}><i className='fa fa-plus'></i>New Task</a></li> : null}
           <li><a href='javascript:;'><i className='fa fa-calendar'></i>Calender</a></li>
         </ul>
         <form className="navbar-form navbar-left" role="search">
@@ -218,6 +216,11 @@ export default class Task extends Component {
   }
 
   _addTask (body) {
-    this.props.addNewTask(body)
+    this.setState({
+      isModalShowed: false
+    }, () => {
+      this.props.addTask(body)
+    })
+    // })
   }
 }

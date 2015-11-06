@@ -31,7 +31,9 @@ export default class Main extends Component {
   static childContextTypes = {
     socket: T.object,
     currentUser: T.object,
-    resourceInfo: T.array
+    resourceInfo: T.array,
+    isAdmin: T.bool,
+    isLeader: T.bool
   }
 
   getChildContext () {
@@ -41,6 +43,8 @@ export default class Main extends Component {
     return {
       socket,
       currentUser: this.props.user,
+      isLeader: this.props.user.role > 1,
+      isAdmin: this.props.user.role < 0,
       resourceInfo
     }
   }

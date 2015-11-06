@@ -9,6 +9,7 @@ const TASK_API_URL = '/api/rest/task'
 
 const LOAD_TASK = 'LOAD_TASK'
 const NEW_TASK = 'NEW_TASK'
+const PUBLISH_TASK = 'PUBLISH_TASK'
 const UPDATE_TASK = 'UPDATE_TASK'
 const SYNC_TASK = 'SYNC_TASK'
 
@@ -147,13 +148,10 @@ export default function (state = initState, action) {
     }
   }
   case NEW_TASK: {
-    return action.error ?
-      update(state, {
-        addNewTaskError: { $set: true }
-      }) :
-      update(state, {
-        addNewTaskError: { $set: false }
-      })
+    const { payload } = action
+    return update(state, {
+      data: { [payload._id]: { $set: payload } }
+    })
   }
   case TASK_MODIFY: {
     const body = action.payload
@@ -202,7 +200,14 @@ export function load (resourceId) {
   }
 }
 
-export function addNewTask (body, ...then) {
+export function addTask (body) {
+  return {
+    type: NEW_TASK,
+    payload: body
+  }
+}
+
+export function publishNewTask (body, ...then) {
   const url = `${TASK_API_URL}`
   const setBodyDefault = setDefault(body)
   // set default
@@ -211,7 +216,7 @@ export function addNewTask (body, ...then) {
   setBodyDefault('checklist', [])
 
   return {
-    type: NEW_TASK,
+    type: PUBLISH_TASK,
     payload: request.post(url, body),
     then
   }

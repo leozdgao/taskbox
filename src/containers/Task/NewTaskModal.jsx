@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import map from 'lodash/collection/map'
 import sortBy from 'lodash/collection/sortBy'
-import { CompanyActions, ProjectActions } from '../../redux/modules'
+import { CompanyActions, ProjectActions, TaskActions } from '../../redux/modules'
 import { Modal, TaskForm, ProjectSelectForm } from '../../components'
 
 @connect(
@@ -13,8 +13,9 @@ import { Modal, TaskForm, ProjectSelectForm } from '../../components'
   }),
   dispatch => ({
     ...bindActionCreators({
-      ...CompanyActions,
-      ...ProjectActions
+      loadCompany: CompanyActions.loadCompany,
+      loadProjectByIds: ProjectActions.loadProjectByIds,
+      publishNewTask: TaskActions.publishNewTask
     }, dispatch)
   })
 )
@@ -28,10 +29,12 @@ class NewTaskModal extends Component {
     company: T.object,
     project: T.object,
     isShowed: T.bool,
+    onSuccess: T.func,
     onSubmit: T.func,
     onHide: T.func,
     loadCompany: T.func,
-    loadProjectByIds: T.func
+    loadProjectByIds: T.func,
+    publishNewTask: T.func
   }
 
   static defaultProps = {
@@ -48,9 +51,8 @@ class NewTaskModal extends Component {
       step: 0,
       currentProject: null,
       currentCompany: null,
-      selectedCid: null,
-      selectedPid: null,
-      avaliableProjects: []
+      avaliableProjects: [],
+      submitting: false
     }
   }
 
@@ -61,7 +63,8 @@ class NewTaskModal extends Component {
         step: 0,
         currentProject: null,
         currentCompany: null,
-        avaliableProjects: []
+        avaliableProjects: [],
+        submitting: false
       })
     }
   }
@@ -144,7 +147,7 @@ class NewTaskModal extends Component {
         <div className="modal-footer">
           <span className='help-text text-danger'>{this.state.msg}</span>
           <button type="button" className="btn btn-sm btn-white" onClick={::this._onBack}>Back</button>
-          <button type="button" className="btn btn-sm btn-success" onClick={::this._onClick}>Publish</button>
+          <button type="button" className="btn btn-sm btn-success" onClick={::this._onClick} disabled={this.state.submitting}>Publish</button>
         </div>
       </div>
     )
@@ -171,9 +174,17 @@ class NewTaskModal extends Component {
       this.setState({ msg: errmsg })
     }
     else {
-      this.setState({ msg: '' }, () => {
+      this.setState({
+        msg: '', submitting: true
+      }, () => {
         body.projectId = this.state.currentProject._id
-        this.props.onSubmit(body)
+
+        this.props.publishNewTask(body, ({ status, body }) => {
+          if (Number(status) !== 200) {
+            this.setState({ msg: 'Publish failed, please try again later.' })
+          }
+          else this.props.onSuccess(body.new)
+        })
       })
     }
   }

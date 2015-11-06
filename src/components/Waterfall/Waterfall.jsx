@@ -24,14 +24,14 @@ class Waterfall extends Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.children.length !== this.props.children.length) {
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.children.length !== this.props.children.length) {
       new ResWaterfall({ minBoxWidth: this.props.minBoxWidth })
       return
     }
 
-    forEach(this.props.children, (child, i) => {
-      const next = nextProps.children[i]
+    forEach(prevProps.children, (child, i) => {
+      const next = this.props.children[i]
       if (next.key !== child.key) {
         new ResWaterfall({ minBoxWidth: this.props.minBoxWidth })
         return false
