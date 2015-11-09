@@ -22,7 +22,7 @@ export default function (body) {
         const control = this.refs[field]
         if (control) {
           const val = control.value
-          if (!validator(val)) this._errors.push(field)
+          if (!validator.bind(this)(val)) this._errors.push(field)
           else ret[field] = val
         }
 

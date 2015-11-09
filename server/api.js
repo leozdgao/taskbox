@@ -14,6 +14,15 @@ router.use('/rest', function (req, res) {
     }).pipe(res)
 })
 
+router.use('/user/cpwd', function (req, res) {
+  var query = req.url.split('?')[1] || ''
+  var url = contants.CHANGE_PASSWORD_URL + '?' + query + '&token=' + req.cookies.token || '';
+  req.pipe(request(url))
+    .on('error', function () {
+      res.status(500).json({ error: 1 })
+    }).pipe(res)
+})
+
 router.use(bodyParser.json())
 
 router.get('/logout', function (req, res) {

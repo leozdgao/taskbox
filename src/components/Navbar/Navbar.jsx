@@ -50,8 +50,8 @@ export default class Navbar extends Component {
                 <span className='hidden-xs'>{name}</span><b className='caret'></b>
               </a>
               <DropdownList className='dropdown-menu' animateName='slideDown' open={this.state.userOpened} onHide={() => this.setState({ userOpened: false })}>
-                <option><a><i className='fa fa-user'></i>Profile</a></option>
-                <option><a><i className='fa fa-cog'></i>Settings</a></option>
+                <option><Link to='/profile'><i className='fa fa-user'></i>Profile</Link></option>
+                <option><Link to='/settings'><i className='fa fa-cog'></i>Settings</Link></option>
                 <option className='divider'></option>
                 <option><a href="/logout"><i className='fa fa-sign-out'></i>Logout</a></option>
               </DropdownList>

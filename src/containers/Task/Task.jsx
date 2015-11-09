@@ -1,6 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
 import { Link } from 'react-router'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import findWhere from 'lodash/collection/findWhere'
 import merge from 'deep-extend'
@@ -14,12 +13,10 @@ import './task.less'
   state => ({
     task: state.task
   }),
-  dispatch => ({
-    ...bindActionCreators({
-      ...TaskActions,
-      ...TaskActions.taskModifyActionCreators
-    }, dispatch)
-  })
+  {
+    ...TaskActions,
+    ...TaskActions.taskModifyActionCreators
+  }
 )
 export default class Task extends Component {
 

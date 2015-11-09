@@ -20,5 +20,6 @@ module.exports = {
   LOGIN_API_URL: combineUrl('/user/login'),
   LOGOUT_API_URL: combineUrl('/user/logout'),
   AUTH_API_URL: combineUrl('/user/isauth'),
+  CHANGE_PASSWORD_URL: combineUrl('/user/cpwd'),
   REST_API_URL: combineUrl('/rest')
 }

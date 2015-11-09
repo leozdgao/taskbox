@@ -4,7 +4,12 @@ import './editablefield.less'
 class EditableField extends Component {
 
   static propTypes = {
-    value: T.string
+    value: T.string,
+    onChange: T.func
+  }
+
+  static defaultProps = {
+    onChange: () => {}
   }
 
   constructor (props) {
@@ -12,8 +17,10 @@ class EditableField extends Component {
 
     this.state = {
       editing: false,
-      value: this.props.value
+      value: this.props.value || ''
     }
+
+    this._lastValue = this.props.value
   }
 
   render () {
@@ -48,7 +55,11 @@ class EditableField extends Component {
   }
 
   _disableEditable () {
-    this.setState({ editing: false })
+    this.setState({ editing: false }, () => {
+      if (this._lastValue !== this.state.value) this.props.onChange(this.state.value)
+
+      this._lastValue = this.state.value
+    })
   }
 }
 

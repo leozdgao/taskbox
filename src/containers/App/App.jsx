@@ -1,6 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
 import IO from 'socket.io-client'
-// import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { ResourceActions } from '../../redux/modules'
 import { Navbar, Sidebar, ScrollPanel } from '../../components'
@@ -17,17 +16,12 @@ socket.on('error', (e) => {
 
 @connect(
   state => ({
-    user: state.user,
+    user: state.user.data, // need not modify user, so just pass the data
     resource: state.resource
   }),
   {
     loadResource: ResourceActions.load
   }
-  // dispatch => ({
-  //   ...bindActionCreators({
-  //     loadResource: ResourceActions.load
-  //   }, dispatch)
-  // })
 )
 export default class Main extends Component {
 

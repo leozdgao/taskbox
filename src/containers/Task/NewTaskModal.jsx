@@ -1,5 +1,4 @@
 import React, { Component, PropTypes as T } from 'react'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import map from 'lodash/collection/map'
 import sortBy from 'lodash/collection/sortBy'
@@ -11,13 +10,11 @@ import { Modal, TaskForm, ProjectSelectForm } from '../../components'
     company: state.company,
     project: state.project
   }),
-  dispatch => ({
-    ...bindActionCreators({
-      loadCompany: CompanyActions.loadCompany,
-      loadProjectByIds: ProjectActions.loadProjectByIds,
-      publishNewTask: TaskActions.publishNewTask
-    }, dispatch)
-  })
+  {
+    loadCompany: CompanyActions.loadCompany,
+    loadProjectByIds: ProjectActions.loadProjectByIds,
+    publishNewTask: TaskActions.publishNewTask
+  }
 )
 class NewTaskModal extends Component {
 

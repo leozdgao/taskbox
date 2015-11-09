@@ -20,6 +20,7 @@ export { default as RadioGroup } from './RadioGroup/RadioGroup'
 export { default as Form } from './Form/Form'
 export { default as TaskForm } from './Form/TaskForm'
 export { default as ProjectSelectForm } from './Form/ProjectSelectForm'
+export { default as ChangePasswordForm } from './Form/ChangePasswordForm'
 export { default as EditableField } from './Form/EditableField'
 
 export { default as Editor } from './Editor/Editor'

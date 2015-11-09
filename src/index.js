@@ -7,7 +7,13 @@ import configureStore from './redux/configureStore'
 import routes from './routes'
 
 // init store
-const store = configureStore(window.__initData__)
+const store = configureStore()
+
+// {
+//   user: {
+//     data: window.__initData__.user
+//   }
+// }
 
 // dev tools
 if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {
