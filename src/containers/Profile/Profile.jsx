@@ -6,6 +6,13 @@ import { UserActions } from '../../redux/modules'
 import { roleMap } from '../../auth'
 import './profile.less'
 
+const avatars = [
+  '/assets/avatar.png',
+  '/assets/avatar0.png',
+  '/assets/avatar1.png',
+  '/assets/avatar2.png'
+]
+
 @connect(
   state => ({
     user: state.user
@@ -39,7 +46,7 @@ class Profile extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { user: { changePasswordPending, lastChangePasswordError } } = nextProps
+    const { user: { changePasswordPending, lastChangePasswordError,  } } = nextProps
     const { user: { changePasswordPending: currentPending } } = this.props
     if (currentPending && !changePasswordPending) { // fulfilled
       this.setState({
@@ -100,7 +107,9 @@ class Profile extends Component {
         </div>
         {this._getChangePasswordPanel()}
         {/* Protal */}
-        <ChangeAvatarModal isShowed={this.state.modalShowed} onHide={::this._hideModal} />
+        <ChangeAvatarModal isShowed={this.state.modalShowed}
+           onHide={::this._hideModal} onSubmit={this.props.updateProfile.bind(this, 'avatar')}
+           items={avatars} defaultValue={currentUser.avatar} />
       </div>
     )
   }

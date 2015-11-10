@@ -79,13 +79,14 @@ export default class TaskPanel extends Component {
             <h4 className='task-title' style={{ color: '#666' }}>Members</h4>
             <div className='task-members'>
               {map(assignee, (resourceId, i) => {
+                const { name, avatar } = this._getResource(resourceId)
                 const tooltip = (
-                  <Tooltip placement='bottom'>{this._getResourceName(resourceId)}</Tooltip>
+                  <Tooltip placement='bottom'>{name}</Tooltip>
                 )
                 return (
                   <OverlayTrigger key={i} event='hover' placement='bottom' overlay={tooltip}>
                     <a href='javascript:;' key={i}>
-                      <img src='/assets/avatar.png' />
+                      <img src={avatar} />
                     </a>
                   </OverlayTrigger>
                 )
@@ -167,15 +168,17 @@ export default class TaskPanel extends Component {
     )
   }
 
-  _getResourceName (resourceId) {
+  _getResource (resourceId) {
     const { resourceInfo } = this.context
 
     for (let i = 0; i < resourceInfo.length; i++) {
       const resource = resourceInfo[i]
       if (resource.resourceId === resourceId) {
-        return resource.name
+        return resource
       }
     }
+
+    return {}
   }
 
   _handleAddItem (key, e) {
