@@ -16,13 +16,15 @@ export default class ScrollPanel extends Component {
   static propTypes = {
     className: PropTypes.string,
     children: PropTypes.any,
+    scrollTopAfterUpdate: PropTypes.bool,
     onScrollTop: PropTypes.func,
     onScrollBottom: PropTypes.func
   }
 
   static defaultProps = {
     onScrollTop: noop,
-    onScrollBottom: noop
+    onScrollBottom: noop,
+    scrollTopAfterUpdate: true
   }
 
   constructor (props) {
@@ -50,7 +52,9 @@ export default class ScrollPanel extends Component {
 
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.children !== this.props.children) {
-      this.setState(this._constructScrollYUpdateState(0, 0))
+      if (this.props.scrollTopAfterUpdate) {
+        this.setState(this._constructScrollYUpdateState(0, 0))
+      }
       this._refreshDOMValue()
     }
 

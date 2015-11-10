@@ -1,7 +1,7 @@
 import update from 'react-addons-update'
 import { json as request } from 'lgutil/common/ajax'
 import createReducer from './createReducer'
-
+import { constructAsyncActionTypes, toKeyMirror } from './createAction'
 
 // -- Constants
 const RESOURCE_API_URL = '/api/rest/resource'
@@ -9,12 +9,17 @@ const CHANGE_PASSWORD_URL = '/api/user/cpwd'
 
 // -- ActionTypes
 const UPDATE_PROFILE = 'user/UPDATE_PROFILE'
+const updateProfileActions = constructAsyncActionTypes(UPDATE_PROFILE)
 const CHANGE_PASSWORD = 'user/CHANGE_PASSWORD'
+const changePasswordActions = constructAsyncActionTypes(CHANGE_PASSWORD)
 
-export const actionTypes = { UPDATE_PROFILE, CHANGE_PASSWORD }
+export const actionTypes = {
+  ...toKeyMirror(updateProfileActions),
+  ...toKeyMirror(changePasswordActions)
+}
 
 const actionMap = {
-  [UPDATE_PROFILE]: (state, action) => {
+  [updateProfileActions.fulfilled] (state, action) {
     const { key, value } = action.meta || {}
     if (key && value) {
       return update(state, {
@@ -22,10 +27,23 @@ const actionMap = {
       })
     }
   },
-  [CHANGE_PASSWORD]: (state, action) => {
-    const { error, payload } = action
+  [changePasswordActions.pending] (state, action) {
     return update(state, {
-      lastChangePasswordError: { $set: error }
+      changePasswordPending: { $set: true },
+      lastChangePasswordError: { $set: null }
+    })
+  },
+  [changePasswordActions.fulfilled] (state, action) {
+    // const { error, payload } = action
+    return update(state, {
+      changePasswordPending: { $set: false },
+      lastChangePasswordError: { $set: null }
+    })
+  },
+  [changePasswordActions.rejected] (state, action) {
+    return update(state, {
+      changePasswordPending: { $set: false },
+      lastChangePasswordError: { $set: action.payload }
     })
   }
 }
@@ -33,8 +51,10 @@ const actionMap = {
 // -- InitState
 const initState =  {
   data: (window.__initData__ && window.__initData__.user),
-  lastChangePasswordError: false,
-  lastUpdateProfileError: false
+  changePasswordPending: false,
+  lastChangePasswordError: null,
+  // updateProfilePending: false,
+  lastUpdateProfileError: null
 }
 
 // -- Reducer
@@ -42,25 +62,31 @@ export default createReducer(actionMap, initState)
 
 // -- Action Creaters
 export function updateProfile (key, value) {
-  const id = initState.data.resourceId // use _id from initState
+  const id = initState.data._id // use _id from initState
   const url = `${RESOURCE_API_URL}/${id}`
   const body = {
     update: { [key]: value }
   }
   return {
     type: UPDATE_PROFILE,
-    payload: request.put(url, body),
+    payload: {
+      promise: request.put(url, body)
+    },
     meta: { key, value }
   }
 }
 
 export function changePassword (oldPassword, newPassword) {
+  const body = {
+    _id: initState.data._id,
+    oldpwd: oldPassword,
+    newpwd: newPassword
+  }
+
   return {
     type: CHANGE_PASSWORD,
-    payload: request.post(CHANGE_PASSWORD_URL, {
-      _id: initState.data._id,
-      oldpwd: oldPassword,
-      newpwd: newPassword
-    })
+    payload: {
+      promise: request.post(CHANGE_PASSWORD_URL, body)
+    }
   }
 }

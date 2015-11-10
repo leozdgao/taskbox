@@ -23,6 +23,7 @@ class ChangePasswordForm extends Component {
 
   static propTypes = {
     fields: T.object,
+    isRequesting: T.bool,
     handleSubmit: T.func.isRequired,
     resetForm: T.func.isRequired
   }
@@ -40,7 +41,7 @@ class ChangePasswordForm extends Component {
   }
 
   render () {
-    const { fields: { oldpwd, newpwd, repeat }, handleSubmit, resetForm } = this.props
+    const { fields: { oldpwd, newpwd, repeat }, handleSubmit, resetForm, isRequesting } = this.props
     const isInvalid = (field) => field.touched && field.error
 
     return (
@@ -60,7 +61,7 @@ class ChangePasswordForm extends Component {
           <input type="password" className="form-control" {...repeat} />
           {isInvalid(repeat) && <span className='help-block'>{repeat.error}</span>}
         </div>
-        <button className="mt-15 btn btn-success btn-block" onClick={handleSubmit}>Change password</button>
+        <button className="mt-15 btn btn-success btn-block" disabled={isRequesting} onClick={handleSubmit}>Change password</button>
       </form>
     )
   }

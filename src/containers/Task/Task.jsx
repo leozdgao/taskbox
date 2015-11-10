@@ -5,8 +5,7 @@ import findWhere from 'lodash/collection/findWhere'
 import merge from 'deep-extend'
 import validator from 'validator'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, Form, Spinner, TaskPanel, Waterfall, IconInput } from '../../components'
-import NewTaskModal from './NewTaskModal'
+import { Animate, Dimmer, Form, Spinner, TaskPanel, Waterfall, IconInput, NewTaskModal } from '../../components'
 import './task.less'
 
 @connect(

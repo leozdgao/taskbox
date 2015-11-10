@@ -67,26 +67,23 @@ export const updateBodyMap = {
   removeCheckList: (taskIndex, listIndex) => ({ [taskIndex]: { checklist: { $splice: [ [ listIndex, 1 ] ] } } })
 }
 const taskActionBuilder = (actions, type) => {
-  const ret = {}
-  actions.forEach((actionName) => {
+  return actions.reduce((ret, actionName) => {
     const bodyBuilder = updateBodyMap[actionName]
     if (typeof bodyBuilder === 'function') {
       ret[actionName] = (...args) => {
         const body = bodyBuilder.apply(null, args)
-
         return {
           type,
           payload: body
         }
       }
     }
-  })
-
-  return ret
+    return ret
+  }, {})
 }
 
 const isActionModifyEntry = (actionName) => {
-  return actionName === 'checkEntry' || actionName === 'addEntry' || actionName === 'removeEntry'
+  return [ 'checkEntry', 'addEntry', 'removeEntry' ].indexOf(actionName) >= 0
 }
 
 export const mergeActions = (ret = {}, actionName, args, updateBody) => {

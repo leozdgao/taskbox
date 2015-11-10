@@ -2,14 +2,41 @@
   width: 90px;
   float: left;
 
-  img {
+  .circle-border {
+    position: relative;
+    border: 6px solid #FFFFFF;
+    border-radius: 50%;
     width: 72px;
     height: 72px;
+    cursor: pointer;
 
-    &.circle-border {
-      border: 6px solid #FFFFFF;
+    img {
       border-radius: 50%;
+      width: 100%;
+      height: 100%;
     }
+
+    &:hover {
+      .dimmer {
+        display: block;
+        font-size: 20px;
+        background-color: rgba(0,0,0,.3);
+        border-radius: inherit;
+
+        i.fa {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          margin-left: -10px;
+          margin-top: -10px;
+          color: #eee;
+        }
+      }
+    }
+  }
+
+  .dimmer {
+    display: none;
   }
 }
 .profile-info {

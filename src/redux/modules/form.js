@@ -3,12 +3,10 @@ import { actionTypes as userActionTypes } from './user'
 import createReducer from './createReducer'
 
 const actionMap = {
-  [userActionTypes.CHANGE_PASSWORD]: (state, action) => {
-    if (action.error) {
-      return {
-        ...state,
-        oldpwd: {} // set old password to empty if error
-      }
+  [userActionTypes["user/CHANGE_PASSWORD_REJECTED"]]: (state, action) => {
+    return {
+      ...state,
+      oldpwd: {} // set old password to empty if error
     }
   }
 }

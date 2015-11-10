@@ -94,6 +94,7 @@
     "redux-form": "^3.0.5",
     "redux-logger": "^1.0.8",
     "redux-promise": "^0.5.0",
+    "redux-promise-middleware": "^2.2.0",
     "redux-thunk": "^1.0.0",
     "request": "^2.65.0",
     "responsive_waterfall": "^1.0.0",

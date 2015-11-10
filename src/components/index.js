@@ -1,6 +1,5 @@
 export { default as Toggle } from './Toggle/Toggle'
 export { default as ScrollPanel } from './ScrollPanel/ScrollPanel'
-export { default as Modal } from './Modal/Modal'
 export { default as Animate } from './Animate/Animate'
 export { default as Dropdown } from './Dropdown/Dropdown'
 export { default as DropdownList } from './Dropdown/DropdownList'
@@ -22,5 +21,9 @@ export { default as TaskForm } from './Form/TaskForm'
 export { default as ProjectSelectForm } from './Form/ProjectSelectForm'
 export { default as ChangePasswordForm } from './Form/ChangePasswordForm'
 export { default as EditableField } from './Form/EditableField'
+
+export { default as Modal } from './Modal/Modal'
+export { default as ChangeAvatarModal } from './Modal/ChangeAvatarModal'
+export { default as NewTaskModal } from './Modal/NewTaskModal'
 
 export { default as Editor } from './Editor/Editor'

@@ -1,35 +1,57 @@
 import update from 'react-addons-update'
 import { json as request } from 'lgutil/common/ajax'
+import createReducer from './createReducer'
+import { constructAsyncActionTypes, toKeyMirror } from './createAction'
 
+// -- Constants
 const RESOURCE_LOAD_API_URL = '/api/rest/resource'
 
-const LOAD_RESOURCE = 'LOAD_RESOURCE'
-const UPDATE_RESOURCE = 'UPDATE_RESOURCE'
+// -- ActionTypes
+const LOAD_RESOURCE = 'resource/LOAD_RESOURCE'
+const loadResourceAction = constructAsyncActionTypes(LOAD_RESOURCE)
+// const UPDATE_RESOURCE = 'UPDATE_RESOURCE'
 
+export const actionTypes = {
+  ...toKeyMirror(loadResourceAction)
+}
+
+// -- InitState
 const initState = {
   data: [],
-  loading: true,
+  loading: false,
   error: null
 }
 
-export default (state = initState, action) => {
-  switch (action.type) {
-  case LOAD_RESOURCE: {
-    const field = action.error ? 'error' : 'data'
+const actionMap = {
+  [loadResourceAction.pending] (state, action) {
     return update(state, {
-      [field]: { $set: action.payload.body },
-      loading: { $set: false }
+      loading: { $set: true },
+      error: { $set: null }
     })
-  }
-  default:
-    return state
+  },
+  [loadResourceAction.fulfilled] (state, action) {
+    return update(state, {
+      loading: { $set: false },
+      data: { $set: action.payload.body }
+    })
+  },
+  [loadResourceAction.rejected] (state, action) {
+    return update(state, {
+      loading: { $set: false },
+      error: { $set: action.payload.body }
+    })
   }
 }
 
-// action for load task
+// -- Reducer
+export default createReducer(actionMap, initState)
+
+// -- Action Creaters
 export function load () {
   return {
     type: LOAD_RESOURCE,
-    payload: request.get(RESOURCE_LOAD_API_URL)
+    payload: {
+      promise: request.get(RESOURCE_LOAD_API_URL)
+    }
   }
 }

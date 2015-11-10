@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import { connect } from 'react-redux'
 import { reset } from 'redux-form'
-import { EditableField, ChangePasswordForm } from '../../components'
+import { Dimmer, Modal, EditableField, ChangePasswordForm, ChangeAvatarModal } from '../../components'
 import { UserActions } from '../../redux/modules'
 import { roleMap } from '../../auth'
 import './profile.less'
@@ -33,19 +33,24 @@ class Profile extends Component {
     super(props, context)
 
     this.state = {
-      showcpwMessage: false
+      loading: false,
+      modalShowed: false
     }
   }
 
   componentWillReceiveProps (nextProps) {
-    const { user: { lastChangePasswordError } } = nextProps
-    if (this.state.showcpwMessage !== lastChangePasswordError) {
+    const { user: { changePasswordPending, lastChangePasswordError } } = nextProps
+    const { user: { changePasswordPending: currentPending } } = this.props
+    if (currentPending && !changePasswordPending) { // fulfilled
       this.setState({
-        showcpwMessage: lastChangePasswordError
+        loading: false
       }, () => {
-        if (!lastChangePasswordError) {
-          this.props.resetForm('changePassword')
-        }
+        if (!lastChangePasswordError) this.props.resetForm('changePassword')
+      })
+    }
+    if (!currentPending && changePasswordPending) { // start requesting
+      this.setState({
+        loading: true
       })
     }
   }
@@ -62,7 +67,10 @@ class Profile extends Component {
               <div className="panel-body">
                 <div className="clearfix">
                   <div className="profile-image">
-                    <img className="circle-border" src={currentUser.avatar}/>
+                    <div className="circle-border" onClick={::this._showModal}>
+                      <img className="" src={currentUser.avatar}/>
+                      <Dimmer><i className="fa fa-edit" /></Dimmer>
+                    </div>
                   </div>
                   <div className="profile-info">
                     <h3>{currentUser.name}</h3>
@@ -91,18 +99,21 @@ class Profile extends Component {
           </div>
         </div>
         {this._getChangePasswordPanel()}
+        {/* Protal */}
+        <ChangeAvatarModal isShowed={this.state.modalShowed} onHide={::this._hideModal} />
       </div>
     )
   }
 
   _getChangePasswordPanel () {
+    const { user: { lastChangePasswordError } } = this.props
     return (
       <div className="row">
         <div className="col-lg-4 col-md-6">
           <div className="panel panel-inverse">
             <div className="panel-body">
-              <ChangePasswordForm onSubmit={::this._handleChangePassword} />
-              {this.state.showcpwMessage &&
+              <ChangePasswordForm onSubmit={::this._handleChangePassword} isRequesting={this.state.loading} />
+              {lastChangePasswordError &&
                 <span className="block mt-15 text-danger">
                   Failed to change password. Maybe your current password is wrong or server just broken...
                 </span>}
@@ -120,6 +131,14 @@ class Profile extends Component {
     }, () => {
       this.props.changePassword(oldpwd, newpwd)
     })
+  }
+
+  _showModal () {
+    this.setState({ modalShowed: true })
+  }
+
+  _hideModal () {
+    this.setState({ modalShowed: false })
   }
 }
 
