@@ -5,7 +5,7 @@ import findWhere from 'lodash/collection/findWhere'
 import merge from 'deep-extend'
 import validator from 'validator'
 import { TaskActions } from '../../redux/modules'
-import { Animate, Dimmer, Form, Spinner, TaskPanel, Waterfall, IconInput, NewTaskModal } from '../../components'
+import { PageHeading, Animate, Dimmer, Form, Spinner, TaskPanel, Waterfall, IconInput, NewTaskModal } from '../../components'
 import './task.less'
 
 @connect(
@@ -82,8 +82,11 @@ export default class Task extends Component {
 
     return (
       <div>
-        <div className="page-header">Task Board</div>
-        {this._getTaskNav()}
+        <PageHeading title="Task" breadcrumb={[
+          { title: "Home", link: "/" }, { title: "Task", link: "/task" }
+        ]}>
+          {this._getTaskNav()}
+        </PageHeading>
         <Animate name='fade'>
           {this.state.loading ? (
             <Spinner key={0} className='task-dimmer' />

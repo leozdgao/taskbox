@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as T } from 'react'
 import { connect } from 'react-redux'
 import { reset } from 'redux-form'
-import { Dimmer, Modal, EditableField, ChangePasswordForm, ChangeAvatarModal } from '../../components'
+import { PageHeading, IBox, Dimmer, Modal, EditableField, ChangePasswordForm, ChangeAvatarModal } from '../../components'
 import { UserActions } from '../../redux/modules'
 import { roleMap } from '../../auth'
 import './profile.less'
@@ -67,11 +67,14 @@ class Profile extends Component {
 
     return (
       <div>
-        <div className="page-header">User - Profile</div>
+        <PageHeading title="Profile" breadcrumb={[
+          { title: "Home", link: "/" }, { title: "User" }, { title: "Profile" }
+        ]} />
         <div className="row">
           <div className="col-lg-4 col-md-6">
-            <div className="panel panel-inverse">
-              <div className="panel-body">
+            <IBox>
+              <IBox.Title><h5>Detail</h5></IBox.Title>
+              <IBox.Content>
                 <div className="clearfix">
                   <div className="profile-image">
                     <div className="circle-border" onClick={::this._showModal}>
@@ -98,8 +101,8 @@ class Profile extends Component {
                     <EditableField value={currentUser.qq} onChange={this.props.updateProfile.bind(this, 'qq')} />
                   </div>
                 </div>
-              </div>
-            </div>
+              </IBox.Content>
+            </IBox>
           </div>
           <div className="col-md-6">
             {/* Timeline here */}
@@ -119,15 +122,16 @@ class Profile extends Component {
     return (
       <div className="row">
         <div className="col-lg-4 col-md-6">
-          <div className="panel panel-inverse">
-            <div className="panel-body">
+          <IBox>
+            <IBox.Title><h5>Change Password</h5></IBox.Title>
+            <IBox.Content>
               <ChangePasswordForm onSubmit={::this._handleChangePassword} isRequesting={this.state.loading} />
               {lastChangePasswordError &&
                 <span className="block mt-15 text-danger">
                   Failed to change password. Maybe your current password is wrong or server just broken...
                 </span>}
-            </div>
-          </div>
+            </IBox.Content>
+          </IBox>
         </div>
       </div>
     )
