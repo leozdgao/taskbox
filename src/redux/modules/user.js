@@ -54,7 +54,9 @@ const initState =  {
   changePasswordPending: false,
   lastChangePasswordError: null,
   // updateProfilePending: false,
-  lastUpdateProfileError: null
+  lastUpdateProfileError: null,
+  loadActivitiesPending: false,
+  lastGetActivitiesError: null
 }
 
 // -- Reducer
@@ -89,4 +91,19 @@ export function changePassword (oldPassword, newPassword) {
       promise: request.post(CHANGE_PASSWORD_URL, body)
     }
   }
+}
+
+export function loadActivities () {
+  // const { resourceId } = initState.data
+  // const query = {
+  //   conditions: {
+  //     assignee: !isLeader(role) ? resourceId : void 0,
+  //     startDate: {
+  //       $lte: getToday().toString()
+  //     },
+  //     endDate: {
+  //       $exists: false
+  //     }
+  //   }
+  // }
 }

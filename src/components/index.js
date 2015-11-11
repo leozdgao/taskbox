@@ -17,6 +17,7 @@ export { default as IconInput } from './IconInput/IconInput'
 export { default as RadioGroup } from './RadioGroup/RadioGroup'
 export { default as PageHeading } from './PageHeading/PageHeading'
 export { default as IBox } from './IBox/IBox'
+export { default as TreeView } from './TreeView/TreeView'
 
 export { default as Form } from './Form/Form'
 export { default as TaskForm } from './Form/TaskForm'

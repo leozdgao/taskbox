@@ -1,9 +1,11 @@
 import update from 'react-addons-update'
 import { json as request } from 'lgutil/common/ajax'
+import createReducer from './createReducer'
 
 const COMPANY_API_URL = '/api/rest/company'
 
-const LOAD_COMPANY = 'LOAD_COMPANY'
+const LOAD_ALL_COMPANY = 'company/LOAD_ALL_COMPANY'
+const LOAD_COMPANY_GROUP = 'company/LOAD_COMPANY_GROUP'
 
 const initState = {
   data: {},
@@ -29,9 +31,8 @@ const hasSameKey = (a, b) => {
 let requests = []
 const cacheRequest = promise => requests.push(promise)
 
-export default function (state = initState, action) {
-  switch (action.type) {
-  case LOAD_COMPANY: {
+const actionMap = {
+  [LOAD_ALL_COMPANY] (state, action) {
     if (action.error) {
       return update(state, {
         lastRError: { $set: true },
@@ -52,15 +53,18 @@ export default function (state = initState, action) {
         })
       }
     }
-  }
-  default: return state
+  },
+  [LOAD_COMPANY_GROUP] (state, action) {
+
   }
 }
+
+export default createReducer(actionMap, initState)
 
 export function loadCompany () {
   const url = COMPANY_API_URL
   return {
-    type: LOAD_COMPANY,
+    type: LOAD_ALL_COMPANY,
     cacheable: true,
     payload: {
       promiseCreator: request.get,
@@ -68,6 +72,21 @@ export function loadCompany () {
     },
     timeout: 5000, // cache timeout, company do not need cache
     onPromised: cacheRequest
+  }
+}
+
+export function loadCompanyGroup (from, to) {
+  const query = {
+    conditions: {
+
+    }
+  }
+  return {
+    type: LOAD_COMPANY_GROUP,
+    cacheKey: `${LOAD_COMPANY_GROUP}$${from}$${to}`,
+    payload: {
+      promise: request.get(url)
+    }
   }
 }
 

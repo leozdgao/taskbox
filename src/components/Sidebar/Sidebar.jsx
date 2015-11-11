@@ -13,8 +13,8 @@ const Sidebar = ({ user = {} }) => {
       <ScrollPanel >
         <ul className="nav">
           <li className="nav-profile">
-            <div className="image">
-              <a><img src={avatar} /></a>
+            <div className="circle-img sm-img image">
+              <Link to="/profile"><img src={avatar} /></Link>
             </div>
             <div className="info">
               {name}
@@ -29,6 +29,12 @@ const Sidebar = ({ user = {} }) => {
               <i className="fa fa-laptop"></i>
               <span>DashBoard</span>
             </IndexLink>
+          </li>
+          <li>
+            <Link to='/info' activeClassName="active">
+              <i className="fa fa-info"></i>
+              <span>Projects</span>
+            </Link>
           </li>
           <li>
             <Link to='/task' activeClassName="active">

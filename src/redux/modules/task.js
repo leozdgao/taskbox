@@ -8,13 +8,13 @@ import { isLeader, isAdmin } from '../../auth'
 
 const TASK_API_URL = '/api/rest/task'
 
-const LOAD_TASK = 'LOAD_TASK'
-const NEW_TASK = 'NEW_TASK'
-const PUBLISH_TASK = 'PUBLISH_TASK'
-const UPDATE_TASK = 'UPDATE_TASK'
-const SYNC_TASK = 'SYNC_TASK'
+const LOAD_TASK = 'task/LOAD_TASK'
+const NEW_TASK = 'task/NEW_TASK'
+const PUBLISH_TASK = 'task/PUBLISH_TASK'
+const UPDATE_TASK = 'task/UPDATE_TASK'
+const SYNC_TASK = 'task/SYNC_TASK'
 
-const TASK_MODIFY = 'TASK_MODIFY'
+const TASK_MODIFY = 'task/TASK_MODIFY'
 
 // - abortable
 // - cacheable
@@ -210,7 +210,7 @@ export function publishNewTask (body, ...then) {
   const url = `${TASK_API_URL}`
   const setBodyDefault = setDefault(body)
   // set default
-  setBodyDefault('startDate', getToday())
+  setBodyDefault('startDate', new Date())
   setBodyDefault('sealed', false)
   setBodyDefault('checklist', [])
 

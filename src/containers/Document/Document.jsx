@@ -1,10 +1,16 @@
 import React, { Component, PropTypes as T } from 'react'
-import { Editor } from '../../components'
+import { PageHeading, Editor } from '../../components'
 
 class Document extends Component {
   render () {
     return (
-      <Editor onLoad={this._editorLoaded} onError={this._editorError} />
+      <div>
+        <PageHeading title="Documents" breadcrumb={[
+          { title: 'Home', link: '/' },
+          { title: 'Documents', link: '/doc' }
+        ]}/>
+        <Editor onLoad={this._editorLoaded} onError={this._editorError} />
+      </div>
     )
   }
 

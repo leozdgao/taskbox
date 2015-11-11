@@ -5,6 +5,7 @@ import * as containers from './containers'
 const {
   App,
   Dashboard,
+  Info,
   Task,
   Team,
   Document,
@@ -16,6 +17,7 @@ export default (
   <Route>
     <Route path="/" component={App}>
       <IndexRoute component={Dashboard} />
+      <Route path="info" component={Info} />
       <Route path="task" component={Task} />
       <Route path="team" component={Team} />
       <Route path="doc" component={Document} />

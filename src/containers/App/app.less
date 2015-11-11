@@ -50,3 +50,19 @@ input[type=checkbox], input[type=radio] {
 .no-margins { margin: 0 !important; }
 .white-bg { background-color: #ffffff; }
 .border-bottom { border-bottom: 1px solid #e7eaec !important; }
+.circle-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+
+  &.sm-img {
+    width: 36px;
+    height: 36px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+}

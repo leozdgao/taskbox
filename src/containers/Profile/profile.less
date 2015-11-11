@@ -6,15 +6,7 @@
     position: relative;
     border: 6px solid #FFFFFF;
     border-radius: 50%;
-    width: 72px;
-    height: 72px;
     cursor: pointer;
-
-    img {
-      border-radius: 50%;
-      width: 100%;
-      height: 100%;
-    }
 
     &:hover {
       .dimmer {
@@ -76,19 +68,43 @@
 
 .change-avatar {
   .img {
-    width: 36px;
-    height: 36px;
     float: left;
     margin: 0 4px;
     cursor: pointer;
 
-    img {
-      width: 100%;
-      height: 100%;
-    }
-
     &.active {
       border: 2px solid steelblue;
+    }
+  }
+}
+
+.feed-element:first-child {
+  margin-top: 0;
+}
+.feed-activity-list .feed-element {
+  border-bottom: 1px solid #e7eaec;
+}
+.feed-element, .media-body {
+  overflow: hidden;
+}
+.feed-element, .feed-element .media {
+  margin-top: 15px;
+}
+.feed-element {
+  padding-bottom: 15px;
+
+  .circle-img {
+    position: relative;
+    margin-right: 15px;
+    background-color: #ccc;
+
+    .fa {
+      position: absolute;
+      font-size: 18px;
+      top: 50%;
+      left: 50%;
+      margin-top: -9px;
+      margin-left: -7.75px;
     }
   }
 }

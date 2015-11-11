@@ -22,7 +22,7 @@ class PageHeading extends Component {
             <ol className="breadcrumb">
               {breadcrumb.map(({ title, link }, i) => {
                 return (
-                  <li className={cNames({ active: i === breadcrumb.length - 1 })}>
+                  <li key={i} className={cNames({ active: i === breadcrumb.length - 1 })}>
                     {link ? <Link to={link}>{title}</Link> : <a>{title}</a>}
                   </li>
                 )

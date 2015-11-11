@@ -41,7 +41,11 @@ class ChangeAvatarModal extends Component {
           <div className="modal-body">
             <div className="clearfix">
               {this.props.items.map((src, i) => {
-                return <div key={i} className={cNames([ "img", { "active": this.state.currentIndex === i } ])}><img src={src} onClick={this._select.bind(this, i)} /></div>
+                return (
+                  <div key={i} className={cNames([ "circle-img sm-img img", { "active": this.state.currentIndex === i } ])}>
+                    <img src={src} onClick={this._select.bind(this, i)} />
+                  </div>
+                )
               })}
             </div>
           </div>
