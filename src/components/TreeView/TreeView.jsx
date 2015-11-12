@@ -8,13 +8,11 @@ export default class TreeView extends Component {
     collapsed: T.bool,
     defaultCollapsed: T.bool,
     nodeLabel: T.node.isRequired,
-    onClick: T.func,
     children: T.any
   }
 
   static defaultProps = {
-    collapsed: true,
-    onClick: () => {}
+    collapsed: false
   }
 
   render () {
@@ -29,7 +27,7 @@ export default class TreeView extends Component {
     const arrowClassName = 'tree-view_arrow'
 
     const arrow = (
-      <div {...rest} className={className + ' ' + arrowClassName} onClick={::this._handleClick}>
+      <div {...rest} className={className + ' ' + arrowClassName} onClick={nodeLabel.props.onClick}>
         ▾
       </div>
     )
@@ -44,10 +42,6 @@ export default class TreeView extends Component {
         </div>
       </div>
     )
-  }
-
-  _handleClick (...args) {
-    this.props.onClick(...args)
   }
 }
 

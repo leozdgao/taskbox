@@ -9,6 +9,7 @@
 
 /* style for the children nodes container */
 .tree-view_children {
+  height: 0px;
   margin-left: 16px;
 }
 
@@ -20,13 +21,16 @@
   user-select: none;
 }
 
+.tree-view_arrow {
+  transform: rotate(-90deg);
+}
 
 .collapsed {
   &.tree-view_children {
-    height: 0px;
+    height: auto;
   }
   /* rotate the triangle to close it */
-  .tree-view_arrow {
-    transform: rotate(-90deg);
+  &>.tree-view_arrow {
+    transform: rotate(0);
   }
 }

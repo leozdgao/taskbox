@@ -1,4 +1,41 @@
-.tree-view_item.collapsed .fa-folder-open:before {
-  content: "\f07b";
-  color: #f59c1a;
+// customize tree view style
+.tree-view_item.collapsed .fa-folder:before {
+  content: "\f07c";
+  color: #00acac;
+}
+
+.tree-view_arrow {
+  font-size: 16px;
+}
+.tree-view_item {
+  .fa {
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    color: #f59c1a;
+  }
+
+  .entry {
+    display: inline-block;
+    color: inherit;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    padding-left: 6px;
+    padding-right: 6px;
+    vertical-align: middle;
+
+    &:hover {
+      background: #f0f3f4!important;
+    }
+
+    &:active {
+      background: #E4E9EC!important;
+    }
+  }
+}
+.project-entry {
+  margin-left: 16px;
+  .fa { color: #49b6d6; }
 }
