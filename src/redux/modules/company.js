@@ -4,7 +4,7 @@ import { json as request } from 'lgutil/common/ajax'
 import findIndex from 'lodash/array/findIndex'
 import createReducer from './createReducer'
 import { constructAsyncActionTypes, toKeyMirror } from './createAction'
-import { hasSameKey, isInGroup, safePush, safeIndexOf, defaultValue } from '../util'
+import { hasSameKey, isInGroup, safePush, safeIndexOf, defaultValue } from '../../utils'
 
 // -- Constants
 const COMPANY_API_URL = '/api/rest/company'

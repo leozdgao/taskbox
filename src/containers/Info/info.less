@@ -26,6 +26,19 @@
     padding-right: 6px;
     vertical-align: middle;
 
+    // .fa { float: left; }
+
+    .shrink-span {
+      // display: block;
+      display: inline-block;
+      width: 200px;
+      // margin-left: 24px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      vertical-align: top;
+    }
+
     &:hover {
       background: #f0f3f4!important;
     }
@@ -38,4 +51,36 @@
 .project-entry {
   margin-left: 16px;
   .fa { color: #49b6d6; }
+}
+
+.info-content {
+  position: absolute;
+  top: 122px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  >.row, >.row>div, >.row>div>.scrollpanel {
+    height: 100%;
+  }
+
+  .center {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+  }
+
+  .wel-page {
+    margin-top: -150px;
+
+    .fa {
+      font-size: 100px;
+    }
+
+    >p {
+      margin-top: 24px;
+      font-size: 18px;
+    }
+  }
 }

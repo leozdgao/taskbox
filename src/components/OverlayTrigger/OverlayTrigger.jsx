@@ -2,7 +2,7 @@ import React, { Component, PropTypes as T } from 'react'
 import ReactDOM from 'react-dom'
 import { Overlay, Transition } from 'react-overlays'
 import contains from 'dom-helpers/query/contains'
-import { isOneOf, createChainedFunction } from '../utils'
+import { isOneOf, createChainedFunction } from '../../utils'
 
 // react-overlays animation
 export const Fade = (props) => {

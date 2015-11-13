@@ -1,5 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
-import { newScript, loadAllScript } from '../utils'
+import { newScript, loadAllScript } from '../../utils'
 import './bootstrap-markdown.min.css'
 
 

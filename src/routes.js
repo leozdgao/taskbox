@@ -6,6 +6,8 @@ const {
   App,
   Dashboard,
   Info,
+  CompanyDetail,
+  ProjectDetail,
   Task,
   Team,
   Document,
@@ -17,7 +19,10 @@ export default (
   <Route>
     <Route path="/" component={App}>
       <IndexRoute component={Dashboard} />
-      <Route path="info" component={Info} />
+      <Route path="info" component={Info}>
+        <Route path="c/:cid" component={CompanyDetail} />
+        <Route path="p/:pid" component={ProjectDetail} />
+      </Route>
       <Route path="task" component={Task} />
       <Route path="team" component={Team} />
       <Route path="doc" component={Document} />
