@@ -2,7 +2,6 @@ import React, { Component, PropTypes as T } from 'react'
 import { newScript, loadAllScript } from '../../utils'
 import './bootstrap-markdown.min.css'
 
-
 const noop = () => {}
 let vendorLoaded  = false
 
