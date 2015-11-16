@@ -10,9 +10,8 @@ import './info.less'
 const { companyGroup } = CompanyActions
 
 @connect(
-  state => ({
-    company: state.company,
-    project: state.project
+  ({ company, project }) => ({
+    company, project
   }),
   {
     ...CompanyActions,
@@ -90,7 +89,7 @@ export default class Info extends Component {
               </ScrollPanel>
             </div>
             <div className="col-md-8 relative">
-              {this.props.children}
+              {this.props.children || this._getInitPage()}
             </div>
           </div>
         </div>

@@ -18,6 +18,10 @@ class Editor extends Component {
     onError: noop
   }
 
+  get value () {
+    return this.refs.editor.value
+  }
+
   componentDidMount () {
     if (!vendorLoaded) this.loadVendorScript(this.configEditor)
     else {
@@ -28,7 +32,7 @@ class Editor extends Component {
 
   render () {
     return (
-      <textarea ref='editor' name="content" data-provide="markdown" rows="10"></textarea>
+      <textarea ref='editor' name="content" data-provide="markdown" rows="15"></textarea>
     )
   }
 
@@ -39,7 +43,7 @@ class Editor extends Component {
         return
       }
 
-      this.$editor.markdown()
+      this.configEditor(this.$editor)
     }
   }
 

@@ -64,7 +64,7 @@ export default class Main extends Component {
         <Navbar user={this.props.user} msgNum={msgNum} />
         <Sidebar user={this.props.user} />
         <ScrollPanel id='content'>
-          {React.cloneElement(this.props.children, { ...this.props })}
+          {this.props.children}
         </ScrollPanel>
       </div>
     )

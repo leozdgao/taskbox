@@ -1,16 +1,14 @@
 .spinner > div {
-  background-color: #fff;
-  width: 15px;
-  height: 15px;
-  border-radius: 100%;
-  margin: 2px;
-  animation-fill-mode: both;
+  display: inline-block;
+  width: 25px;
+  height: 25px;
   border: 2px solid #fff;
   border-bottom-color: transparent;
-  height: 25px;
-  width: 25px;
+  border-radius: 100%;
+  margin: 2px;
+  background-color: #fff;
   background: transparent !important;
-  display: inline-block;
+  animation-fill-mode: both;
   animation: rotate 0.75s 0s linear infinite;
 }
 
@@ -34,4 +32,20 @@
   bottom: 0;
   left: 0;
   right: 0;
+  text-align: center;
+  height: 100%;
+  background-color: #fff;
+
+  .spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -17px;
+    margin-top: -17px;
+
+    &>div {
+      border: 2px solid #00acac;
+      border-bottom-color: transparent;
+    }
+  }
 }

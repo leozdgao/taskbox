@@ -5,17 +5,17 @@ export const isOneOf = (one, of) => {
   return one === of
 }
 
-export const createChainedFunction = (target, ...funcs) => {
+export const createChainedFunction = (...funcs) => {
   return funcs.filter((f) => {
     return f != null
   }).reduce((acc, f) => {
     if (acc === null) {
-      return f.bind(target)
+      return f
     }
 
     return (...args) => {
-      args.apply(target, args)
-      f.apply(target, args)
+      args.apply(null, args)
+      f.apply(null, args)
     }
   }, null)
 }

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes as T } from 'react'
 import findWhere from 'lodash/collection/findWhere'
-import DropdownInput from './DropDownInput'
+import { DropdownInput } from '../../components'
 
 const getValue = (obj, key) => {
   if (obj != null) return obj[key]

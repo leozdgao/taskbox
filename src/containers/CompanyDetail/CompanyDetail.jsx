@@ -12,6 +12,8 @@ import './companydetail.less'
 )
 class CompanyDetail extends Component {
 
+  static displayName = "CompanyDetail"
+
   static propTypes = {
     params: T.object,
     project: T.object,

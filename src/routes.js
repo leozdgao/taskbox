@@ -11,6 +11,7 @@ const {
   Task,
   Team,
   Document,
+  NewPost,
   Profile,
   Page404
 } = containers
@@ -25,7 +26,10 @@ export default (
       </Route>
       <Route path="task" component={Task} />
       <Route path="team" component={Team} />
-      <Route path="doc" component={Document} />
+      <Route path="doc" component={Document}>
+        <Route path="new" component={NewPost} />
+        {/* <Route path=":docId" component={PostView} /> */}
+      </Route>
       <Route path="profile" component={Profile} />
     </Route>
     <Route path="*" component={Page404} />

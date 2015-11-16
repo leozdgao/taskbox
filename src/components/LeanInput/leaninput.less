@@ -1,0 +1,33 @@
+.cleanText {
+  position: relative;
+  border-bottom: 2px solid #ccc;
+
+  input {
+    display: block;
+    width: 100%;
+    border-style: none;
+    padding: 10px;
+
+    &:focus~.strip {
+      width: 100%;
+    }
+  }
+
+  .strip {
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    transition: all .3s;
+    width: 0;
+    height: 2px;
+    background-color: steelblue;
+
+    &.show { width: 100%; }
+  }
+
+  // invalid clean text
+  // &.invalid {
+  //   border-bottom-color: @errorColor;
+  // }
+}

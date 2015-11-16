@@ -38,8 +38,8 @@ export default class Task extends Component {
     addTask: T.func
   }
 
-  constructor (props) {
-    super(props)
+  constructor (props, context) {
+    super(props, context)
 
     this.state = {
       loading: true,
@@ -89,7 +89,7 @@ export default class Task extends Component {
         </PageHeading>
         <Animate name='fade'>
           {this.state.loading ? (
-            <Spinner key={0} className='task-dimmer' />
+            <Spinner key={0} />
           ) : (
             this.state.error ? (
               <Dimmer className='block-center' style={{ height: 165 }}>
@@ -125,7 +125,7 @@ export default class Task extends Component {
   _getTaskNav () {
     const { isLeader } = this.context
     return (
-      <nav className="navbar navbar-default task-navbar">
+      <nav className="navbar navbar-default">
         <ul className="nav navbar-nav">
           {isLeader ? <li><a href='javascript:;' onClick={::this._showModal}><i className='fa fa-plus'></i>New Task</a></li> : null}
           <li><a href='javascript:;'><i className='fa fa-calendar'></i>Calender</a></li>
