@@ -28,8 +28,11 @@ class Editor extends Component {
   }
 
   componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
-    if (isScriptLoaded && !this.props.isScriptLoaded && isScriptLoadSucceed) {
-      this.initEditor()
+    if (isScriptLoaded && !this.props.isScriptLoaded) {
+      if (isScriptLoadSucceed) {
+        this.initEditor()
+      }
+      else this.props.onError()
     }
   }
 
@@ -48,7 +51,7 @@ class Editor extends Component {
 
   initEditor () {
     this.$editor = window.jQuery(this.refs.editor)
-    
+
     if (this.$editor.data('markdown')) {
       this.$editor.data('markdown').showEditor()
       this.props.onLoad()

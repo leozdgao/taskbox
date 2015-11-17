@@ -16,7 +16,8 @@ class NewPost extends Component {
     super(props, context)
 
     this.state = {
-      editorLoading: true
+      editorLoading: true,
+      editorLoadFailed: false
     }
   }
 
@@ -33,30 +34,50 @@ class NewPost extends Component {
               <b>{name}</b> is writing...
             </span>
           </div>
-          <form>
-            <div className="form-group">
-              <LeanInput className="title" placeholder="Title" autoFocus />
-            </div>
-            <div className="form-group">
-              <Editor ref="editor" onLoad={::this._editorLoaded} onError={::this._editorError}  />
-            </div>
-            <a className="btn btn-success" onClick={::this._handlePublish}>Publish</a>
-          </form>
+          {this.state.editorLoadFailed ? this._getFailedContent() : (
+            <form>
+              <div className="form-group">
+                <LeanInput className="title" placeholder="Title" autoFocus />
+              </div>
+              <div className="form-group">
+                <Editor ref="editor" onLoad={::this._editorLoaded} onError={::this._editorError}  />
+              </div>
+              <a className="btn btn-success" onClick={::this._handlePublish}>Publish</a>
+            </form>
+          )}
           {this.state.editorLoading && <Spinner />}
         </div>
       </FullScreenPanel>
     )
   }
 
+  _getFailedContent () {
+    return (
+      <div>
+        <a className="btn btn-success" onClick={::this._reload}>Reload</a>
+      </div>
+    )
+  }
+
   _editorLoaded () {
-    console.log('load')
     this.setState({
-      editorLoading: false
+      editorLoading: false,
+      editorLoadFailed: false
     })
   }
 
   _editorError () {
-    console.log('error')
+    this.setState({
+      editorLoading: false,
+      editorLoadFailed: true
+    })
+  }
+
+  _reload () {
+    this.setState({
+      editorLoading: true,
+      editorLoadFailed: false
+    })
   }
 
   _handlePublish () {

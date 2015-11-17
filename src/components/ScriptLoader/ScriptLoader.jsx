@@ -1,10 +1,31 @@
 import React, { Component, PropTypes as T } from 'react'
 import hoistStatics from 'hoist-non-react-statics'
-import { newScript, loadAllScript, series } from '../../utils'
+import { isDefined, newScript, series } from '../../utils'
 
 const loadedScript = []
+let failedScript = []
 
 const scriptLoader = (...scripts) => (WrappedComponent) => {
+
+  const addCache = (entry) => {
+    if (loadedScript.indexOf(entry) < 0) {
+      loadedScript.push(entry)
+    }
+  }
+
+  const removeFailedScript = () => {
+    if (failedScript.length > 0) {
+      failedScript.forEach((script) => {
+        const node = document.querySelector(`script[src='${script}']`)
+        if (node != null) {
+          node.parentNode.removeChild(node)
+        }
+      })
+
+      failedScript = []
+    }
+  }
+
   class ScriptLoader extends Component {
     static propTypes = {
       onScriptLoaded: T.func
@@ -35,17 +56,19 @@ const scriptLoader = (...scripts) => (WrappedComponent) => {
         else return loadNewScript(src)
       })
 
-      series(...tasks)(src => {
-        const addCache = (entry) => {
-          if (loadedScript.indexOf(entry) < 0) {
-            loadedScript.push(entry)
+      series(...tasks)((err, src) => {
+        if (err) {
+          failedScript.push(src)
+        }
+        else {
+          if (Array.isArray(src)) {
+            src.forEach(addCache)
           }
+          else addCache(src)
         }
-        if (Array.isArray(src)) {
-          src.forEach(addCache)
-        }
-        else addCache(src)
       })(err => {
+        removeFailedScript()
+
         this.setState({
           isScriptLoaded: true,
           isScriptLoadSucceed: !err

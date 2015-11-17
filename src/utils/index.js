@@ -81,7 +81,7 @@ export const newScript = (src) => (cb) => {
   const script = document.createElement('script')
   script.src = src
   script.addEventListener('load', () => cb(null, src))
-  script.addEventListener('error', () => cb(true))
+  script.addEventListener('error', () => cb(true, src))
   document.body.appendChild(script)
   return script
 }
@@ -114,10 +114,12 @@ export const parallel = (...tasks) => (each) => (cb) => {
         else {
           // collect result
           if (args.length <= 1) args = args[0]
-          if (isFunction(each)) each.call(null, args, i)
+
           ret[i] = args
           successed ++
         }
+
+        if (isFunction(each)) each.call(null, err, args, i)
 
         if (hasError) cb(true)
         else if (tasks.length === successed) {
@@ -147,11 +149,13 @@ export const series = (...tasks) => (each) => (cb) => {
   const ret = []
   const iterator = () => {
     thunk((err, ...args) => {
+      if (args.length <= 1) args = args[0]
+      if (isFunction(each)) each.call(null, err, args, key)
+
       if (err) cb(err)
       else {
         // collect result
-        if (args.length <= 1) args = args[0]
-        if (isFunction(each)) each.call(null, args, key)
+        ret.push(args)
 
         next = nextThunk()
         key = next[0]
