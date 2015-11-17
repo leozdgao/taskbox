@@ -88,6 +88,7 @@
     "react-addons-shallow-compare": "^0.14.0",
     "react-addons-transition-group": "^0.14.0",
     "react-addons-update": "^0.14.0",
+    "react-async-script-loader": "^0.1.1",
     "react-dom": "^0.14.0",
     "react-overlays": "^0.5.0",
     "react-redux": "^4.0.0",

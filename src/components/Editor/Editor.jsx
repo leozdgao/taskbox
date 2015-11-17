@@ -1,5 +1,6 @@
 import React, { Component, PropTypes as T } from 'react'
-import scriptLoader from '../ScriptLoader/ScriptLoader'
+// import scriptLoader from '../ScriptLoader/ScriptLoader'
+import scriptLoader from 'react-async-script-loader'
 import { newScript, loadAllScript } from '../../utils'
 import './bootstrap-markdown.min.css'
 

@@ -1,6 +1,3 @@
-// decorator
-export { default as scriptLoader } from './ScriptLoader/ScriptLoader'
-
 // components
 export { default as Animate } from './Animate/Animate'
 export { default as CheckEntry } from './CheckEntry/CheckEntry'
