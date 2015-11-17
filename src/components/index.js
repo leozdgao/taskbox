@@ -1,3 +1,7 @@
+// decorator
+export { default as scriptLoader } from './ScriptLoader/ScriptLoader'
+
+// components
 export { default as Animate } from './Animate/Animate'
 export { default as CheckEntry } from './CheckEntry/CheckEntry'
 export { default as Dimmer } from './Dimmer/Dimmer'
@@ -26,10 +30,12 @@ export { default as Tooltip } from './Tooltip/Tooltip'
 export { default as TreeView } from './TreeView/TreeView'
 export { default as Waterfall } from './Waterfall/Waterfall'
 
+// form template
 export { default as TaskForm } from './Form/TaskForm'
 export { default as ProjectSelectForm } from './Form/ProjectSelectForm'
 export { default as ChangePasswordForm } from './Form/ChangePasswordForm'
 
+// modals template
 export { default as Modal } from './Modal/Modal'
 export { default as ChangeAvatarModal } from './Modal/ChangeAvatarModal'
 export { default as NewTaskModal } from './Modal/NewTaskModal'

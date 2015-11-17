@@ -48,7 +48,8 @@ class NewPost extends Component {
     )
   }
 
-  _editorLoaded () {console.log('load')
+  _editorLoaded () {
+    console.log('load')
     this.setState({
       editorLoading: false
     })

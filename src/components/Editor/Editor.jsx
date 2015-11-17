@@ -1,13 +1,19 @@
 import React, { Component, PropTypes as T } from 'react'
+import scriptLoader from '../ScriptLoader/ScriptLoader'
 import { newScript, loadAllScript } from '../../utils'
 import './bootstrap-markdown.min.css'
 
 const noop = () => {}
-let vendorLoaded  = false
 
+@scriptLoader([
+  'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js'
+], '/assets/bootstrap-markdown.js')
 class Editor extends Component {
 
   static propTypes = {
+    isScriptLoaded: T.bool,
+    isScriptLoadSucceed: T.bool,
     onLoad: T.func,
     onError: T.func
   }
@@ -21,10 +27,15 @@ class Editor extends Component {
     return this.refs.editor.value
   }
 
+  componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
+    if (isScriptLoaded && !this.props.isScriptLoaded && isScriptLoadSucceed) {
+      this.initEditor()
+    }
+  }
+
   componentDidMount () {
-    if (!vendorLoaded) this.loadVendorScript(this.configEditor)
-    else {
-      this.$editor = window.jQuery(this.refs.editor)
+    const { isScriptLoaded, isScriptLoadSucceed } = this.props
+    if (isScriptLoaded && isScriptLoadSucceed) {
       this.initEditor()
     }
   }
@@ -36,38 +47,16 @@ class Editor extends Component {
   }
 
   initEditor () {
-    if (vendorLoaded && this.$editor != null) {
-      if (this.$editor.data('markdown')) {
-        this.$editor.data('markdown').showEditor()
-        return
-      }
-
-      this.configEditor(this.$editor)
+    this.$editor = window.jQuery(this.refs.editor)
+    
+    if (this.$editor.data('markdown')) {
+      this.$editor.data('markdown').showEditor()
+      this.props.onLoad()
+      return
     }
-  }
 
-  loadVendorScript (callback) {
-    loadAllScript([
-      newScript(
-        'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'
-      ),
-      newScript(
-        'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js'
-      )
-    ], () => {
-      newScript('/assets/bootstrap-markdown.js', () => {
-        vendorLoaded = true
-        callback.bind(this)(window.jQuery(this.refs.editor))
-      })
-    }, (isSucceed) => {
-      if (!isSucceed) this.props.onError()
-    })
-  }
-
-  configEditor ($editor) {
-    const { props } = this
-    $editor.markdown({
-      onShow: props.onLoad
+    this.$editor.markdown({
+      onShow: this.props.onLoad
     })
   }
 }

@@ -1,59 +1,3 @@
-export const isOneOf = (one, of) => {
-  if (Array.isArray(of)) {
-    return of.indexOf(one) > -1
-  }
-  return one === of
-}
-
-export const createChainedFunction = (...funcs) => {
-  return funcs.filter((f) => {
-    return f != null
-  }).reduce((acc, f) => {
-    if (acc === null) {
-      return f
-    }
-
-    return (...args) => {
-      args.apply(null, args)
-      f.apply(null, args)
-    }
-  }, null)
-}
-
-export const loadAllScript = (asyncList, callback, final) => {
-  const taskSum = asyncList.length
-  let finished = 0
-  let successed = 0
-  asyncList.forEach((task) => {
-    task.addEventListener('load', () => {
-      finished ++
-      successed ++
-
-      if (taskSum === finished) {
-        if (taskSum === successed) callback.call(this)
-
-        final.call(this, taskSum === successed)
-      }
-    })
-    task.addEventListener('error', () => {
-      finished ++
-
-      if (taskSum === finished) {
-        final.call(this, taskSum === successed)
-      }
-    })
-  })
-}
-
-export const newScript = (src, onload, onerror) => {
-  const script = document.createElement('script')
-  script.src = src
-  script.addEventListener('load', onload)
-  script.addEventListener('error', onerror)
-  document.body.appendChild(script)
-  return script
-}
-
 export const isDefined = val => val != null
 export const resolveProp = obj => prop => obj[prop]
 
@@ -69,6 +13,10 @@ export const hasSameKey = (a, b) => {
 
     return true
   }
+}
+
+export const isFunction = val => {
+  return typeof val === 'function'
 }
 
 export const isInRange = (from, to) => (num) => {
@@ -105,4 +53,113 @@ export const defaultValue = (d) => (v) => {
 export const noop = () => {}
 export const always = val => () => {
   return val
+}
+
+export const isOneOf = (one, of) => {
+  if (Array.isArray(of)) {
+    return of.indexOf(one) > -1
+  }
+  return one === of
+}
+
+export const createChainedFunction = (...funcs) => {
+  return funcs.filter((f) => {
+    return f != null
+  }).reduce((acc, f) => {
+    if (acc === null) {
+      return f
+    }
+
+    return (...args) => {
+      args.apply(null, args)
+      f.apply(null, args)
+    }
+  }, null)
+}
+
+export const newScript = (src) => (cb) => {
+  const script = document.createElement('script')
+  script.src = src
+  script.addEventListener('load', () => cb(null, src))
+  script.addEventListener('error', () => cb(true))
+  document.body.appendChild(script)
+  return script
+}
+
+const keyIterator = (cols) => {
+  const keys = Object.keys(cols)
+  let i = -1
+  return {
+    next () {
+      i++ // inc
+      if (i >= keys.length) return null
+      else return keys[i]
+    }
+  }
+}
+
+// tasks should be a collection of thunk
+export const parallel = (...tasks) => (each) => (cb) => {
+  let hasError = false
+  let successed = 0
+  const ret = []
+  tasks = tasks.filter(isFunction)
+
+  if (tasks.length <= 0) cb(null)
+  else {
+    tasks.forEach((task, i) => {
+      const thunk = task
+      thunk((err, ...args) => {
+        if (err) hasError = true
+        else {
+          // collect result
+          if (args.length <= 1) args = args[0]
+          if (isFunction(each)) each.call(null, args, i)
+          ret[i] = args
+          successed ++
+        }
+
+        if (hasError) cb(true)
+        else if (tasks.length === successed) {
+          cb(null, ret)
+        }
+      })
+    })
+  }
+}
+
+// tasks should be a collection of thunk
+export const series = (...tasks) => (each) => (cb) => {
+  tasks = tasks.filter(val => val != null)
+  const nextKey = keyIterator(tasks)
+  const nextThunk = () => {
+    const key = nextKey.next()
+    let thunk = tasks[key]
+    if (Array.isArray(thunk)) thunk = parallel.apply(null, thunk).call(null, each)
+    return [ key, thunk ]
+  }
+  let key, thunk
+  let next = nextThunk()
+  key = next[0]
+  thunk = next[1]
+  if (thunk == null) return cb(null)
+
+  const ret = []
+  const iterator = () => {
+    thunk((err, ...args) => {
+      if (err) cb(err)
+      else {
+        // collect result
+        if (args.length <= 1) args = args[0]
+        if (isFunction(each)) each.call(null, args, key)
+
+        next = nextThunk()
+        key = next[0]
+        thunk = next[1]
+        if (thunk == null) return cb(null, ret) // finished
+        else iterator()
+      }
+    })
+  }
+  iterator()
 }
