@@ -28,6 +28,7 @@ export { default as TreeView } from './TreeView/TreeView'
 export { default as Waterfall } from './Waterfall/Waterfall'
 
 // form template
+export { default as EditPostForm } from './Form/EditPostForm'
 export { default as TaskForm } from './Form/TaskForm'
 export { default as ProjectSelectForm } from './Form/ProjectSelectForm'
 export { default as ChangePasswordForm } from './Form/ChangePasswordForm'

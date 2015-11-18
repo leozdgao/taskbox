@@ -1,5 +1,6 @@
 export const isDefined = val => val != null
 export const resolveProp = obj => prop => obj[prop]
+export const prop = prop => obj => obj[prop]
 
 export const hasSameKey = (a, b) => {
   const aKeys = Object.keys(a)
@@ -71,7 +72,7 @@ export const createChainedFunction = (...funcs) => {
     }
 
     return (...args) => {
-      args.apply(null, args)
+      acc.apply(null, args)
       f.apply(null, args)
     }
   }, null)
@@ -166,4 +167,14 @@ export const series = (...tasks) => (each) => (cb) => {
     })
   }
   iterator()
+}
+
+export const autobind = (methodNames) => {
+  return {
+    componentWillMount () {
+      methodNames.forEach((name) => {
+        this[name] = this[name].bind(this)
+      })
+    }
+  }
 }

@@ -2,6 +2,9 @@
   padding: 25px;
 
   .content {
+    height: 100%;
+    position: relative;
+
     >h2 {
       margin-top: 0;
     }
@@ -19,11 +22,20 @@
     font-size: 18px;
   }
 
+  .form {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+  }
+
   .dimmer {
-    margin-top: 75px;
+    // margin-top: 75px;
+    background-color: #fff;
 
     .spinner {
-      margin-top: -92px;
+      // margin-top: -92px;
     }
   }
 }

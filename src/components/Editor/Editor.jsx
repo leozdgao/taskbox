@@ -3,6 +3,7 @@ import React, { Component, PropTypes as T } from 'react'
 import scriptLoader from 'react-async-script-loader'
 import { newScript, loadAllScript } from '../../utils'
 import './bootstrap-markdown.min.css'
+import './editor.less'
 
 const noop = () => {}
 
@@ -15,11 +16,15 @@ class Editor extends Component {
   static propTypes = {
     isScriptLoaded: T.bool,
     isScriptLoadSucceed: T.bool,
+    onChange: T.func,
+    onBlur: T.func,
     onLoad: T.func,
     onError: T.func
   }
 
   static defaultProps = {
+    onChange: noop,
+    onBlur: noop,
     onLoad: noop,
     onError: noop
   }
@@ -46,7 +51,7 @@ class Editor extends Component {
 
   render () {
     return (
-      <textarea ref='editor' name="content" data-provide="markdown" rows="15"></textarea>
+      <textarea {...this.props} ref='editor' name="content" data-provide="markdown" rows="15" onBlur={::this.handleBlur}></textarea>
     )
   }
 
@@ -60,8 +65,15 @@ class Editor extends Component {
     }
 
     this.$editor.markdown({
-      onShow: this.props.onLoad
+      onShow: this.props.onLoad,
+      onChange: (e) => {
+        this.props.onChange(e.getContent())
+      }
     })
+  }
+
+  handleBlur (e) {
+    this.props.onBlur(e.target.value) // handle for redux-form
   }
 }
 

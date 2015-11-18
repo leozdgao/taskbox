@@ -10,9 +10,18 @@ const actionMap = {
     }
   }
 }
+const editPostActionMap = {
+  "redux-form/CHANGE" ( state, action ) {
+    return {
+      ...state,
+      isDirty: true
+    }
+  }
+}
 
 const reducer = formReducer.plugin({
-  changePassword: createReducer(actionMap)
+  changePassword: createReducer(actionMap),
+  editPost: createReducer(editPostActionMap)
 })
 
 export default reducer
