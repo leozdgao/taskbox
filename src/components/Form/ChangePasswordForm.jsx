@@ -17,7 +17,8 @@ import cNames from 'classnames'
     else if (values.repeat !== values.newpwd) errors.repeat = 'Two passwords are not consistant.'
 
     return errors
-  }
+  },
+  touchOnBlur: false
 })
 class ChangePasswordForm extends Component {
 

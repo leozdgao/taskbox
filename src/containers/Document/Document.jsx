@@ -17,7 +17,7 @@ class Document extends Component {
       <div>
         <PageHeading title="Documents" breadcrumb={[
           { title: 'Home', link: '/' },
-          { title: 'Documents', link: '/doc' }
+          { title: 'Document', link: '/doc' }
         ]}>
           {this._getDocNav()}
         </PageHeading>

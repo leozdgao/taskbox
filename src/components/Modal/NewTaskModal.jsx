@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 import map from 'lodash/collection/map'
 import sortBy from 'lodash/collection/sortBy'
 import { CompanyActions, ProjectActions, TaskActions } from '../../redux/modules'
-import { Modal, TaskForm, ProjectSelectForm } from '../../components'
+import { TaskForm, ProjectSelectForm } from '../../components'
+import ModalWrapper from './ModalWrapper'
 
 @connect(
   state => ({
@@ -76,11 +77,11 @@ class NewTaskModal extends Component {
 
   render () {
     return (
-      <Modal isShowed={this.props.isShowed}
+      <ModalWrapper isShowed={this.props.isShowed}
         animateName='modalFade' transitionTimeout={500}
         dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
         {this._getContent()}
-      </Modal>
+      </ModalWrapper>
     )
   }
 
@@ -97,14 +98,14 @@ class NewTaskModal extends Component {
   _confirmProject () {
     const companies = sortBy(map(this.props.company.data, c => c), 'name')
     return (
-      <div className="modal-content">
-        <div className="modal-header">
+      <div>
+        <ModalWrapper.Header>
           <button type="button" className="close" onClick={this.props.onHide}>
             <span aria-hidden="true">×</span>
           </button>
           <h4 className="modal-title">Choose a project</h4>
-        </div>
-        <div className="modal-body">
+        </ModalWrapper.Header>
+        <ModalWrapper.Content>
           <ProjectSelectForm
             defaultCompany={this.state.currentCompany}
             defaultProject={this.state.currentProject}
@@ -112,14 +113,14 @@ class NewTaskModal extends Component {
             currentProjectItems={this.state.avaliableProjects}
             onCompanyChange={::this._handleCompanyChange}
             onProjectChange={::this._handleProjectChange} />
-        </div>
-        <div className="modal-footer">
+        </ModalWrapper.Content>
+        <ModalWrapper.Footer>
           <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
           {this.state.currentProject ?
             <button type="button" className="btn btn-sm btn-info" onClick={::this._onNext}>Next</button>
             : null
           }
-        </div>
+        </ModalWrapper.Footer>
       </div>
     )
   }
@@ -128,24 +129,24 @@ class NewTaskModal extends Component {
     const { currentProject, currentCompany } = this.state
     const defaultTaskTitle = currentProject && currentCompany ? `${currentCompany.name} - ${currentProject.name}` : ''
     return (
-      <div className="modal-content">
-        <div className="modal-header">
+      <div>
+        <ModalWrapper.Header>
           <button type="button" className="close" onClick={this.props.onHide}>
             <span aria-hidden="true">×</span>
           </button>
           <h4 className="modal-title">Publish a new Task</h4>
-        </div>
-        <div className="modal-body">
+        </ModalWrapper.Header>
+        <ModalWrapper.Content>
           <TaskForm
             ref='taskform'
             defaultTaskTitle={defaultTaskTitle}
             avaliableResources={this.context.resourceInfo} />
-        </div>
-        <div className="modal-footer">
+        </ModalWrapper.Content>
+        <ModalWrapper.Footer>
           <span className='help-text text-danger'>{this.state.msg}</span>
           <button type="button" className="btn btn-sm btn-white" onClick={::this._onBack}>Back</button>
           <button type="button" className="btn btn-sm btn-success" onClick={::this._onClick} disabled={this.state.submitting}>Publish</button>
-        </div>
+        </ModalWrapper.Footer>
       </div>
     )
   }

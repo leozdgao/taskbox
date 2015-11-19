@@ -1,6 +1,6 @@
 import React, { Component, PropTypes as T } from 'react'
 import cNames from 'classnames'
-import { Modal } from '../../components'
+import ModalWrapper from './ModalWrapper'
 
 class ChangeAvatarModal extends Component {
 
@@ -28,33 +28,29 @@ class ChangeAvatarModal extends Component {
 
   render () {
     return (
-      <Modal isShowed={this.props.isShowed}
-        animateName='modalFade' transitionTimeout={500}
-        dimmerClassName='modal-dimmer' modalClassName='modal-dialog change-avatar'>
-        <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="close" onClick={this.props.onHide}>
-              <span aria-hidden="true">×</span>
-            </button>
-            <h4 className="modal-title">Change avatar</h4>
+      <ModalWrapper isShowed={this.props.isShowed} className='change-avatar'>
+        <ModalWrapper.Header>
+          <button type="button" className="close" onClick={this.props.onHide}>
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 className="modal-title">Change avatar</h4>
+        </ModalWrapper.Header>
+        <ModalWrapper.Content>
+          <div className="clearfix">
+            {this.props.items.map((src, i) => {
+              return (
+                <div key={i} className={cNames([ "circle-img sm-img img", { "active": this.state.currentIndex === i } ])}>
+                  <img src={src} onClick={this._select.bind(this, i)} />
+                </div>
+              )
+            })}
           </div>
-          <div className="modal-body">
-            <div className="clearfix">
-              {this.props.items.map((src, i) => {
-                return (
-                  <div key={i} className={cNames([ "circle-img sm-img img", { "active": this.state.currentIndex === i } ])}>
-                    <img src={src} onClick={this._select.bind(this, i)} />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
-            <button type="button" className="btn btn-sm btn-success" onClick={::this._onClick}>Apply</button>
-          </div>
-        </div>
-      </Modal>
+        </ModalWrapper.Content>
+        <ModalWrapper.Footer>
+          <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
+          <button type="button" className="btn btn-sm btn-success" onClick={::this._onClick}>Apply</button>
+        </ModalWrapper.Footer>
+      </ModalWrapper>
     )
   }
 

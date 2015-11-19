@@ -35,5 +35,7 @@ export { default as ChangePasswordForm } from './Form/ChangePasswordForm'
 
 // modals template
 export { default as Modal } from './Modal/Modal'
+export { default as ModalWrapper } from './Modal/ModalWrapper'
 export { default as ChangeAvatarModal } from './Modal/ChangeAvatarModal'
+export { default as ConfirmLeaveModal } from './Modal/ConfirmLeaveModal'
 export { default as NewTaskModal } from './Modal/NewTaskModal'

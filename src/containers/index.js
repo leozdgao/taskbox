@@ -10,6 +10,8 @@ export { default as Team } from './Team/Team'
 
 export { default as Document } from './Document/Document'
 export { default as NewPost } from './NewPost/NewPost'
+export { default as PostList } from './PostList/PostList'
+export { default as PostView } from './PostView/PostView'
 
 export { default as Profile } from './Profile/Profile'
 export { default as Page404 } from './Page404/Page404'

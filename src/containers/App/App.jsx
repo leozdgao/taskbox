@@ -34,6 +34,13 @@ export default class Main extends Component {
     isLeader: T.bool
   }
 
+  static propTypes = {
+    children: T.any.isRequired,
+    user: T.object,
+    loadResource: T.func,
+    resource: T.object
+  }
+
   getChildContext () {
     const resourceInfo = Array.isArray(this.props.resource.data) ?
       this.props.resource.data.sort((a, b) => a.resourceId - b.resourceId) : [] // return empty array if error
@@ -45,13 +52,6 @@ export default class Main extends Component {
       isAdmin: isAdmin(this.props.user.role),
       resourceInfo
     }
-  }
-
-  static propTypes = {
-    children: T.any.isRequired,
-    user: T.object,
-    loadResource: T.func,
-    resource: T.object
   }
 
   componentDidMount () {

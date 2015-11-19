@@ -29,6 +29,7 @@ class EditPostForm extends Component {
   }
 
   static defaultProps = {
+    isRequesting: false,
     onSubmit: noop,
     onLoad: noop,
     onError: noop
@@ -62,10 +63,12 @@ class EditPostForm extends Component {
         <div className="form-group">
           <Editor ref="editor" onLoad={onLoad} onError={onError} {...content}  />
         </div>
-        <div>
-          <a className="btn btn-success" onClick={handleSubmit}>Publish</a>
+        <div className="form-footer">
+          <a className="btn btn-success pull-left" onClick={handleSubmit} disabled={this.props.isRequesting}>
+            {this.props.isRequesting ? "Publishing..." : "Publish"}
+          </a>
           {invalidKeys.length > 0 &&
-            <span className="help-block">{`You should populate following fields: ${invalidKeyString}`}</span>}
+            <span className="block text-danger">{`You should populate following fields: ${invalidKeyString}`}</span>}
         </div>
       </form>
     )
