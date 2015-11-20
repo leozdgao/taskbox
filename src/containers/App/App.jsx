@@ -2,7 +2,7 @@ import React, { Component, PropTypes as T } from 'react'
 import IO from 'socket.io-client'
 import { connect } from 'react-redux'
 import { ResourceActions } from '../../redux/modules'
-import { Navbar, Sidebar, ScrollPanel } from '../../components'
+import { Navbar, Sidebar, ScrollPanel, Spinner } from '../../components'
 import { isLeader, isAdmin } from '../../auth'
 
 import './app.less'
@@ -54,19 +54,33 @@ export default class Main extends Component {
     }
   }
 
+  // init state
+  state = { pageReady: false }
+
+  componentWillReceiveProps (nextProps) {
+    const { resource } = this.props
+    const { resource: nextResource } = nextProps
+
+    if (resource.isLoading && !nextResource.isLoading) {
+      this.setState({ pageReady: true })
+    }
+  }
+
   componentDidMount () {
     this.props.loadResource()
   }
 
   render () {
     return (
-      <div id='page-container'>
-        <Navbar user={this.props.user} msgNum={msgNum} />
-        <Sidebar user={this.props.user} />
-        <ScrollPanel id='content'>
-          {this.props.children}
-        </ScrollPanel>
-      </div>
+      this.state.pageReady ? (
+        <div id='page-container'>
+          <Navbar user={this.props.user} msgNum={msgNum} />
+          <Sidebar user={this.props.user} />
+          <ScrollPanel id='content'>
+            {this.props.children}
+          </ScrollPanel>
+        </div>
+      ): <Spinner className="white-bg" />
     )
   }
 }

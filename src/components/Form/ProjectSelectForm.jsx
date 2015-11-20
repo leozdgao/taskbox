@@ -1,6 +1,6 @@
 import React, { Component, PropTypes as T } from 'react'
 import findWhere from 'lodash/collection/findWhere'
-import { DropdownInput } from '../../components'
+import { DropDownInput } from '../../components'
 
 const getValue = (obj, key) => {
   if (obj != null) return obj[key]
@@ -52,7 +52,7 @@ class ProjectSelectForm extends Component {
     const projectMsg = currentProject ? `${currentProject.name}` : ''
     return (
       <form>
-        <DropdownInput ref='companyId'
+        <DropDownInput ref='companyId'
           defaultValue={currentCompany}
           items={this.props.avaliableCompanies}
           valueMap={c => c._id} nameMap={c => c.name}

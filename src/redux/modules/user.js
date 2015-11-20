@@ -1,7 +1,7 @@
 import update from 'react-addons-update'
 import { json as request } from 'lgutil/common/ajax'
-import createReducer from './createReducer'
-import { constructAsyncActionTypes, toKeyMirror } from './createAction'
+import createReducer from '../createReducer'
+import { constructAsyncActionTypes, toKeyMirror } from '../createAction'
 
 // -- Constants
 const RESOURCE_API_URL = '/api/rest/resource'

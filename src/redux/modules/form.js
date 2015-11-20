@@ -1,6 +1,6 @@
 import { reducer as formReducer } from 'redux-form'
 import { actionTypes as userActionTypes } from './user'
-import createReducer from './createReducer'
+import createReducer from '../createReducer'
 
 const actionMap = {
   [userActionTypes["user/CHANGE_PASSWORD_REJECTED"]]: (state, action) => {

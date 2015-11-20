@@ -42,5 +42,8 @@ module.exports = {
         exclude: /node_modules/
       }
     ]
+  },
+  externals: {
+    marked: 'marked'
   }
 }

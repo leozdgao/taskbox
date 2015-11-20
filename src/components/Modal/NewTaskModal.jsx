@@ -77,9 +77,7 @@ class NewTaskModal extends Component {
 
   render () {
     return (
-      <ModalWrapper isShowed={this.props.isShowed}
-        animateName='modalFade' transitionTimeout={500}
-        dimmerClassName='modal-dimmer' modalClassName='modal-dialog'>
+      <ModalWrapper isShowed={this.props.isShowed}>
         {this._getContent()}
       </ModalWrapper>
     )
@@ -97,6 +95,7 @@ class NewTaskModal extends Component {
 
   _confirmProject () {
     const companies = sortBy(map(this.props.company.data, c => c), 'name')
+
     return (
       <div>
         <ModalWrapper.Header>
