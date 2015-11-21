@@ -1,4 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
+import ReactDom from 'react-dom'
 import { Link, Lifecycle, History } from 'react-router'
 import { connect } from 'react-redux'
 import reactMixin from 'react-mixin'
@@ -10,7 +11,8 @@ import { PostActions } from '../../redux/modules'
 import './postview.less'
 
 @scriptLoader(
-  'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js'
 )
 @connect(
   ({ post }) => ({ post }),
@@ -70,6 +72,15 @@ class PostView extends Component {
     if (!isScriptLoadSucceed && nextScriptLoadSucceed) {
       this.setState({
         depLoaded: true
+      }, () => {
+        // after dependencies loaded, hightlight the code
+        const codeDomList = ReactDom.findDOMNode(this).querySelectorAll('pre code')
+        const codes = Array.prototype.slice.apply(codeDomList)
+        codes.forEach((block) => {
+          if (window.hljs) { // hightlight.js should already be loaded
+            hljs.highlightBlock(block)
+          }
+        })
       })
     }
   }
@@ -89,7 +100,6 @@ class PostView extends Component {
 
     return (
       <FullScreenPanel className="postview">
-        <a className="close" onClick={::this.history.goBack}><i className="fa fa-times"></i></a>
         {(!this.state.isLoading && this.state.depLoaded) ? (
           // render post here
           <ScrollPanel>
@@ -99,15 +109,16 @@ class PostView extends Component {
                 <section className="tag-set">
                   {post.tags.map((tag, i) => <Tag key={i}>{tag}</Tag>)}
                 </section>
-                <section>
+                <section className="post-info">
                   <img className="circle-img xs-img" src={author.avatar} />
                   <b>{author.name}</b> write on <b>{moment(post.date).format('YYYY-MM-DD')}</b>
                 </section>
               </header>
-              <section dangerouslySetInnerHTML={{ __html: marked(post.content) }}></section>
+              <section className="post-content" dangerouslySetInnerHTML={{ __html: marked(post.content) }}></section>
             </div>
           </ScrollPanel>
         ) : <Spinner />}
+        <a className="close" onClick={::this.history.goBack}><i className="fa fa-times"></i></a>
       </FullScreenPanel>
     )
   }

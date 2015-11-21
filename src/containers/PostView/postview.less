@@ -1,16 +1,47 @@
 .postview {
+  padding: 0;
+
   .scrollpanel {
     height: 100%;
   }
+  .close {
+    position: absolute;
+    float: none;
+    top: 16px;
+    right: 16px;
+  }
 
   .post-header {
+    margin: 48px 0 32px 0;
 
-    h1 { font-size: 48px; }
-
-    .tag { margin: 0 5px; }
+    h1 {
+      font-size: 48px;
+      margin: 48px 0 16px 0;
+      font-weight: bold;
+    }
 
     .tag-set {
-      margin: 0 -5px;
+      margin: 16px -5px;
+
+      .tag { margin: 0 5px; }
+    }
+
+    .post-info {
+      color: #ccc;
+      b { color: #999; }
+      .circle-img { margin-right: 5px; }
+    }
+  }
+
+  .post-content {
+    font-size: 16px;
+    line-height: 1.5;
+
+    p { margin: 1em 0; }
+
+    h1, h2, h3 {
+      margin-top: 32px;
+      font-weight: bold;
     }
   }
 }

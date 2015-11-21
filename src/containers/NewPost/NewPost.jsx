@@ -15,7 +15,7 @@ import './newpost.less'
 @reactMixin.decorate(History)
 @reactMixin.decorate(autobind([ 'routerWillLeave' ]))
 class NewPost extends Component {
-  
+
   static propTypes = {
     form: T.object,
     post: T.object,
@@ -67,7 +67,7 @@ class NewPost extends Component {
         const postId = nextPost.lastPublishedPostId
         if (postId) {
           this._confirmToLeave = true
-          this.history.pushState(null, `/doc/${postId}`)
+          this.history.pushState(null, `/doc/p/${postId}`)
         }
       }
     }
