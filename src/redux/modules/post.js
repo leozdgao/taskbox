@@ -6,17 +6,20 @@ import { constructAsyncActionTypes, toKeyMirror } from '../createAction'
 
 // -- Constants
 const POST_API_URL = '/api/rest/article'
-const PAGE_LIMIT = 15
+export const PAGE_LIMIT = 15
 
 // -- ActionTypes
 const LOAD_POST = 'post/LOAD_POST'
+const COUNT_POST = 'post/COUNT_POST'
 const PUBLISH_POST = 'post/PUBLISH_POST'
 const loadPostAction = constructAsyncActionTypes(LOAD_POST)
+const countAction = constructAsyncActionTypes(COUNT_POST)
 const publishPostAction = constructAsyncActionTypes(PUBLISH_POST)
 // const UPDATE_RESOURCE = 'UPDATE_RESOURCE'
 
 export const actionTypes = {
   ...toKeyMirror(loadPostAction),
+  ...toKeyMirror(countAction),
   ...toKeyMirror(publishPostAction)
 }
 
@@ -24,6 +27,7 @@ export const actionTypes = {
 const initState = {
   data: {},
   page: {},
+  count: 1,
   isLoading: false,
   lastLoadingError: null,
   isPublishing: false,
@@ -32,6 +36,11 @@ const initState = {
 }
 
 const actionMap = {
+  [countAction.fulfilled] (state, { payload }) {
+    return update(state, {
+      count: { $set: payload.body.count }
+    })
+  },
   [loadPostAction.pending] (state, action) {
     return update(state, {
       isLoading: { $set: true },
@@ -45,7 +54,9 @@ const actionMap = {
     let { body } = payload
     if (!Array.isArray(body)) body = [ body ]
     const dataUpdate = body.reduce((ret, post) => {
-      ret[post._id] = { $set: post }
+      const current = state.data[post._id]
+      // skip which content already loaded
+      if (!current || !current.content) ret[post._id] = { $set: post }
       return ret
     }, {})
     updateBody.data = dataUpdate
@@ -110,9 +121,6 @@ export function loadOne (id) {
 }
 
 export function loadByPage (page) {
-  //
-  // TODO: add query
-  //
   const query  = {
     options: {
       limit: PAGE_LIMIT,
@@ -121,7 +129,8 @@ export function loadByPage (page) {
         priority: -1,
         date: -1
       }
-    }
+    },
+    fields: { content: 0 }
   }
 
   return {
@@ -138,6 +147,15 @@ export function load () {
     type: LOAD_POST,
     payload: {
       promise: request.get(POST_API_URL)
+    }
+  }
+}
+
+export function count () {
+  return {
+    type: COUNT_POST,
+    payload: {
+      promise: request.get(`${POST_API_URL}/count`)
     }
   }
 }

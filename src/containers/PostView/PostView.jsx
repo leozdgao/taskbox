@@ -44,7 +44,7 @@ class PostView extends Component {
     this.state = {
       depLoaded: false,
       data: data || {},
-      isLoading: data == null // load post if it not exist in store
+      isLoading: !(data && data.content) // load post if it not exist in store
     }
   }
 

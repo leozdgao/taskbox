@@ -51,7 +51,9 @@ class Editor extends Component {
 
   render () {
     return (
-      <textarea {...this.props} ref='editor' name="content" data-provide="markdown" data-iconlibrary="fa" rows="15" onBlur={::this.handleBlur}></textarea>
+      <textarea {...this.props} ref='editor' name="content"
+        data-provide="markdown" data-iconlibrary="fa"
+        rows="15" onBlur={::this.handleBlur}></textarea>
     )
   }
 
