@@ -68,11 +68,10 @@ class PostList extends Component {
           postList: []
         })
       }
-      if (post.count !== nextPost.count) {
-        this.setState({
-          postCount: nextPost.count
-        })
-      }
+      
+      this.setState({
+        postCount: nextPost.count
+      })
     }
   }
 
