@@ -63,7 +63,7 @@ export default class Info extends Component {
         ]} />
         <div className="info-content">
           <div className="row">
-            <div className="col-md-4">
+            <div className="info-tree">
               <ScrollPanel scrollTopAfterUpdate={false}>
                 <div>
                   {companyGroup.map((group, i) => {
@@ -88,7 +88,7 @@ export default class Info extends Component {
                 </div>
               </ScrollPanel>
             </div>
-            <div className="col-md-8 relative">
+            <div className="info-panel relative">
               {this.props.children || this._getInitPage()}
             </div>
           </div>
