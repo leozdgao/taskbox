@@ -104,18 +104,18 @@ export default createReducer(actionMap, initState)
 export function publish (body) {
   return {
     type: PUBLISH_POST,
-    payload: {
-      promise: request.post(POST_API_URL, body)
-    }
+    endPoint: POST_API_URL,
+    method: 'POST',
+    body
   }
 }
 
 export function loadOne (id) {
   return {
     type: LOAD_POST,
-    payload: {
-      promise: request.get(`${POST_API_URL}/${id}`)
-    }
+    endPoint: `${POST_API_URL}/${id}`,
+    cacheKey: `LOAD_POST_${id}`,
+    cacheTimeout: 5000
   }
 }
 
@@ -142,20 +142,11 @@ export function loadByPage (page) {
   }
 }
 
-export function load () {
-  return {
-    type: LOAD_POST,
-    payload: {
-      promise: request.get(POST_API_URL)
-    }
-  }
-}
-
 export function count () {
   return {
     type: COUNT_POST,
-    payload: {
-      promise: request.get(`${POST_API_URL}/count`)
-    }
+    endPoint: `${POST_API_URL}/count`,
+    cacheKey: 'COUNT_POST',
+    cacheTimeout: 5000
   }
 }

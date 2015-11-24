@@ -4,7 +4,7 @@ import { json as request } from 'lgutil/common/ajax'
 import findIndex from 'lodash/array/findIndex'
 import createReducer from '../createReducer'
 import { constructAsyncActionTypes, toKeyMirror } from '../createAction'
-import { hasSameKey, isInGroup, safePush, safeIndexOf, defaultValue } from '../../utils'
+import { hasSameKey, isInGroup, safePush, safeIndexOf, defaultValue, removeFromArray } from '../../utils'
 
 // -- Constants
 const COMPANY_API_URL = '/api/rest/company'
@@ -37,10 +37,13 @@ const groupCompany = (ret = {}, company) => {
 // -- ActionTypes
 const LOAD_ALL_COMPANY = 'company/LOAD_ALL_COMPANY'
 const LOAD_COMPANY_GROUP = 'company/LOAD_COMPANY_GROUP'
+const LOAD_COMPANY = 'company/LOAD_COMPANY'
 const loadCompanyGroupActions = constructAsyncActionTypes(LOAD_COMPANY_GROUP)
+const loadCompanyActions = constructAsyncActionTypes(LOAD_COMPANY)
 
 export const actionTypes = {
-  ...toKeyMirror(loadCompanyGroupActions)
+  ...toKeyMirror(loadCompanyGroupActions),
+  ...toKeyMirror(loadCompanyActions)
 }
 
 const actionMap = {
@@ -101,6 +104,28 @@ const actionMap = {
     return update(state, {
       pendingGroup: { $splice: [ i, 1 ] }
     })
+  },
+  [loadCompanyActions.pending] (state, { meta: { id } }) {
+    return update(state, {
+      loadingCompany: { $push: [ id ] },
+      loadedCompany: { $apply: removeFromArray(id) },
+      loadFailedCompany: { $apply: removeFromArray(id) }
+    })
+  },
+  [loadCompanyActions.fulfilled] (state, { payload: { body }, meta: { id } }) {
+    return update(state, {
+      data: { [id]: { $set: body } },
+      loadingCompany: {  $apply: removeFromArray(id) },
+      loadedCompany: { $push: [ id ] },
+      loadFailedCompany: { $apply: removeFromArray(id) }
+    })
+  },
+  [loadCompanyActions.rejected] (state, { meta: { id } }) {
+    return update(state, {
+      loadingCompany: {  $apply: removeFromArray(id) },
+      loadedCompany: { $apply: removeFromArray(id) },
+      loadFailedCompany: { $push: [ id ] }
+    })
   }
 }
 
@@ -114,10 +139,9 @@ const initState = {
   group: initGroup,
   loading: true,
   pendingGroup: [],
-  lastCError: false,
-  lastUError: false,
-  lastRError: false,
-  lasdDError: false
+  loadingCompany: [],
+  loadedCompany: [],
+  loadFailedCompany: []
 }
 
 // -- Reducer
@@ -125,16 +149,11 @@ export default createReducer(actionMap, initState)
 
 // -- ActionCreators
 export function loadCompany () {
-  const url = COMPANY_API_URL
   return {
     type: LOAD_ALL_COMPANY,
-    cacheable: true,
-    payload: {
-      promiseCreator: request.get,
-      args: [ url ]
-    },
-    timeout: 5000, // cache timeout, company do not need cache
-    onPromised: cacheRequest
+    endPoint: COMPANY_API_URL,
+    cacheKey: 'COMPANY_API_URL',
+    cacheTimeout: 10000 // 10s
   }
 }
 
@@ -142,9 +161,10 @@ export function loadOne (id) {
   const url = `${COMPANY_API_URL}/${id}`
   return {
     type: LOAD_COMPANY,
-    payload: {
-      promise: request.get(url)
-    }
+    meta: { id },
+    endPoint: url,
+    cacheKey: `LOAD_COMPANY_${id}`,
+    cacheTimeout: 5000
   }
 }
 
@@ -161,11 +181,11 @@ export function loadCompanyGroup (group) {
   const url = `${COMPANY_API_URL}?${qs.stringify(query)}`
   return {
     type: LOAD_COMPANY_GROUP,
-    cacheKey: `${LOAD_COMPANY_GROUP}$${from}$${to}`,
-    payload: {
-      promise: request.get(url)
-    },
-    meta: group
+    meta: group,
+    endPoint: url,
+    query,
+    cacheKey: `LOAD_COMPANY_GROUP$${from}$${to}`,
+    cacheTimeout: 5000
   }
 }
 

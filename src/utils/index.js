@@ -8,6 +8,10 @@ export const devLog = (...args) => {
   }
 }
 
+export const has = (coll, val) => {
+  return Array.isArray(coll) && coll.indexOf(val) >= 0
+}
+
 export const hasSameKey = (a, b) => {
   const aKeys = Object.keys(a)
   const bKeys = Object.keys(b)
