@@ -138,6 +138,16 @@ export function loadCompany () {
   }
 }
 
+export function loadOne (id) {
+  const url = `${COMPANY_API_URL}/${id}`
+  return {
+    type: LOAD_COMPANY,
+    payload: {
+      promise: request.get(url)
+    }
+  }
+}
+
 export function loadCompanyGroup (group) {
   const { from, to, key } = group
   const query = {

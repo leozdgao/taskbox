@@ -1,18 +1,26 @@
 import update from 'react-addons-update'
 import qs from 'qs'
 import { json as request } from 'lgutil/common/ajax'
+import createReducer from '../createReducer'
+import { constructAsyncActionTypes, toKeyMirror } from '../createAction'
+import { removeFromArray } from '../../utils'
 
+// -- Constants
 const PROJECT_API_URL = '/api/rest/project'
 
-const LOAD_PROJECT = 'LOAD_PROJECT'
+// -- ActionTypes
+const LOAD_PROJECT_FOR_COMPANY = 'LOAD_PROJECT_FOR_COMPANY'
+const loadProjectForCompanyAction = constructAsyncActionTypes(LOAD_PROJECT_FOR_COMPANY)
+
+export const actionTypes = {
+  ...toKeyMirror(loadProjectForCompanyAction)
+}
 
 const initState = {
   data: {},
-  loading: true,
-  lastCError: false,
-  lastUError: false,
-  lastRError: false,
-  lasdDError: false
+  companyProjectsLoading: [], // some companyIds
+  companyProjectsLoaded: [], // some companyIds
+  companyProjectsLoadFailed: [] // need not reason for now
 }
 const hasSameKey = (a, b) => {
   const aKeys = Object.keys(a)
@@ -30,54 +38,56 @@ const hasSameKey = (a, b) => {
 let requests = []
 const cacheRequest = promise => requests.push(promise)
 
-export default function (state = initState, action) {
-  switch (action.type) {
-  case LOAD_PROJECT: {
-    if (action.error) {
-      return update(state, {
-        lastRError: { $set: true },
-        loading: { $set: false }
-      })
-    }
-    else {
-      const data = action.payload.body.reduce((ret, project) => {
-        ret[project._id] = { $set: project }
-        return ret
-      }, {})
-      // if (hasSameKey(data, state.data)) return state
-      // else {
-      return update(state, {
-        data,
-        lastRError: { $set: false },
-        loading: { $set: false }
-      })
-      // }
-    }
-  }
-  default: return state
+const actionMap = {
+  [loadProjectForCompanyAction.pending] (state, { payload, meta: { companyId } }) {
+    return update(state, {
+      companyProjectsLoading: { $push: [ companyId ] },
+      companyProjectsLoaded: { $apply: removeFromArray(companyId) },
+      companyProjectsLoadFailed: { $apply: removeFromArray(companyId) }
+    })
+  },
+  [loadProjectForCompanyAction.fulfilled] (state, { payload, meta: { companyId } }) {
+    const data = payload.body.reduce((ret, project) => {
+      ret[project._id] = { $set: project }
+      return ret
+    }, {})
+
+    return update(state, {
+      data,
+      companyProjectsLoading: { $apply: removeFromArray(companyId) },
+      companyProjectsLoaded: { $push: [ companyId ] },
+      companyProjectsLoadFailed: { $apply: removeFromArray(companyId) }
+    })
+  },
+  [loadProjectForCompanyAction.rejected] (state, { meta: { companyId } }) {
+    return update(state, {
+      companyProjectsLoading: { $apply: removeFromArray(companyId) },
+      companyProjectsLoaded: { $apply: removeFromArray(companyId) },
+      companyProjectsLoadFailed: { $push: [ companyId ] }
+    })
   }
 }
 
-export function loadProjectByIds (ids, ...then) {
+// -- Reducer
+export default createReducer(actionMap, initState)
+
+// -- Action Creaters
+export function loadProjectForCompany ({ _id, projects }) {
   const query = {
     conditions: {
       _id: {
-        $in: [].concat(ids)
+        $in: [].concat(projects)
       }
     }
   }
-  const url = `${PROJECT_API_URL}?${qs.stringify(query)}`
 
   return {
-    type: LOAD_PROJECT,
-    cacheable: true,
-    payload: {
-      promiseCreator: request.get,
-      args: [ url ]
-    },
-    timeout: 5000, // cache timeout, company do not need cache
-    onPromised: cacheRequest,
-    then
+    type: LOAD_PROJECT_FOR_COMPANY,
+    meta: { companyId: _id },
+    endPoint: PROJECT_API_URL,
+    query,
+    cacheKey: `LOAD_PROJECT_FOR_COMPANY_${_id}`,
+    cacheTimeout: 10000 // 10s cache
   }
 }
 

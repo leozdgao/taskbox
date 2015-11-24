@@ -2,6 +2,12 @@ export const isDefined = val => val != null
 export const resolveProp = obj => prop => obj[prop]
 export const prop = prop => obj => obj[prop]
 
+export const devLog = (...args) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log.apply(console, args)
+  }
+}
+
 export const hasSameKey = (a, b) => {
   const aKeys = Object.keys(a)
   const bKeys = Object.keys(b)
@@ -177,4 +183,31 @@ export const autobind = (methodNames) => {
       })
     }
   }
+}
+
+export const removeFromArray = item => arr => {
+  function iterator (ret, arr) {
+    if (arr.length === 0) return ret
+
+    const [ fst, ...others ] = arr
+    if (fst !== item) ret.push(fst)
+
+    return iterator(ret, others)
+  }
+
+  return iterator([], arr)
+}
+
+export const diffBool = (current, next) => (key, nextT, nextF) => {
+  if (!current[key] && next[key]) {
+    nextT && nextT.call(null, current[key], next[key])
+  }
+
+  if (current[key] && !next[key]) {
+    nextF && nextF.call(null, current[key], next[key])
+  }
+}
+
+export const diff = (current, next) => (key, cb) => {
+  if (current[key] !== next[key]) cb && cb.call(null, current[key], next[key])
 }

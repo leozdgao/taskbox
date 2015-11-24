@@ -46,9 +46,9 @@ class CompanyDetail extends Component {
             {sortBy(
               projects.map(resolveProp(projectData))
               .filter(isDefined), 'name')
-              .map(({ name, startDate, lastUpdateDate, status }) => {
+              .map(({ name, startDate, lastUpdateDate, status }, i) => {
                 return (
-                  <tr>
+                  <tr key={i}>
                     <td>{name}</td>
                     <td>{startDate}</td>
                     <td>{lastUpdateDate}</td>

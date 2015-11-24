@@ -4,6 +4,7 @@ import map from 'lodash/collection/map'
 import sortBy from 'lodash/collection/sortBy'
 import { CompanyActions, ProjectActions, TaskActions } from '../../redux/modules'
 import { TaskForm, ProjectSelectForm } from '../../components'
+import { resolveProp, isDefined } from '../../utils'
 import ModalWrapper from './ModalWrapper'
 
 @connect(
@@ -13,7 +14,7 @@ import ModalWrapper from './ModalWrapper'
   }),
   {
     loadCompany: CompanyActions.loadCompany,
-    loadProjectByIds: ProjectActions.loadProjectByIds,
+    loadProjectForCompany: ProjectActions.loadProjectForCompany,
     publishNewTask: TaskActions.publishNewTask
   }
 )
@@ -31,7 +32,7 @@ class NewTaskModal extends Component {
     onSubmit: T.func,
     onHide: T.func,
     loadCompany: T.func,
-    loadProjectByIds: T.func,
+    loadProjectForCompany: T.func,
     publishNewTask: T.func
   }
 
@@ -55,6 +56,7 @@ class NewTaskModal extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    // reset form after open
     if (!this.props.isShowed && nextProps.isShowed) {
       this.setState({
         msg: '',
@@ -64,6 +66,25 @@ class NewTaskModal extends Component {
         avaliableProjects: [],
         submitting: false
       })
+    }
+
+    if (nextProps.isShowed) {
+      const { currentCompany } = this.state
+      if (currentCompany != null) {
+        const { project: { companyProjectsLoading, companyProjectsLoaded, data: projectData } } = nextProps
+        if (companyProjectsLoaded.indexOf(currentCompany._id) >=0) {
+          const avaliableProjects = sortBy(
+            currentCompany.projects
+              .map(resolveProp(projectData))
+              .filter(isDefined),
+            'name'
+          )
+
+          this.setState({
+            avaliableProjects
+          })
+        }
+      }
     }
   }
 
@@ -187,13 +208,18 @@ class NewTaskModal extends Component {
   }
 
   _handleCompanyChange (company) {
-    this.props.loadProjectByIds(company.projects, ({ body }) => {
-      body = sortBy(body, 'name')
-      this.setState({
-        currentCompany: company,
-        avaliableProjects: body
-      })
+    this.props.loadProjectForCompany(company)
+    this.setState({
+      currentCompany: company
     })
+
+    //  ({ body }) => {
+    //   body = sortBy(body, 'name')
+    //   this.setState({
+    //     currentCompany: company,
+    //     avaliableProjects: body
+    //   })
+    // })
   }
 
   _handleProjectChange (project) {

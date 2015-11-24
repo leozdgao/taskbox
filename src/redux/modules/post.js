@@ -15,7 +15,6 @@ const PUBLISH_POST = 'post/PUBLISH_POST'
 const loadPostAction = constructAsyncActionTypes(LOAD_POST)
 const countAction = constructAsyncActionTypes(COUNT_POST)
 const publishPostAction = constructAsyncActionTypes(PUBLISH_POST)
-// const UPDATE_RESOURCE = 'UPDATE_RESOURCE'
 
 export const actionTypes = {
   ...toKeyMirror(loadPostAction),
@@ -135,10 +134,11 @@ export function loadByPage (page) {
 
   return {
     type: LOAD_POST,
-    payload: {
-      promise: request.get(`${POST_API_URL}?${qs.stringify(query)}`)
-    },
-    meta: { page }
+    meta: { page },
+    endPoint: POST_API_URL,
+    query,
+    cacheKey: `POST_PAGE_${page}`,
+    cacheTimeout: 5000
   }
 }
 

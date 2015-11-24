@@ -3,6 +3,7 @@ import find from 'lodash/collection/find'
 import forEach from 'lodash/collection/forEach'
 import qs from 'qs'
 import merge from 'deep-extend'
+import moment from 'moment'
 import { json as request } from 'lgutil/common/ajax'
 import { isLeader, isAdmin } from '../../auth'
 
@@ -28,13 +29,10 @@ const initState = {
 
 let requests = []
 const cacheRequest = promise => requests.push(promise)
-const getToday = () => {
-  const d = new Date()
-  d.setMinutes(0)
-  d.setSeconds(0)
-  d.setHours(0)
-  d.setMilliseconds(0)
-  return d
+const getTomorrow = () => {
+  const today = moment()
+  const tomorrow = today.add(1, 'days')
+  return tomorrow.toDate()
 }
 const setDefault = (target) => (key, defaultValue) => {
   if (target[key] == null) target[key] = defaultValue
@@ -178,7 +176,7 @@ export function load (resource) {
     conditions: {
       assignee: !isLeader(role) ? resourceId : void 0,
       startDate: {
-        $lte: getToday().toString()
+        $lt: getTomorrow().toString()
       },
       endDate: {
         $exists: false

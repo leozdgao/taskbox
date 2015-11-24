@@ -6,6 +6,7 @@ import promiseMiddleware from 'redux-promise-middleware'
 import createLogger from 'redux-logger'
 import cacheablePromise from './middlewares/cacheablePromise'
 import thenablePromise from './middlewares/thenablePromise'
+import apiMiddleWare from './middlewares/apiMiddleWare'
 import rootReducer from './modules/reducer'
 
 const loggerMiddleware = createLogger({
@@ -18,12 +19,13 @@ let createStoreWithMiddleware
 if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {
   const { devTools, persistState } = require('redux-devtools')
   createStoreWithMiddleware = compose(
-    applyMiddleware(cacheablePromise, thenablePromise, promiseMiddleware(), thunkMiddleware, loggerMiddleware),
+    applyMiddleware(apiMiddleWare, cacheablePromise, thenablePromise, promiseMiddleware(), thunkMiddleware, loggerMiddleware),
     devTools(),
     persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
   )(createStore)
 } else {
   createStoreWithMiddleware = applyMiddleware(
+    apiMiddleWare,
     cacheablePromise,
     thenablePromise,
     promiseMiddleware(),

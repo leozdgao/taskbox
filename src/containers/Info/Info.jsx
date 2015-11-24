@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import sortBy from 'lodash/collection/sortBy'
 import { PageHeading, TreeView, IBox, ScrollPanel } from '../../components'
 import { CompanyActions, ProjectActions } from '../../redux/modules'
-import { isDefined, resolveProp, always } from '../../utils'
+import { isDefined, resolveProp, always, diff } from '../../utils'
 import './info.less'
 
 const { companyGroup } = CompanyActions
@@ -25,7 +25,7 @@ export default class Info extends Component {
     company: T.object,
     project: T.object,
     loadCompanyGroup: T.func,
-    loadProjectByIds: T.func
+    loadProjectForCompany: T.func
   }
 
   constructor (props, context) {
@@ -38,8 +38,29 @@ export default class Info extends Component {
       rightPanel: {
         type: null,
         id: null
-      }
+      },
+      companyProjectsLoading: [],
+      companyProjectsLoaded: []
     }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const diffProps = diff(this.props.project, nextProps.project)
+    diffProps('companyProjectsLoading', (curr, next) => {
+      this.setState({
+        companyProjectsLoading: next
+      })
+    })
+    diffProps('companyProjectsLoaded', (curr, next) => {
+      const [ ...copy ] = curr
+      next.forEach(val => {
+        if (copy.indexOf(val) < 0) copy.push(val)
+      })
+
+      this.setState({
+        companyProjectsLoaded: copy
+      })
+    })
   }
 
   componentDidMount () {
@@ -121,24 +142,30 @@ export default class Info extends Component {
       </Link>
     )
     const collapsed = collapsedCompany.indexOf(comp._id) >= 0
+    const isLoading = ({ _id }) => {
+      return this.state.companyProjectsLoading.indexOf(_id) >= 0
+    }
+    const projectEntry = isLoading(comp) ? <div>Loading...</div>: (
+      sortBy(comp.projects.map(resolveProp(projectData))
+        .filter(isDefined), 'name')
+        .map((p, i) => {
+          return (
+            // project entry
+            <div key={i} className="tree-view_item project-entry">
+              <a className='entry' onClick={this._handleProjectEntryClick.bind(this, p)}>
+                <i className="fa fa-clipboard"></i>
+                <span className="shrink-span">{p.name}</span>
+              </a>
+            </div>
+          )
+        })
+    )
 
     return (
       <TreeView key={i}
         nodeLabel={compLabel}
         collapsed={collapsed}>
-        {sortBy(comp.projects.map(resolveProp(projectData))
-          .filter(isDefined), 'name')
-          .map((p, i) => {
-            return (
-              // project entry
-              <div key={i} className="tree-view_item project-entry">
-                <a className='entry' onClick={this._handleProjectEntryClick.bind(this, p)}>
-                  <i className="fa fa-clipboard"></i>
-                  <span className="shrink-span">{p.name}</span>
-                </a>
-              </div>
-            )
-          })}
+        {projectEntry}
       </TreeView>
     )
   }
@@ -156,12 +183,13 @@ export default class Info extends Component {
     }
   }
 
-  _handleCompanyEntryClick ({ _id, projects }) {
+  _handleCompanyEntryClick (company) {
     const [ ...anotherCopy ] = this.state.collapsedCompany
+    const { _id } = company
     const i = anotherCopy.indexOf(_id)
     if (i < 0) {
       anotherCopy.push(_id)
-      this.props.loadProjectByIds(projects)
+      this.props.loadProjectForCompany(company)
     }
     else anotherCopy.splice(i, 1)
 
