@@ -2,7 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import createHistory from 'history/lib/createBrowserHistory'
 import { Provider } from 'react-redux'
-import { Router, PropTypes as RouterPropTypes } from 'react-router'
+// import { Router, PropTypes as RouterPropTypes } from 'react-router'
+import { ReduxRouter } from 'redux-router'
 import configureStore from './redux/configureStore'
 import routes from './routes'
 
@@ -21,11 +22,14 @@ if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {
   createDevToolsWindow(store)
 }
 
+// <Router history={history} routes={routes} />
 // config app root
 const history = createHistory()
 const root = (
   <Provider store={store} key="provider">
-    <Router history={history} routes={routes} />
+    <ReduxRouter>
+      {routes}
+    </ReduxRouter>
   </Provider>
 )
 

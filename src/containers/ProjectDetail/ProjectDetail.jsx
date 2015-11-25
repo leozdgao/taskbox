@@ -1,18 +1,56 @@
 import React, { Component, PropTypes as T } from 'react'
+import { connect } from 'react-redux'
+import { diff } from '../../utils'
 
+function mapStateToProps (state) {
+  const { project, company } = state
+
+  // data fetching deps
+  // 'project' -> 'company'
+
+  return {
+    project, company
+  }
+}
+
+@connect(
+  mapStateToProps
+)
 class ProjectDetail extends Component {
   static propTypes = {
-    pid: T.string
+    params: T.object
   }
 
   contructor (props, context) {
     super(props, context)
+
+    this.state = {
+
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const diffProps = diff(this.props.params, nextProps.params)
+    diffProps('pid', () => {
+      this.tryToGetProject(nextProps)
+    })
+  }
+
+  componentDidMount () {
+    this.tryToGetProject(this.props)
   }
 
   render () {
     return (
       <div></div>
     )
+  }
+
+  tryToGetProject (props) {
+    const {
+      params: { pid },
+      project: { data: projectData }
+    } = props
   }
 }
 

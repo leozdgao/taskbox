@@ -1,12 +1,16 @@
 /* global __DEVTOOLS__ */
 import { createStore, applyMiddleware, compose } from 'redux'
+import { reduxReactRouter } from 'redux-router'
+import { createHistory } from 'history'
+import routes from '../routes'
+
 import thunkMiddleware from 'redux-thunk'
-// import promiseMiddleware from 'redux-promise'
 import promiseMiddleware from 'redux-promise-middleware'
 import createLogger from 'redux-logger'
 import cacheablePromise from './middlewares/cacheablePromise'
 import thenablePromise from './middlewares/thenablePromise'
 import apiMiddleWare from './middlewares/apiMiddleWare'
+
 import rootReducer from './modules/reducer'
 
 const loggerMiddleware = createLogger({
@@ -16,21 +20,23 @@ const loggerMiddleware = createLogger({
 
 let createStoreWithMiddleware
 
+const storeEnhancer = compose(
+  applyMiddleware(apiMiddleWare, cacheablePromise, thenablePromise, promiseMiddleware(), thunkMiddleware, loggerMiddleware),
+  reduxReactRouter({
+    routes,
+    createHistory
+  })
+)
+
 if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {
   const { devTools, persistState } = require('redux-devtools')
   createStoreWithMiddleware = compose(
-    applyMiddleware(apiMiddleWare, cacheablePromise, thenablePromise, promiseMiddleware(), thunkMiddleware, loggerMiddleware),
+    storeEnhancer,
     devTools(),
     persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
   )(createStore)
 } else {
-  createStoreWithMiddleware = applyMiddleware(
-    apiMiddleWare,
-    cacheablePromise,
-    thenablePromise,
-    promiseMiddleware(),
-    thunkMiddleware
-  )(createStore)
+  createStoreWithMiddleware = storeEnhancer(createStore)
 }
 
 

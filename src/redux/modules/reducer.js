@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-
+import { routerStateReducer } from 'redux-router'
 import chats from './chat'
 import task from './task'
 import post from './post'
@@ -10,7 +10,7 @@ import user from './user'
 import form from './form'
 
 const rootReducer = combineReducers({
-  // just hold the state
+  router: routerStateReducer,
   user, task, resource, company, project,
   form, post
 })

@@ -14,11 +14,27 @@ socket.on('error', (e) => {
   console.log('socket error')
 })
 
+let loadOnceGlobal = false
+
+function mapStateToProps (state, props) {
+
+  props.location
+
+  const {
+    user: { data: currentUser },
+    resource: { data: resourceData, isLoading }
+  } = state
+  const resourceInfo = (resourceData || []).sort((a, b) => a.resourceId - b.resourceId)
+
+  return {
+    currentUser: state.user.data || {},
+    resourceLoading: isLoading,
+    resourceInfo
+  }
+}
+
 @connect(
-  state => ({
-    user: state.user.data, // need not modify user, so just pass the data
-    resource: state.resource
-  }),
+  mapStateToProps,
   {
     loadResource: ResourceActions.load
   }
@@ -42,45 +58,45 @@ export default class Main extends Component {
   }
 
   getChildContext () {
-    const resourceInfo = Array.isArray(this.props.resource.data) ?
-      this.props.resource.data.sort((a, b) => a.resourceId - b.resourceId) : [] // return empty array if error
+    const { resourceInfo, currentUser } = this.props
 
     return {
       socket,
-      currentUser: this.props.user,
-      isLeader: isLeader(this.props.user.role),
-      isAdmin: isAdmin(this.props.user.role),
+      currentUser,
+      isLeader: isLeader(currentUser.role),
+      isAdmin: isAdmin(currentUser.role),
       resourceInfo
     }
   }
 
-  // init state
-  state = { pageReady: false }
-
   componentWillReceiveProps (nextProps) {
-    const { resource } = this.props
-    const { resource: nextResource } = nextProps
-
-    if (resource.isLoading && !nextResource.isLoading) {
-      this.setState({ pageReady: true })
-    }
+    this.ensureDataFetch(nextProps)
   }
 
   componentDidMount () {
-    this.props.loadResource()
+    this.ensureDataFetch(this.props)
   }
 
   render () {
+    const { resourceLoading, currentUser } = this.props
+
     return (
-      this.state.pageReady ? (
+      !resourceLoading ? (
         <div id='page-container'>
-          <Navbar user={this.props.user} msgNum={msgNum} />
-          <Sidebar user={this.props.user} />
+          <Navbar user={currentUser} msgNum={msgNum} />
+          <Sidebar user={currentUser} />
           <ScrollPanel id='content'>
             {this.props.children}
           </ScrollPanel>
         </div>
       ): <Spinner className="white-bg" />
     )
+  }
+
+  ensureDataFetch (props) {
+    if (!loadOnceGlobal) {
+      loadOnceGlobal = true
+      props.loadResource()
+    }
   }
 }

@@ -9,7 +9,7 @@ import { removeFromArray } from '../../utils'
 const PROJECT_API_URL = '/api/rest/project'
 
 // -- ActionTypes
-const LOAD_PROJECT_FOR_COMPANY = 'LOAD_PROJECT_FOR_COMPANY'
+const LOAD_PROJECT_FOR_COMPANY = 'project/LOAD_PROJECT_FOR_COMPANY'
 const loadProjectForCompanyAction = constructAsyncActionTypes(LOAD_PROJECT_FOR_COMPANY)
 
 export const actionTypes = {
@@ -66,6 +66,29 @@ const actionMap = {
       companyProjectsLoadFailed: { $push: [ companyId ] }
     })
   }
+}
+
+// CRUD
+// const { initState, actionMap, actions } =
+//   createReduxModule('project', [
+//     { type: 'PROJECTS_FOR_COMPANY', async: true },
+//     { type: 'PROJECT', async: true }
+//   ])
+
+
+// A redux module
+//
+function createReduxModule (name, deps, otherState) {
+  // generate ActionTypes
+  const LOAD = `@@${name}`
+  const CREATE = ``
+  const UPDATE = ``
+  const REMOVE = ``
+
+
+  // reducer how to update data
+
+  // try to pass action type to action creators
 }
 
 // -- Reducer
