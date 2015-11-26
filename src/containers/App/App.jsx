@@ -17,9 +17,6 @@ socket.on('error', (e) => {
 let loadOnceGlobal = false
 
 function mapStateToProps (state, props) {
-
-  props.location
-
   const {
     user: { data: currentUser },
     resource: { data: resourceData, isLoading }
