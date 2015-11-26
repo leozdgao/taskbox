@@ -41,3 +41,6 @@ export { default as ModalWrapper } from './Modal/ModalWrapper'
 export { default as ChangeAvatarModal } from './Modal/ChangeAvatarModal'
 export { default as ConfirmLeaveModal } from './Modal/ConfirmLeaveModal'
 export { default as NewTaskModal } from './Modal/NewTaskModal'
+
+// hoc
+export { default as dataDependence } from './DataFetch/dataFetch'

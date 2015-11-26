@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { routerStateReducer } from 'redux-router'
-import chats from './chat'
+import chat from './chat'
 import task from './task'
 import post from './post'
 import resource from './resource'
@@ -12,7 +12,8 @@ import form from './form'
 const rootReducer = combineReducers({
   router: routerStateReducer,
   user, task, resource, company, project,
-  form, post
+  form, post,
+  chat
 })
 
 export default rootReducer
