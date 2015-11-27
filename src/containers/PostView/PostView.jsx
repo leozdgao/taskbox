@@ -83,10 +83,12 @@ class PostView extends Component {
     // const post = this.state.data
     const { post } = this.props
     const isLoaded = post != null
+    const isError = post && post.error
     const author = isLoaded && findWhere(resourceInfo, { _id: post.author }) || {}
 
     return (
       <FullScreenPanel className="postview">
+        {isError && <p>Error</p>}
         {(isLoaded && this.state.depLoaded) ? (
           // render post here
           <ScrollPanel>
