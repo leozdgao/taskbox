@@ -1,5 +1,8 @@
 import React, { Component, PropTypes as T } from 'react'
-import { isDefined, has } from '../../utils'
+import forEach from 'lodash/collection/forEach'
+import reduce from 'lodash/collection/reduce'
+import { isObject, isDefined, has } from '../../utils'
+import { defaultKey } from '../../redux/dataFetch'
 
 const resolvePropByPath = obj => path => {
   const subPaths = path.split('.')
@@ -19,6 +22,13 @@ const isRejected = ({ rejected }, id) => {
   return has(rejected, id)
 }
 
+const combineResult = (init, val) => {
+  return {
+    ...init,
+    ...val
+  }
+}
+
 const storeShape = T.shape({
   subscribe: T.func.isRequired,
   dispatch: T.func.isRequired,
@@ -26,6 +36,29 @@ const storeShape = T.shape({
 })
 
 const dataDependence = mapFetchConfig => WrappedComponent => {
+
+  const normalizeConfig = (config) => {
+    return reduce(config, (acc, block, propName) => {
+      if (Array.isArray(block)) { // series task
+        acc[propName] = block.reduce((ret, subConfig) => {
+          if (!ret.next) return { ...subConfig, next: [] }
+          else {
+            ret.next.push(subConfig)
+            return ret
+          }
+        }, {})
+      }
+      else {
+        acc[propName] = block
+      }
+
+      return acc
+    }, {})
+  }
+
+  // const mergeParallelConfig = () => {
+  //
+  // }
 
   //     {
   //       name: 'post',
@@ -52,7 +85,7 @@ const dataDependence = mapFetchConfig => WrappedComponent => {
         throw new Error("Can't find redux store.")
       }
 
-      this.config = mapFetchConfig(props, this.store.getState)
+      this.config = this.calculateConfig(props)
       this.state = Object.keys(this.config).reduce((ret, propName) => {
         const config = this.config[propName]
 
@@ -64,7 +97,7 @@ const dataDependence = mapFetchConfig => WrappedComponent => {
     }
 
     componentWillReceiveProps (nextProps) {
-      this.config = mapFetchConfig(props, this.store.getState) // recalculate config
+      this.config = this.calculateConfig(nextProps) // recalculate config
 
       this.ensureDataFetch(nextProps)
     }
@@ -79,36 +112,54 @@ const dataDependence = mapFetchConfig => WrappedComponent => {
       this.tryUnsubscribe()
     }
 
+    // start data fetch here
     ensureDataFetch (props) {
       const { dispatch } = this.store
-      Object.keys(this.config).forEach(propName => {
-        const { action, args, key, state: statePath } = this.config[propName]
-        const requestState = this.getRequestState(statePath)
-        if (!isPending(requestState, key)) dispatch(action.apply(null, args))
+
+      forEach(this.config, (config, propName) => {
+        if (isObject(config)) { // dispatch action by a single config block
+          const { action, args, key = defaultKey, state: statePath } = config
+          const requestState = this.getRequestState(statePath)
+          if (!isPending(requestState, key)) dispatch(action.apply(null, args))
+        }
+        else {
+          throw new Error('Invalid config block, it should be an array or object.')
+        }
       })
     }
 
     handleChange () {
-      Object.keys(this.config).forEach(propName => {
-        const { state: statePath, key, mapVal } = this.config[propName]
-        const requestState = this.getRequestState(statePath)
-        if (isRejected(requestState, key)) {
-          this.setState({
-            [propName]: { error: true }
-          })
+      const state = reduce(this.config, (state, config, propName) => {
+        const val = this.updateState(config, propName)
+        return combineResult(state, val)
+      }, this.state)
+
+      this.setState(state)
+    }
+
+    updateState (config, propName) {
+      const { state: statePath, key = defaultKey, mapVal } = config
+      const requestState = this.getRequestState(statePath)
+      if (isRejected(requestState, key)) {
+        return {
+          [propName]: { error: true }
         }
-        if (isFulfilled(requestState, key)) {
-          const val = mapVal(this.store.getState())
-          this.setState({
-            [propName]: val
-          })
+      }
+      if (isFulfilled(requestState, key)) {
+        const val = mapVal(this.store.getState())
+        return {
+          [propName]: val
         }
-        if (isPending(requestState, key)) {
-          this.setState({
-            [propName]: null
-          })
+      }
+      if (isPending(requestState, key)) {
+        return {
+          [propName]: null
         }
-      })
+      }
+    }
+
+    calculateConfig (props) {
+      return normalizeConfig(mapFetchConfig(props, this.store.getState))
     }
 
     trySubscribe () {

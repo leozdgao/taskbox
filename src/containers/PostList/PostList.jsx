@@ -3,18 +3,39 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import findWhere from 'lodash/collection/findWhere'
-import { Tag, Pagination } from '../../components'
-import { PostActions } from '../../redux/modules'
+import { Tag, Pagination, dataDependence } from '../../components'
+import { Request } from '../../redux/modules'
 import { isDefined, resolveProp } from '../../utils'
 import './postlist.less'
 
-@connect(
-  ({ post }) => ({ post }),
-  {
-    loadPostByPage: PostActions.loadByPage,
-    loadPostCount: PostActions.count
+const { PostModule } = Request
+const { actionCreators: PostActionCreators } = PostModule
+
+const mapDep = (props, getState) => {
+  const { params } = props
+  const page = params.page || 1
+
+  return {
+    postList: {
+      state: 'request.post.loadPage',
+      key: page,
+      action: PostActionCreators.loadByPage,
+      args: [ page ],
+      mapVal: ({ storage: { post } }) => {
+        const { page: pageMap, data } = post
+        return pageMap[page].map(resolveProp(data))
+      }
+    },
+    count: {
+      state: 'request.post.count',
+      action: PostActionCreators.count,
+      args: [],
+      mapVal: ({ storage: { post: { count } } }) => count
+    }
   }
-)
+}
+
+@dataDependence(mapDep)
 class PostList extends Component {
 
   static contextTypes = {
@@ -23,76 +44,32 @@ class PostList extends Component {
 
   static propTypes = {
     params: T.object,
-    post: T.object,
-    loadPostByPage: T.func,
-    loadPostCount: T.func
+    postList: T.array,
+    count: T.number
   }
 
-  constructor (props, context) {
-    super(props, context)
-
-    this.state = {
-      pageLoading: true,
-      postList: [],
-      postCount: 1
-    }
+  state = { // hold count state
+    count: 0
   }
 
-  componentWillReceiveProps (nextProps) {
-    const { params } = this.props
-    const { params: nextParams } = nextProps
-    const currentPage = Number(params.page || 1)
-    const nextPage = Number(nextParams.page || 1)
-
-    if (isNaN(currentPage) || isNaN(nextPage)) return
-
-    // page updated, need reload post
-    if (currentPage !== nextPage) {
-      this.props.loadPostByPage(nextPage)
-    }
-    else { // page not change, load state change
-      const { post } = this.props
-      const { post: nextPost } = nextProps
-
-      if (post.isLoading && !nextPost.isLoading) {
-        const { data: postData, page: postPageMap } = nextPost
-        const postIds = postPageMap[currentPage]
-        this.setState({
-          pageLoading: false,
-          postList: postIds.map(resolveProp(postData))
-        })
-      }
-      if (!post.isLoading && nextPost.isLoading) {
-        this.setState({
-          pageLoading: true,
-          postList: []
-        })
-      }
-      
-      this.setState({
-        postCount: nextPost.count
-      })
-    }
-  }
-
-  componentDidMount () {
-    const { params } = this.props
-    this.props.loadPostByPage(params.page || 1)
-    this.props.loadPostCount()
+  componentWillReceiveProps ({ count }) {
+    if (count) this.setState({ count })
   }
 
   render () {
     const { resourceInfo } = this.context
     const { params: { page = 1 } } = this.props
-
+    const { count } = this.state
     const currentPage = Number(page)
-    const pageCount = Math.floor(this.state.postCount / PostActions.PAGE_LIMIT) + 1
+    const pageCount = count && Math.floor(count / PostModule.PAGE_LIMIT) + 1
+
+    const postList = this.props.postList || []
 
     return (
       <div>
         <Pagination currentPage={currentPage} pageCount={pageCount}
           pageLimit={10} mapLink={(i) => <Link to={`/doc/${i}`}>{i}</Link>} />
-        {this.state.postList.map((post, i) => {
+        {postList.map((post, i) => {
           const author = findWhere(resourceInfo, { _id: post.author }) || {}
           return (
             <div className="post-item" key={i}>

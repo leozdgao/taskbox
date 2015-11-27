@@ -1,4 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
+import { compose } from 'redux'
 import ReactDom from 'react-dom'
 import { Link, Lifecycle, History } from 'react-router'
 import { connect } from 'react-redux'
@@ -6,21 +7,40 @@ import reactMixin from 'react-mixin'
 import findWhere from 'lodash/collection/findWhere'
 import moment from 'moment'
 import scriptLoader from 'react-async-script-loader'
-import { FullScreenPanel, Spinner, Tag, ScrollPanel } from '../../components'
-import { PostActions } from '../../redux/modules'
+import { FullScreenPanel, Spinner, Tag, ScrollPanel, dataDependence } from '../../components'
+import { Request } from '../../redux/modules'
 import './postview.less'
 
-@scriptLoader(
-  'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js'
-)
-@connect(
-  ({ post }) => ({ post }),
-  {
-    loadPost: PostActions.loadOne
+const { PostModule } = Request
+const { actionCreators: PostActionCreators } = PostModule
+
+const mapDep = (props) => {
+  const { params: { docId } } = props
+
+  return {
+    post: {
+      state: 'request.post.load',
+      key: docId,
+      action: PostActionCreators.loadOne,
+      args: [ docId ],
+      mapVal: ({ storage: { post } }) => {
+        const { data } = post
+        return data[docId]
+      }
+    }
   }
+}
+
+const decorate = compose(
+  scriptLoader(
+    'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js'
+  ),
+  dataDependence(mapDep),
+  reactMixin.decorate(History)
 )
-@reactMixin.decorate(History)
+
+@decorate
 class PostView extends Component {
 
   static contextTypes = {
@@ -34,38 +54,11 @@ class PostView extends Component {
     isScriptLoadSucceed: T.bool
   }
 
-  constructor (props, context) {
-    super(props, context)
-
-    const { params, post: { data: postData } } = this.props
-    const id = params.docId
-    const data = postData[id]
-
-    this.state = {
-      depLoaded: false,
-      data: data || {},
-      isLoading: !(data && data.content) // load post if it not exist in store
-    }
+  state = {
+    depLoaded: false
   }
 
   componentWillReceiveProps (nextProps) {
-    const { post, params: { docId } } = this.props
-    const { post: nextPost } = nextProps
-
-    if (post.isLoading && !nextPost.isLoading) {
-      const { data: postData } = nextPost
-      this.setState({
-        isLoading: false,
-        data: postData[docId]
-      })
-    }
-    if (!post.isLoading && nextPost.isLoading) {
-      this.setState({
-        isLoading: true,
-        data: {}
-      })
-    }
-
     const { isScriptLoadSucceed } = this.props
     const { isScriptLoadSucceed: nextScriptLoadSucceed } = nextProps
 
@@ -85,22 +78,16 @@ class PostView extends Component {
     }
   }
 
-  componentDidMount () {
-    const { loadPost, params } = this.props
-
-    if (this.state.isLoading) {
-      loadPost(params.docId)
-    }
-  }
-
   render () {
     const resourceInfo = this.context.resourceInfo
-    const post = this.state.data
-    const author = findWhere(resourceInfo, { _id: post.author }) || {}
+    // const post = this.state.data
+    const { post } = this.props
+    const isLoaded = post != null
+    const author = isLoaded && findWhere(resourceInfo, { _id: post.author }) || {}
 
     return (
       <FullScreenPanel className="postview">
-        {(!this.state.isLoading && this.state.depLoaded) ? (
+        {(isLoaded && this.state.depLoaded) ? (
           // render post here
           <ScrollPanel>
             <div className="container">

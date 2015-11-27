@@ -43,4 +43,4 @@ export { default as ConfirmLeaveModal } from './Modal/ConfirmLeaveModal'
 export { default as NewTaskModal } from './Modal/NewTaskModal'
 
 // hoc
-export { default as dataDependence } from './DataFetch/dataFetch'
+export { default as dataDependence } from './DataDependence/dataDependence'

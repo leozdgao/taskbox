@@ -26,6 +26,11 @@ export const hasSameKey = (a, b) => {
   }
 }
 
+export const isObject = val => {
+  // not null or array
+  return !!val && !Array.isArray(val) && typeof val == 'object'
+}
+
 export const isFunction = val => {
   return typeof val === 'function'
 }

@@ -7,6 +7,7 @@ import { isDefined } from '../../utils'
 @dataDependence((props, getState) => {
   // const postId = props.params.pid
   const postId = "5650379082b6427c0bd84fdd"
+  const pid = "123"
   // const { post: { data } } = state
   return {
     post: {

@@ -8,3 +8,6 @@ export * as PostActions from './post'
 
 // Test
 export * as ChatActions from './chat'
+
+export * as Storage from './storage'
+export * as Request from './request'

@@ -13,6 +13,8 @@ import { removeFromArray } from '../utils'
 //   load: companyLoadReducer
 // })
 
+export const defaultKey = '_ONLY_'
+
 const getActionMap = (asyncAction) => {
   const transferId = (state, id, key) => {
     const { pending, fulfilled, rejected } = state
@@ -24,19 +26,23 @@ const getActionMap = (asyncAction) => {
       rejected: key === 'rejected' ? [ ...rejected, id ] : removeId(rejected)
     }
   }
+  const getId = action => {
+    return (action.meta && action.meta.id) || defaultKey
+  }
+
   return {
     [asyncAction.pending] (state, action) {
-      const { meta: { id } } = action
+      const id = getId(action)
 
       return transferId(state, id, 'pending')
     },
     [asyncAction.fulfilled] (state, action) {
-      const { meta: { id } } = action
+      const id = getId(action)
 
       return transferId(state, id, 'fulfilled')
     },
     [asyncAction.rejected] (state, action) {
-      const { meta: { id } } = action
+      const id = getId(action)
 
       return transferId(state, id, 'rejected')
     }

@@ -20,10 +20,9 @@ export function loadOne (id) {
     endPoint: `${POST_API_URL}/${id}`,
     cacheKey: `LOAD_POST_${id}`,
     cacheTimeout: 5000,
-    meta: { id } // for cache
+    meta: { id } // for dataDependence track the request state
   }
 }
-
 
 // export default function (state = [], action) {
 //   switch (action.type) {

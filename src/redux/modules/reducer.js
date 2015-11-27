@@ -9,11 +9,16 @@ import project from './project'
 import user from './user'
 import form from './form'
 
+import requestReducer from './request/reducer'
+import storageReducer from './storage/reducer'
+
 const rootReducer = combineReducers({
   router: routerStateReducer,
   user, task, resource, company, project,
   form, post,
-  chat
+  chat,
+  request: requestReducer,
+  storage: storageReducer
 })
 
 export default rootReducer
