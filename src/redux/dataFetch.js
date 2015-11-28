@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import createReducer from './createReducer'
 import { constructAsyncActionTypes } from './createAction'
-import { removeFromArray } from '../utils'
+import { removeFromArray, has } from '../utils'
 
 // Use:
 //
@@ -14,6 +14,14 @@ import { removeFromArray } from '../utils'
 // })
 
 export const defaultKey = '_ONLY_'
+
+export const spreadStatus = (reqStatus, key = defaultKey) => {
+  return {
+    isPending: has(reqStatus.pending, key),
+    isFulfilled: has(reqStatus.fulfilled, key),
+    isRejected: has(reqStatus.rejected, key)
+  }
+}
 
 const getActionMap = (asyncAction) => {
   const transferId = (state, id, key) => {

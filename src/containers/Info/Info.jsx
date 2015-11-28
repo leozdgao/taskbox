@@ -2,30 +2,46 @@ import React, { Component, PropTypes as T } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import sortBy from 'lodash/collection/sortBy'
+import reduce from 'lodash/collection/reduce'
 import { PageHeading, TreeView, IBox, ScrollPanel } from '../../components'
-import { CompanyActions, ProjectActions } from '../../redux/modules'
-import { isDefined, resolveProp, always, diff } from '../../utils'
+import { Request } from '../../redux/modules'
+import { isDefined, resolveProp, always, diff, resolvePropByPath } from '../../utils'
 import './info.less'
 
-const { companyGroup } = CompanyActions
+const { CompanyModule, ProjectModule } = Request
+const { actionCreators: CompanyActionCreators, companyGroup } = CompanyModule
+const { actionCreators: ProjectActionCreators } = ProjectModule
+
+const mapStateToProps = state => {
+  const resolveState = resolvePropByPath(state)
+  const companyData = resolveState('storage.company.data')
+  const projectData = resolveState('storage.project.data')
+  const group = resolveState('storage.company.group')
+
+  return {
+    group: reduce(group, (acc, arr, groupKey) => {
+      acc[groupKey] = sortBy(arr.map(resolveProp(companyData)).filter(isDefined), 'name')
+      return acc
+    }, {}),
+    projectData
+  }
+}
 
 @connect(
-  ({ company, project }) => ({
-    company, project
-  }),
+  mapStateToProps,
   {
-    ...CompanyActions,
-    ...ProjectActions
+    loadGroup: CompanyActionCreators.loadGroup,
+    loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany
   }
 )
 export default class Info extends Component {
 
   static propTypes = {
     children: T.any,
-    company: T.object,
-    project: T.object,
-    loadCompanyGroup: T.func,
-    loadProjectForCompany: T.func
+    loadGroup: T.func,
+    loadProjectUnderCompany: T.func,
+    group: T.object,
+    projectData: T.object
   }
 
   constructor (props, context) {
@@ -34,33 +50,8 @@ export default class Info extends Component {
     this.state = {
       collapsedCompanyGroup: companyGroup.map(always(false)),
       loadingCompanyGroup: companyGroup.map(always(false)),
-      collapsedCompany: [],
-      rightPanel: {
-        type: null,
-        id: null
-      },
-      companyProjectsLoading: [],
-      companyProjectsLoaded: []
+      collapsedCompany: []
     }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const diffProps = diff(this.props.project, nextProps.project)
-    diffProps('companyProjectsLoading', (curr, next) => {
-      this.setState({
-        companyProjectsLoading: next
-      })
-    })
-    diffProps('companyProjectsLoaded', (curr, next) => {
-      const [ ...copy ] = curr
-      next.forEach(val => {
-        if (copy.indexOf(val) < 0) copy.push(val)
-      })
-
-      this.setState({
-        companyProjectsLoaded: copy
-      })
-    })
   }
 
   componentDidMount () {
@@ -71,10 +62,7 @@ export default class Info extends Component {
     const {
       collapsedCompanyGroup
     } = this.state
-    const {
-      company: { pendingGroup, data: companyData, group: companySet },
-    } = this.props
-    const isPending = (key) => pendingGroup.indexOf(key) >= 0
+    const { group: groupData } = this.props
 
     return (
       <div>
@@ -99,10 +87,7 @@ export default class Info extends Component {
                       <TreeView key={i}
                         nodeLabel={label}
                         collapsed={collapsedCompanyGroup[i]}>
-                        {isPending(key) && companySet[key].length <= 0 ? <div>Loading...</div> : (
-                          sortBy(companySet[key].map(resolveProp(companyData)), 'name')
-                            .map(::this._getCompanyEntry)
-                        )}
+                        {groupData[key].map(::this._getCompanyEntry)}
                       </TreeView>
                     )
                   })}
@@ -132,7 +117,7 @@ export default class Info extends Component {
       collapsedCompany
     } = this.state
     const {
-      project: { data: projectData }
+      projectData
     } = this.props
     // company entry
     const compLabel = (
@@ -142,10 +127,7 @@ export default class Info extends Component {
       </Link>
     )
     const collapsed = collapsedCompany.indexOf(comp._id) >= 0
-    const isLoading = ({ _id }) => {
-      return this.state.companyProjectsLoading.indexOf(_id) >= 0
-    }
-    const projectEntry = isLoading(comp) ? <div>Loading...</div>: (
+    const projectEntry =
       sortBy(comp.projects.map(resolveProp(projectData))
         .filter(isDefined), 'name')
         .map((p, i) => {
@@ -159,7 +141,6 @@ export default class Info extends Component {
             </div>
           )
         })
-    )
 
     return (
       <TreeView key={i}
@@ -179,7 +160,7 @@ export default class Info extends Component {
     })
 
     if (collapsed) {
-      this.props.loadCompanyGroup(group)
+      this.props.loadGroup(group)
     }
   }
 
@@ -189,25 +170,16 @@ export default class Info extends Component {
     const i = anotherCopy.indexOf(_id)
     if (i < 0) {
       anotherCopy.push(_id)
-      this.props.loadProjectForCompany(company)
+      this.props.loadProjectUnderCompany(company)
     }
     else anotherCopy.splice(i, 1)
 
     this.setState({
-      collapsedCompany: anotherCopy,
-      rightPanel: {
-        type: 'company',
-        id: _id
-      }
+      collapsedCompany: anotherCopy
     })
   }
 
   _handleProjectEntryClick ({ _id }) {
-    this.setState({
-      rightPanel: {
-        type: 'project',
-        id: _id
-      }
-    })
+
   }
 }

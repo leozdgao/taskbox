@@ -9,38 +9,35 @@ import moment from 'moment'
 import scriptLoader from 'react-async-script-loader'
 import { FullScreenPanel, Spinner, Tag, ScrollPanel, dataDependence } from '../../components'
 import { Request } from '../../redux/modules'
+import { spreadStatus } from '../../redux/dataFetch'
+import { resolvePropByPath } from '../../utils'
 import './postview.less'
 
 const { PostModule } = Request
 const { actionCreators: PostActionCreators } = PostModule
 
-const mapDep = (props) => {
+const mapStateToProps = (state, props) => {
   const { params: { docId } } = props
+  const resolveState = resolvePropByPath(state)
+  const reqStatus = resolveState('request.post.load')
+  const postData = resolveState('storage.post.data')
 
   return {
     post: {
-      state: 'request.post.load',
-      key: docId,
-      action: PostActionCreators.loadOne,
-      args: [ docId ],
-      mapVal: ({ storage: { post } }) => {
-        const { data } = post
-        return data[docId]
-      }
+      val: postData[docId],
+      ...spreadStatus(reqStatus, docId)
     }
   }
 }
 
-const decorate = compose(
-  scriptLoader(
-    'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js'
-  ),
-  dataDependence(mapDep),
-  reactMixin.decorate(History)
+@scriptLoader(
+  'https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js'
 )
-
-@decorate
+@connect(mapStateToProps, {
+  loadPost: PostActionCreators.loadOne
+})
+@reactMixin.decorate(History)
 class PostView extends Component {
 
   static contextTypes = {
@@ -59,8 +56,12 @@ class PostView extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { isScriptLoadSucceed } = this.props
-    const { isScriptLoadSucceed: nextScriptLoadSucceed } = nextProps
+    const { isScriptLoadSucceed, params: { docId } } = this.props
+    const { isScriptLoadSucceed: nextScriptLoadSucceed, params: { docId: nextDocId }  } = nextProps
+
+    if (docId !== nextDocId) {
+      this.props.loadPost(nextDocId)
+    }
 
     if (!isScriptLoadSucceed && nextScriptLoadSucceed) {
       this.setState({
@@ -78,18 +79,29 @@ class PostView extends Component {
     }
   }
 
+  componentDidMount () {
+    const { params: { docId } } = this.props
+    this.props.loadPost(docId)
+  }
+
   render () {
     const resourceInfo = this.context.resourceInfo
-    // const post = this.state.data
-    const { post } = this.props
-    const isLoaded = post != null
-    const isError = post && post.error
-    const author = isLoaded && findWhere(resourceInfo, { _id: post.author }) || {}
+    const { post: postVector } = this.props
+    const post = postVector.val
+    const author = postVector.fulfilled && post &&
+      findWhere(resourceInfo, { _id: post.author }) || {}
+
+    if (postVector.isRejected) {
+      return (
+        <FullScreenPanel className="postview">
+          <h2>Error</h2>
+        </FullScreenPanel>
+      )
+    }
 
     return (
       <FullScreenPanel className="postview">
-        {isError && <p>Error</p>}
-        {(isLoaded && this.state.depLoaded) ? (
+        {(postVector.isFulfilled && this.state.depLoaded) ? (
           // render post here
           <ScrollPanel>
             <div className="container">

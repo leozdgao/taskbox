@@ -1,8 +1,7 @@
 import { combineReducers } from 'redux'
-import { routerStateReducer } from 'redux-router'
-import chat from './chat'
+// import { routerStateReducer } from 'redux-router'
+// import chat from './chat'
 import task from './task'
-import post from './post'
 import resource from './resource'
 import company from './company'
 import project from './project'
@@ -13,10 +12,9 @@ import requestReducer from './request/reducer'
 import storageReducer from './storage/reducer'
 
 const rootReducer = combineReducers({
-  router: routerStateReducer,
+  // router: routerStateReducer,
   user, task, resource, company, project,
-  form, post,
-  chat,
+  form,
   request: requestReducer,
   storage: storageReducer
 })

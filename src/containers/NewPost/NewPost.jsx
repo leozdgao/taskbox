@@ -3,13 +3,30 @@ import { Link, Lifecycle, History } from 'react-router'
 import { connect } from 'react-redux'
 import reactMixin from 'react-mixin'
 import { FullScreenPanel, Spinner, EditPostForm, ConfirmLeaveModal } from '../../components'
-import { autobind } from '../../utils'
-import { PostActions } from '../../redux/modules'
+import { autobind, resolvePropByPath } from '../../utils'
+import { Request } from '../../redux/modules'
+import { spreadStatus } from '../../redux/dataFetch'
 import './newpost.less'
 
+const { PostModule } = Request
+const { actionCreators: PostActionCreators } = PostModule
+
+const mapStateToProps = state => {
+  const resolveState = resolvePropByPath(state)
+  const reqStatus = resolveState('request.post.create')
+
+  return {
+    publishStatus: spreadStatus(reqStatus),
+    editPostIsDirty: state.form.editPost.isDirty,
+    lastPublishedPostId: resolveState('storage.post.lastPublishedPostId')
+  }
+}
+
 @connect(
-  ({ post, form }) => ({ post, form }),
-  { publishPost: PostActions.publish }
+  mapStateToProps,
+  {
+    publishPost: PostActionCreators.publish
+  }
 )
 @reactMixin.decorate(Lifecycle)
 @reactMixin.decorate(History)
@@ -17,9 +34,9 @@ import './newpost.less'
 class NewPost extends Component {
 
   static propTypes = {
-    form: T.object,
-    post: T.object,
-    publishPost: T.func
+    publishPost: T.func,
+    editPostIsDirty: T.bool,
+    publishStatus: T.object
   }
 
   static contextTypes = {
@@ -32,16 +49,13 @@ class NewPost extends Component {
     this.state = {
       editorLoading: true,
       editorLoadFailed: false,
-      postPublishing: false,
-      postPublishError: false,
       modalShowed: false
-      // confirmToLeave: false
     }
   }
 
   routerWillLeave () {
-    const { form: { editPost } } = this.props
-    const cantLeave = editPost.isDirty && !this._confirmToLeave
+    const { editPostIsDirty } = this.props
+    const cantLeave = editPostIsDirty && !this._confirmToLeave
     if (cantLeave) {
       this.setState({
         modalShowed: true
@@ -52,29 +66,18 @@ class NewPost extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { post: { isPublishing } } = this.props
-    const { post: nextPost } = nextProps
+    const { publishStatus } = this.props
+    const { publishStatus:nextPublishStatus, lastPublishedPostId } = nextProps
 
-    if (isPublishing && !nextPost.isPublishing) { // finish publish
-      if (nextPost.lastPublishingError) {
-        this.setState({
-          postPublishing: false,
-          postPublishError: true
-        })
-      }
-      else {
-        // go to view the new post
-        const postId = nextPost.lastPublishedPostId
-        if (postId) {
-          this._confirmToLeave = true
-          this.history.pushState(null, `/doc/p/${postId}`)
-        }
-      }
+    if (publishStatus.isPending && nextPublishStatus.isFulfilled) {
+      this._confirmToLeave = true
+      this.history.pushState(null, `/doc/p/${lastPublishedPostId}`)
     }
   }
 
   render () {
     const { currentUser: { avatar, name } } = this.context
+    const { publishStatus } = this.props
 
     return (
       <FullScreenPanel className="newpost">
@@ -89,10 +92,10 @@ class NewPost extends Component {
           <div className="form">
             {this.state.editorLoadFailed ? this._getFailedContent() : (
               <div>
-                <EditPostForm ref="form" isRequesting={this.state.postPublishing}
+                <EditPostForm ref="form" isRequesting={publishStatus.isPending}
                   onSubmit={::this._handlePublish} onLoad={::this._editorLoaded}
                   onError={::this._editorError} />
-                {this.state.postPublishError && (
+                {publishStatus.isRejected && (
                   <div className="block text-danger pbt-10">Publish failed, please try again later.</div>
                 )}
               </div>
@@ -116,18 +119,17 @@ class NewPost extends Component {
   }
 
   _handlePublish (body) {
-    this.setState({
-      postPublishing: true,
-      postPublishError: false
-    })
+    const { publishStatus } = this.props
 
-    if (!this.state.postPublishing) {
+    if (!publishStatus.isPending) {
       const { currentUser } = this.context
       body.author = currentUser._id // populate author to current user
       this.props.publishPost(body)
     }
   }
 
+
+  // handle editor load
   _editorLoaded () {
     this.setState({
       editorLoading: false,

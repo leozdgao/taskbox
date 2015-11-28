@@ -220,3 +220,11 @@ export const diffBool = (current, next) => (key, nextT, nextF) => {
 export const diff = (current, next) => (key, cb) => {
   if (current[key] !== next[key]) cb && cb.call(null, current[key], next[key])
 }
+
+export const resolvePropByPath = obj => path => {
+  const subPaths = path.split('.')
+  return subPaths.reduce((target, key) => {
+    if (!isDefined(target)) return void 0
+    return target[key]
+  }, obj)
+}

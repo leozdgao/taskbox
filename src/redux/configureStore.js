@@ -1,6 +1,6 @@
 /* global __DEVTOOLS__ */
 import { createStore, applyMiddleware, compose } from 'redux'
-import { reduxReactRouter } from 'redux-router'
+// import { reduxReactRouter } from 'redux-router'
 import { createHistory } from 'history'
 import routes from '../routes'
 
@@ -21,11 +21,15 @@ const loggerMiddleware = createLogger({
 let createStoreWithMiddleware
 
 const storeEnhancer = compose(
-  applyMiddleware(apiMiddleWare, cacheablePromise, thenablePromise, promiseMiddleware(), thunkMiddleware, loggerMiddleware),
-  reduxReactRouter({
-    routes,
-    createHistory
-  })
+  applyMiddleware(
+    apiMiddleWare, cacheablePromise,
+    thenablePromise, promiseMiddleware(),
+    thunkMiddleware, loggerMiddleware
+  )
+  // reduxReactRouter({
+  //   routes,
+  //   createHistory
+  // })
 )
 
 if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {

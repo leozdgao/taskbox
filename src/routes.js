@@ -1,8 +1,6 @@
 import React from 'react'
 import { IndexRoute, Route } from 'react-router'
-import * as containers from './containers'
-
-const {
+import {
   App,
   Dashboard,
   Info,
@@ -16,7 +14,7 @@ const {
   PostView,
   Profile,
   Page404
-} = containers
+} from './containers'
 
 export default (
   <Route>

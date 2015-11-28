@@ -8,9 +8,11 @@ const { actionTypes: { load, loadPage, create, count } }  = PostModule
 //   {
 //     data: {},
 //     page: {},
-//     count
+//     count,
+//     lastPublishedPostId
 //   }
 //
+
 const actionMap = {
   [load.fulfilled] (state, { payload, meta }) {
     const ret = payload.body
@@ -35,7 +37,8 @@ const actionMap = {
   [create.fulfilled] (state, { payload }) {
     const ret = payload.body
     return update(state, {
-      data: { [ret._id]: { $set: ret } }
+      data: { [ret._id]: { $set: ret } },
+      lastPublishedPostId: { $set: ret._id }
     })
   },
   [count.fulfilled] (state, { payload }) {

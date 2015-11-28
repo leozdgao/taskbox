@@ -29,7 +29,6 @@ const mapDep = (props, getState) => {
     count: {
       state: 'request.post.count',
       action: PostActionCreators.count,
-      args: [],
       mapVal: ({ storage: { post: { count } } }) => count
     }
   }
@@ -44,26 +43,29 @@ class PostList extends Component {
 
   static propTypes = {
     params: T.object,
-    postList: T.array,
-    count: T.number
+    postList: T.object,
+    count: T.object
   }
 
-  state = { // hold count state
-    count: 0
-  }
-
-  componentWillReceiveProps ({ count }) {
-    if (count) this.setState({ count })
-  }
+  // state = { // hold count state
+  //   count: 0
+  // }
+  //
+  // componentWillReceiveProps ({ count }) {
+  //   if (count) this.setState({ count })
+  // }
 
   render () {
     const { resourceInfo } = this.context
     const { params: { page = 1 } } = this.props
-    const { count } = this.state
+    let { postList: { val: postList }, count: { val: count } } = this.props
+    postList = postList || []
+    count = count || 0
+    // const { count } = this.state
+    // const count = count || 0
     const currentPage = Number(page)
     const pageCount = count && Math.floor(count / PostModule.PAGE_LIMIT) + 1
 
-    const postList = this.props.postList || []
 
     return (
       <div>

@@ -49,9 +49,10 @@ export default class Main extends Component {
 
   static propTypes = {
     children: T.any.isRequired,
-    user: T.object,
     loadResource: T.func,
-    resource: T.object
+    currentUser: T.object,
+    resourceInfo: T.array,
+    resourceLoading: T.bool
   }
 
   getChildContext () {
@@ -78,15 +79,14 @@ export default class Main extends Component {
     const { resourceLoading, currentUser } = this.props
 
     return (
-      !resourceLoading ? (
-        <div id='page-container'>
-          <Navbar user={currentUser} msgNum={msgNum} />
-          <Sidebar user={currentUser} />
-          <ScrollPanel id='content'>
-            {this.props.children}
-          </ScrollPanel>
-        </div>
-      ): <Spinner className="white-bg" />
+      <div id='page-container'>
+        {resourceLoading && <Spinner className="white-bg" />}
+        <Navbar user={currentUser} msgNum={msgNum} />
+        <Sidebar user={currentUser} />
+        <ScrollPanel id='content'>
+          {this.props.children}
+        </ScrollPanel>
+      </div>
     )
   }
 
