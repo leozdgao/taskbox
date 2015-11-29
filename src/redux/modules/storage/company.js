@@ -11,6 +11,13 @@ const { actionTypes: { loadOne, loadAll, loadGroup }, companyGroup }  = CompanyM
 //   group: {}
 // }
 
+const initGroup = companyGroup.reduce((ret, { key }) => {
+  ret[key] = []
+  return ret
+}, {})
+
+const initState = { data: {}, group: initGroup }
+
 const groupCompany = (ret = {}, company) => {
   const groupIndex = findIndex(companyGroup, ({ from, to }) => {
     return isInGroup(from, to)(company.name)
@@ -63,9 +70,4 @@ const actionMap = {
   }
 }
 
-const initGroup = companyGroup.reduce((ret, { key }) => {
-  ret[key] = []
-  return ret
-}, {})
-
-export default createReducer(actionMap, { data: {}, group: initGroup })
+export default createReducer(actionMap, initState)

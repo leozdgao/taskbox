@@ -2,20 +2,39 @@ import React, { Component, PropTypes as T } from 'react'
 import { connect } from 'react-redux'
 import map from 'lodash/collection/map'
 import sortBy from 'lodash/collection/sortBy'
-import { CompanyActions, ProjectActions, TaskActions } from '../../redux/modules'
+import { TaskActions } from '../../redux/modules'
+import { Request, Views } from '../../redux/modules'
 import { TaskForm, ProjectSelectForm } from '../../components'
-import { resolveProp, isDefined } from '../../utils'
+import { resolveProp, isDefined, resolvePropByPath } from '../../utils'
 import ModalWrapper from './ModalWrapper'
 
+const { NewTaskModalModule } = Views
+const { CompanyModule } = Request
+const { actionCreators: NewTaskModalActions } = NewTaskModalModule
+const { actionCreators: CompanyActions } = CompanyModule
+
+const mapStateToProps = state => {
+  const resolveState = resolvePropByPath(state)
+  const { step, currentProject, currentCompany, projectOptions } = resolveState('views.newTaskModal')
+  const companyData = resolveState('storage.company.data')
+
+  return {
+    avaliableCompanies: sortBy(map(companyData, val => val), 'name'),
+    step, currentProject, currentCompany,
+    projectOptions: sortBy(projectOptions, 'name')
+  }
+}
+
 @connect(
-  state => ({
-    company: state.company,
-    project: state.project
-  }),
+  mapStateToProps,
   {
-    loadCompany: CompanyActions.loadCompany,
-    loadProjectForCompany: ProjectActions.loadProjectForCompany,
-    publishNewTask: TaskActions.publishNewTask
+    nextStep: NewTaskModalActions.nextStep,
+    prevStep: NewTaskModalActions.prevStep,
+    loadAllCompany: CompanyActions.loadAll,
+    selectCompany: NewTaskModalActions.selectCompany,
+    selectProject: NewTaskModalActions.selectProject,
+    publishNewTask: TaskActions.publishNewTask,
+    reset: NewTaskModalActions.reset
   }
 )
 class NewTaskModal extends Component {
@@ -25,15 +44,22 @@ class NewTaskModal extends Component {
   }
 
   static propTypes = {
-    company: T.object,
-    project: T.object,
+    avaliableCompanies: T.array,
+    projectOptions: T.array,
+    currentProject: T.object,
+    currentCompany: T.object,
+    step: T.number,
     isShowed: T.bool,
     onSuccess: T.func,
     onSubmit: T.func,
     onHide: T.func,
-    loadCompany: T.func,
-    loadProjectForCompany: T.func,
-    publishNewTask: T.func
+    nextStep: T.func,
+    prevStep: T.func,
+    loadAllCompany: T.func,
+    selectCompany: T.func,
+    selectProject: T.func,
+    publishNewTask: T.func,
+    reset: T.func
   }
 
   static defaultProps = {
@@ -45,56 +71,28 @@ class NewTaskModal extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {
+    this._initState = {
       msg: '',
-      step: 0,
-      currentProject: null,
-      currentCompany: null,
-      avaliableProjects: [],
       submitting: false
     }
+
+    this.state = this._initState
   }
 
   componentWillReceiveProps (nextProps) {
     // reset form after open
     if (!this.props.isShowed && nextProps.isShowed) {
-      this.setState({
-        msg: '',
-        step: 0,
-        currentProject: null,
-        currentCompany: null,
-        avaliableProjects: [],
-        submitting: false
-      })
-    }
-
-    if (nextProps.isShowed) {
-      const { currentCompany } = this.state
-      if (currentCompany != null) {
-        const { project: { companyProjectsLoading, companyProjectsLoaded, data: projectData } } = nextProps
-        if (companyProjectsLoaded.indexOf(currentCompany._id) >=0) {
-          const avaliableProjects = sortBy(
-            currentCompany.projects
-              .map(resolveProp(projectData))
-              .filter(isDefined),
-            'name'
-          )
-
-          this.setState({
-            avaliableProjects
-          })
-        }
-      }
+      this.props.reset() // reset modal state
     }
   }
 
   componentDidMount () {
-    this.props.loadCompany()
+    this.props.loadAllCompany()
   }
 
-  componentWillUnmount () {
-    CompanyActions.dispose()
-  }
+  // componentWillUnmount () {
+  //   // CompanyActions.dispose()
+  // }
 
   render () {
     return (
@@ -109,13 +107,19 @@ class NewTaskModal extends Component {
   }
 
   _getContent () {
-    const { step } = this.state
+    const { step } = this.props
     if (step === 0) return this._confirmProject()
     if (step === 1) return this._newTaskContent()
   }
 
   _confirmProject () {
-    const companies = sortBy(map(this.props.company.data, c => c), 'name')
+    const {
+      avaliableCompanies: companies,
+      currentProject, currentCompany,
+      projectOptions,
+      // actions
+      selectCompany, selectProject
+    } = this.props
 
     return (
       <div>
@@ -127,17 +131,17 @@ class NewTaskModal extends Component {
         </ModalWrapper.Header>
         <ModalWrapper.Content>
           <ProjectSelectForm
-            defaultCompany={this.state.currentCompany}
-            defaultProject={this.state.currentProject}
+            currentCompany={currentCompany}
+            currentProject={currentProject}
             avaliableCompanies={companies}
-            currentProjectItems={this.state.avaliableProjects}
-            onCompanyChange={::this._handleCompanyChange}
-            onProjectChange={::this._handleProjectChange} />
+            projectOptions={projectOptions}
+            onCompanyChange={selectCompany}
+            onProjectChange={selectProject} />
         </ModalWrapper.Content>
         <ModalWrapper.Footer>
           <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>Cancel</button>
-          {this.state.currentProject ?
-            <button type="button" className="btn btn-sm btn-info" onClick={::this._onNext}>Next</button>
+          {currentProject ?
+            <button type="button" className="btn btn-sm btn-info" onClick={this.props.nextStep}>Next</button>
             : null
           }
         </ModalWrapper.Footer>
@@ -146,7 +150,7 @@ class NewTaskModal extends Component {
   }
 
   _newTaskContent () {
-    const { currentProject, currentCompany } = this.state
+    const { currentProject, currentCompany } = this.props
     const defaultTaskTitle = currentProject && currentCompany ? `${currentCompany.name} - ${currentProject.name}` : ''
     return (
       <div>
@@ -164,22 +168,11 @@ class NewTaskModal extends Component {
         </ModalWrapper.Content>
         <ModalWrapper.Footer>
           <span className='help-text text-danger'>{this.state.msg}</span>
-          <button type="button" className="btn btn-sm btn-white" onClick={::this._onBack}>Back</button>
+          <button type="button" className="btn btn-sm btn-white" onClick={this.props.prevStep}>Back</button>
           <button type="button" className="btn btn-sm btn-success" onClick={::this._onClick} disabled={this.state.submitting}>Publish</button>
         </ModalWrapper.Footer>
       </div>
     )
-  }
-
-  _onBack () {
-    this.setState({ step: 0 })
-  }
-
-  _onNext () {
-    this.setState({
-      step: 1,
-      msg: ''
-    })
   }
 
   _onClick () {
@@ -195,7 +188,7 @@ class NewTaskModal extends Component {
       this.setState({
         msg: '', submitting: true
       }, () => {
-        body.projectId = this.state.currentProject._id
+        body.projectId = this.props.currentProject._id
 
         this.props.publishNewTask(body, ({ status, body }) => {
           if (Number(status) !== 200) {
@@ -205,25 +198,6 @@ class NewTaskModal extends Component {
         })
       })
     }
-  }
-
-  _handleCompanyChange (company) {
-    this.props.loadProjectForCompany(company)
-    this.setState({
-      currentCompany: company
-    })
-
-    //  ({ body }) => {
-    //   body = sortBy(body, 'name')
-    //   this.setState({
-    //     currentCompany: company,
-    //     avaliableProjects: body
-    //   })
-    // })
-  }
-
-  _handleProjectChange (project) {
-    this.setState({ currentProject: project })
   }
 }
 

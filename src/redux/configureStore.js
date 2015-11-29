@@ -10,6 +10,7 @@ import createLogger from 'redux-logger'
 import cacheablePromise from './middlewares/cacheablePromise'
 import thenablePromise from './middlewares/thenablePromise'
 import apiMiddleWare from './middlewares/apiMiddleWare'
+import combineActionMiddleware from './middlewares/combineActionMiddleware'
 
 import rootReducer from './modules/reducer'
 
@@ -22,7 +23,8 @@ let createStoreWithMiddleware
 
 const storeEnhancer = compose(
   applyMiddleware(
-    apiMiddleWare, cacheablePromise,
+    apiMiddleWare, combineActionMiddleware,
+    cacheablePromise,
     thenablePromise, promiseMiddleware(),
     thunkMiddleware, loggerMiddleware
   )
