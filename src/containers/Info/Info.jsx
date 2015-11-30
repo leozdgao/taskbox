@@ -26,13 +26,14 @@ const mapStateToProps = state => {
     projectData
   }
 }
+const mapActionToProps = {
+  loadGroup: CompanyActionCreators.loadGroup,
+  loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany
+}
 
 @connect(
   mapStateToProps,
-  {
-    loadGroup: CompanyActionCreators.loadGroup,
-    loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany
-  }
+  mapActionToProps
 )
 export default class Info extends Component {
 
@@ -134,10 +135,10 @@ export default class Info extends Component {
           return (
             // project entry
             <div key={i} className="tree-view_item project-entry">
-              <a className='entry' onClick={this._handleProjectEntryClick.bind(this, p)}>
+              <Link to={`/info/p/${p._id}`} className='entry'>
                 <i className="fa fa-clipboard"></i>
                 <span className="shrink-span">{p.name}</span>
-              </a>
+              </Link>
             </div>
           )
         })

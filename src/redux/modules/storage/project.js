@@ -3,7 +3,7 @@ import findIndex from 'lodash/array/findIndex'
 import createReducer from '../../createReducer'
 import { ProjectModule } from '../request'
 
-const { actionTypes: { loadProjectUnderCompany } }  = ProjectModule
+const { actionTypes: { loadProjectUnderCompany, loadOne } }  = ProjectModule
 
 // {
 //   data: {}
@@ -18,6 +18,11 @@ const actionMap = {
 
     return update(state, {
       data
+    })
+  },
+  [loadOne.fulfilled] (state, { payload: { body } }) {
+    return update(state, {
+      data: { [body._id]: { $set: body } }
     })
   }
 }

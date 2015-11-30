@@ -77,7 +77,7 @@ function loadGroup (group) {
     endPoint: url,
     query,
     cacheKey: `LOAD_COMPANY_GROUP$${from}$${to}`,
-    cacheTimeout: 5000
+    cacheTimeout: 10000
   }
 }
 
@@ -88,6 +88,6 @@ function loadOne (id) {
     meta: { id },
     endPoint: url,
     cacheKey: `LOAD_ONE_COMPANY${id}`,
-    cacheTimeout: 5000
+    cacheTimeout: 10000
   }
 }

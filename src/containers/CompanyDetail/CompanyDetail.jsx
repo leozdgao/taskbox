@@ -1,4 +1,5 @@
 import React, { Component, PropTypes as T } from 'react'
+import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import sortBy from 'lodash/collection/sortBy'
@@ -49,6 +50,7 @@ class CompanyDetail extends Component {
   static displayName = "CompanyDetail"
 
   static propTypes = {
+    params: T.object,
     companyVector: T.object,
     projectUnderCompanyVector: T.object,
 
@@ -58,7 +60,17 @@ class CompanyDetail extends Component {
 
   componentWillReceiveProps (nextProps) {
     // ensure company fetch work
-    this.ensureDataFetch(nextProps)
+    const { params: { cid }, companyVector, loadProjectUnderCompany } = this.props
+    const { params: { cid: nextCid }, companyVector: nextCompanyVector } = nextProps
+
+    if (cid !== nextCid) {
+      this.ensureDataFetch(nextProps)
+    }
+    else {
+      if (!companyVector.isFulfilled && nextCompanyVector.isFulfilled) {
+        loadProjectUnderCompany(nextCompanyVector.val)
+      }
+    }
   }
 
   componentDidMount () {
@@ -105,10 +117,10 @@ class CompanyDetail extends Component {
           </thead>
           <tbody>
             {projectUnderCompanyVector.val
-              .map(({ name, startDate, lastUpdateDate, status }, i) => {
+              .map(({ _id, name, startDate, lastUpdateDate, status }, i) => {
                 return (
                   <tr key={i}>
-                    <td>{name}</td>
+                    <td><Link to={`/info/p/${_id}`}>{name}</Link></td>
                     <td>{moment(startDate).format('YYYY-MM-DD')}</td>
                     <td>{moment(lastUpdateDate).format('YYYY-MM-DD')}</td>
                     <td>{status}</td>
@@ -125,18 +137,10 @@ class CompanyDetail extends Component {
   ensureDataFetch (props) {
     const {
       params: { cid },
-      companyVector, projectUnderCompanyVector,
-      loadCompany, loadProjectUnderCompany
+      loadCompany
     } = props
 
-    if (!companyVector.isFulfilled && !companyVector.isPending) {
-      loadCompany(cid)
-    }
-    if (companyVector.isFulfilled &&
-      !projectUnderCompanyVector.isFulfilled &&
-      !projectUnderCompanyVector.isPending) {
-      loadProjectUnderCompany(companyVector.val)
-    }
+    loadCompany(cid)
   }
 }
 
