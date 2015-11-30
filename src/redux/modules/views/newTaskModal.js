@@ -47,7 +47,7 @@ const actionMap = {
     })
   },
   [loadProjectUnderCompany.fulfilled] (state, { payload: { body } }) {
-    if (Array.isArray(body)) {
+    if (Array.isArray(body) && state.currentCompany) {
       const { currentCompany } = state
       return update(state, {
         projectOptions: { $set: body.filter(p => p.companyId === currentCompany._id) }

@@ -3,66 +3,57 @@ import { connect } from 'react-redux'
 import moment from 'moment'
 import sortBy from 'lodash/collection/sortBy'
 import { Spinner } from '../../components'
-import { CompanyActions, ProjectActions } from '../../redux/modules'
-import { isDefined, resolveProp, has, diff } from '../../utils'
+import { Request } from '../../redux/modules'
+import { spreadStatus } from '../../redux/dataFetch'
+import { isDefined, resolveProp, resolvePropByPath } from '../../utils'
 import './companydetail.less'
+
+const { CompanyModule, ProjectModule } = Request
+const { actionCreators: CompanyActionCreators } = CompanyModule
+const { actionCreators: ProjectActionCreators } = ProjectModule
 
 function mapStateToProps (state, props) {
   const cid = props.params.cid
-  const {
-    company: {
-      data: companyData, loadedCompany,
-      loadingCompany, loadFailedCompany
-    },
-    project: {
-      data: projectData,
-      companyProjectsLoading,
-      companyProjectsLoaded
-    }
-  } = state
+  const resolveState = resolvePropByPath(state)
+  const companyReqState = resolveState('request.company.loadOne')
+  const companyData = resolveState('storage.company.data')
+  const projectUnderCompanyReqState = resolveState('request.project.loadProjectUnderCompany')
+  const projectData = resolveState('storage.project.data')
 
   const currentCompany = companyData[cid]
-  const needFetchCompany = !isDefined(currentCompany)
-  const companyFetching = has(loadingCompany, cid)
-  const companyFetchFailed = has(loadFailedCompany, cid)
+  const projectsUnderCompany = currentCompany && sortBy(currentCompany.projects.map(resolveProp(projectData)).filter(isDefined), 'name')
 
-  const projectsUnderCompany = currentCompany &&
-    sortBy(currentCompany.projects.map(resolveProp(projectData)).filter(isDefined), 'name') || []
-  const needFetchProjectsUnderCompany = currentCompany &&
-    !has(companyProjectsLoading, cid) && !has(companyProjectsLoaded, cid) &&
-    currentCompany.projects.length > projectsUnderCompany
+  return {
+    companyVector: {
+      val: currentCompany,
+      ...spreadStatus(companyReqState, cid)
+    },
+    projectUnderCompanyVector: {
+      val: projectsUnderCompany || [], // give a default value
+      ...spreadStatus(projectUnderCompanyReqState, cid)
+    }
+  }
+}
 
-  return ({
-    currentCompany, needFetchCompany,
-    companyFetching, companyFetchFailed,
-
-    projectsUnderCompany,
-    needFetchProjectsUnderCompany
-  })
+const mapActionToProps = {
+  loadCompany: CompanyActionCreators.loadOne,
+  loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany
 }
 
 @connect(
   mapStateToProps,
-  {
-    loadCompany: CompanyActions.loadOne,
-    loadProjectForCompany: ProjectActions.loadProjectForCompany
-  }
+  mapActionToProps
 )
 class CompanyDetail extends Component {
 
   static displayName = "CompanyDetail"
 
   static propTypes = {
-    currentCompany: T.object,
-    needFetchCompany: T.bool,
-    companyFetching: T.bool,
-    companyFetchFailed: T.bool,
-
-    projectsUnderCompany: T.array,
-    needFetchProjectsUnderCompany: T.bool,
+    companyVector: T.object,
+    projectUnderCompanyVector: T.object,
 
     loadCompany: T.func,
-    loadProjectForCompany: T.func
+    loadProjectUnderCompany: T.func
   }
 
   componentWillReceiveProps (nextProps) {
@@ -75,21 +66,15 @@ class CompanyDetail extends Component {
   }
 
   render () {
-    const {
-      needFetchCompany,
-      companyFetching,
-      companyFetchFailed,
-    } = this.props
+    const { companyVector } = this.props
 
-    if (needFetchCompany || companyFetching) {
-      return <Spinner />
-    }
-    else if (companyFetchFailed) { // can't find
+    if (companyVector.isRejected) {
       return this._getErrorContent()
     }
-    else {
+    else if (companyVector.isFulfilled) {
       return this._getCompanyDetail()
     }
+    else return <Spinner />
   }
 
   _getErrorContent () {
@@ -103,11 +88,9 @@ class CompanyDetail extends Component {
   }
 
   _getCompanyDetail () {
-    const {
-      currentCompany,
-      projectsUnderCompany
-    } = this.props
-    const { name, clientId, projects } = currentCompany
+    const { companyVector, projectUnderCompanyVector } = this.props
+    const { name, clientId, projects } = companyVector.val
+
     return (
       <div>
         <h2>{`${name} (${clientId})`}</h2>
@@ -121,7 +104,7 @@ class CompanyDetail extends Component {
             </tr>
           </thead>
           <tbody>
-            {projectsUnderCompany
+            {projectUnderCompanyVector.val
               .map(({ name, startDate, lastUpdateDate, status }, i) => {
                 return (
                   <tr key={i}>
@@ -141,20 +124,18 @@ class CompanyDetail extends Component {
   // use data from the store or send an api request
   ensureDataFetch (props) {
     const {
-      currentCompany,
-      companyFetching,
-      needFetchCompany,
-      needFetchProjectsUnderCompany,
-      params: { cid }
+      params: { cid },
+      companyVector, projectUnderCompanyVector,
+      loadCompany, loadProjectUnderCompany
     } = props
 
-    if (needFetchCompany && !companyFetching) {
-      props.loadCompany(cid)
+    if (!companyVector.isFulfilled && !companyVector.isPending) {
+      loadCompany(cid)
     }
-
-    if (needFetchProjectsUnderCompany) {
-      // currentCompany will not be null here
-      props.loadProjectForCompany(currentCompany)
+    if (companyVector.isFulfilled &&
+      !projectUnderCompanyVector.isFulfilled &&
+      !projectUnderCompanyVector.isPending) {
+      loadProjectUnderCompany(companyVector.val)
     }
   }
 }

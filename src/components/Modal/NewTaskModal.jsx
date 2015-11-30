@@ -24,18 +24,19 @@ const mapStateToProps = state => {
     projectOptions: sortBy(projectOptions, 'name')
   }
 }
+const mapActionToProps = {
+  nextStep: NewTaskModalActions.nextStep,
+  prevStep: NewTaskModalActions.prevStep,
+  loadAllCompany: CompanyActions.loadAll,
+  selectCompany: NewTaskModalActions.selectCompany,
+  selectProject: NewTaskModalActions.selectProject,
+  publishNewTask: TaskActions.publishNewTask,
+  reset: NewTaskModalActions.reset
+}
 
 @connect(
   mapStateToProps,
-  {
-    nextStep: NewTaskModalActions.nextStep,
-    prevStep: NewTaskModalActions.prevStep,
-    loadAllCompany: CompanyActions.loadAll,
-    selectCompany: NewTaskModalActions.selectCompany,
-    selectProject: NewTaskModalActions.selectProject,
-    publishNewTask: TaskActions.publishNewTask,
-    reset: NewTaskModalActions.reset
-  }
+  mapActionToProps
 )
 class NewTaskModal extends Component {
 
@@ -80,8 +81,8 @@ class NewTaskModal extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    // reset form after open
-    if (!this.props.isShowed && nextProps.isShowed) {
+    // reset form after close this modal
+    if (this.props.isShowed && !nextProps.isShowed) {
       this.props.reset() // reset modal state
     }
   }
