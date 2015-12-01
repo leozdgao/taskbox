@@ -33,14 +33,6 @@ class ChangePasswordForm extends Component {
     handleSubmit: () => {}
   }
 
-  constructor (props, context) {
-    super(props, context)
-
-    this.state = {
-
-    }
-  }
-
   render () {
     const { fields: { oldpwd, newpwd, repeat }, handleSubmit, resetForm, isRequesting } = this.props
     const isInvalid = (field) => field.touched && field.error

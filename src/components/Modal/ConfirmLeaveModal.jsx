@@ -25,7 +25,7 @@ class ConfirmLeaveModal extends Component {
         </ModalWrapper.Content>
         <ModalWrapper.Footer>
           <button type="button" className="btn btn-sm btn-white" onClick={this.props.onHide}>No</button>
-          <button type="button" className="btn btn-sm btn-success" onClick={this.props.onSubmit}>Confrim</button>
+          <button type="button" className="btn btn-sm btn-success" onClick={this.props.onSubmit}>Confirm</button>
         </ModalWrapper.Footer>
       </ModalWrapper>
     )

@@ -36,10 +36,10 @@ class EditPostForm extends Component {
   }
 
   // TODO: Issue with HOC, can't resolve this property
-  isDirty () {
-    const { dirty } = this.props // only by this dirty property for now
-    return dirty
-  }
+  // isDirty () {
+  //   const { dirty } = this.props // only by this dirty property for now
+  //   return dirty
+  // }
 
   constructor (props, context) {
     super(props, context)

@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import sortBy from 'lodash/collection/sortBy'
-import { Spinner } from '../../components'
+import { Spinner, OverlayTrigger, Tooltip, CompanyEditModal, ScrollPanel } from '../../components'
 import { Request } from '../../redux/modules'
 import { spreadStatus } from '../../redux/dataFetch'
 import { isDefined, resolveProp, resolvePropByPath } from '../../utils'
@@ -21,8 +21,11 @@ function mapStateToProps (state, props) {
   const projectUnderCompanyReqState = resolveState('request.project.loadProjectUnderCompany')
   const projectData = resolveState('storage.project.data')
 
+  const companyUpdateState = resolveState('request.company.update')
+
   const currentCompany = companyData[cid]
-  const projectsUnderCompany = currentCompany && sortBy(currentCompany.projects.map(resolveProp(projectData)).filter(isDefined), 'name')
+  const projectsUnderCompany = currentCompany &&
+    sortBy(currentCompany.projects.map(resolveProp(projectData)).filter(isDefined), 'name')
 
   return {
     companyVector: {
@@ -32,13 +35,17 @@ function mapStateToProps (state, props) {
     projectUnderCompanyVector: {
       val: projectsUnderCompany || [], // give a default value
       ...spreadStatus(projectUnderCompanyReqState, cid)
+    },
+    companyUpdateState: {
+      ...spreadStatus(companyUpdateState)
     }
   }
 }
 
 const mapActionToProps = {
   loadCompany: CompanyActionCreators.loadOne,
-  loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany
+  loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany,
+  updateCompany: CompanyActionCreators.update
 }
 
 @connect(
@@ -53,15 +60,31 @@ class CompanyDetail extends Component {
     params: T.object,
     companyVector: T.object,
     projectUnderCompanyVector: T.object,
+    companyUpdateState: T.object,
 
     loadCompany: T.func,
-    loadProjectUnderCompany: T.func
+    loadProjectUnderCompany: T.func,
+    updateCompany: T.func
+  }
+
+  state = {
+    editModalShowed: false,
+    addProjectModalShowed: false
   }
 
   componentWillReceiveProps (nextProps) {
     // ensure company fetch work
-    const { params: { cid }, companyVector, loadProjectUnderCompany } = this.props
-    const { params: { cid: nextCid }, companyVector: nextCompanyVector } = nextProps
+    const {
+      params: { cid },
+      companyVector,
+      loadProjectUnderCompany,
+      companyUpdateState
+    } = this.props
+    const {
+      params: { cid: nextCid },
+      companyVector: nextCompanyVector,
+      companyUpdateState: nextCompanyUpdateState
+    } = nextProps
 
     if (cid !== nextCid) {
       this.ensureDataFetch(nextProps)
@@ -69,6 +92,13 @@ class CompanyDetail extends Component {
     else {
       if (!companyVector.isFulfilled && nextCompanyVector.isFulfilled) {
         loadProjectUnderCompany(nextCompanyVector.val)
+      }
+
+      if (!companyUpdateState.isFulfilled && nextCompanyUpdateState.isFulfilled) {
+        // hide modal after update company
+        this.setState({
+          editModalShowed: false
+        })
       }
     }
   }
@@ -100,12 +130,30 @@ class CompanyDetail extends Component {
   }
 
   _getCompanyDetail () {
-    const { companyVector, projectUnderCompanyVector } = this.props
+    const { companyVector, projectUnderCompanyVector, companyUpdateState } = this.props
     const { name, clientId, projects } = companyVector.val
+    const addTooltip = (
+      <Tooltip placement='bottom'>Add project</Tooltip>
+    )
+    const editTooltip = (
+      <Tooltip placement='bottom'>Edit company</Tooltip>
+    )
 
     return (
-      <div>
-        <h2>{`${name} (${clientId})`}</h2>
+      <ScrollPanel className="company-detail">
+        <header>
+          <h2>{`${name} (${clientId})`}</h2>
+          <div>
+            <OverlayTrigger event='hover' placement='bottom' overlay={addTooltip}>
+              <a className="head-icon"><i className="fa fa-plus"></i></a>
+            </OverlayTrigger>
+            <OverlayTrigger event='hover' placement='bottom' overlay={editTooltip}>
+              <a className="head-icon" onClick={() => this.setState({ editModalShowed: true })}>
+                <i className="fa fa-pencil-square-o"></i>
+              </a>
+            </OverlayTrigger>
+          </div>
+        </header>
         <table className="company-table">
           <thead>
             <tr>
@@ -129,7 +177,12 @@ class CompanyDetail extends Component {
               })}
           </tbody>
         </table>
-      </div>
+        <CompanyEditModal
+          isShowed={this.state.editModalShowed} body={companyVector.val}
+          isRequesting={companyUpdateState.isPending} isFailed={companyUpdateState.isRejected}
+          onHide={() => this.setState({ editModalShowed: false })}
+          onFormSubmit={::this._updateCompany} />
+      </ScrollPanel>
     )
   }
 
@@ -141,6 +194,11 @@ class CompanyDetail extends Component {
     } = props
 
     loadCompany(cid)
+  }
+
+  _updateCompany (body) {
+    const { companyVector: { val }, updateCompany } = this.props
+    updateCompany(val._id, body)
   }
 }
 

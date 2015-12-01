@@ -26,12 +26,21 @@ const LOAD_ONE_COMPANY = '@@company/LOAD_ONE_COMPANY'
 const loadCompanyAsyncActions = constructAsyncActionTypes(LOAD_ONE_COMPANY)
 const loadCompanyReducer = createActionReducer(loadCompanyAsyncActions)
 
+const EDIT_ONE_COMPANY = '@@company/EDIT_ONE_COMPANY'
+const editCompanyAsyncActions = constructAsyncActionTypes(EDIT_ONE_COMPANY)
+const editCompanyReducer = createActionReducer(editCompanyAsyncActions)
+
+const ADD_ONE_COMPANY = '@@company/ADD_ONE_COMPANY'
+const addCompanyAsyncActions = constructAsyncActionTypes(ADD_ONE_COMPANY)
+const addCOmpanyReducer = createActionReducer(addCompanyAsyncActions)
+
 //
 // Action Types
 export const actionTypes = {
   loadAll: loadAllCompanyAsyncActions,
   loadOne: loadCompanyAsyncActions,
-  loadGroup: loadCompanyGroupAsyncActions
+  loadGroup: loadCompanyGroupAsyncActions,
+  update: editCompanyAsyncActions
 }
 
 //
@@ -39,13 +48,15 @@ export const actionTypes = {
 export default combineReducers({
   loadAll: loadAllCompanyReducer,
   loadOne: loadCompanyReducer,
-  loadGroup: loadCompanyGroupReducer
+  loadGroup: loadCompanyGroupReducer,
+  update: editCompanyReducer,
+
 })
 
 //
 // Action Creators
 export const actionCreators = {
-  loadOne, loadAll, loadGroup
+  loadOne, loadAll, loadGroup, update
 }
 
 function loadAll () {
@@ -89,5 +100,20 @@ function loadOne (id) {
     endPoint: url,
     cacheKey: `LOAD_ONE_COMPANY${id}`,
     cacheTimeout: 10000
+  }
+}
+
+function update (id, body) {
+  const url = `${COMPANY_API_URL}/${id}`
+  return {
+    type: EDIT_ONE_COMPANY,
+    method: 'PUT',
+    body: {
+      update: body,
+      options: {
+        new: true
+      }
+    },
+    endPoint: url
   }
 }

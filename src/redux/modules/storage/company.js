@@ -4,7 +4,12 @@ import createReducer from '../../createReducer'
 import { CompanyModule } from '../request'
 import { isInGroup, safePush, safeIndexOf } from '../../../utils'
 
-const { actionTypes: { loadOne, loadAll, loadGroup }, companyGroup }  = CompanyModule
+const {
+  actionTypes: {
+    loadOne, loadAll, loadGroup, update: updateAction
+  },
+  companyGroup
+}  = CompanyModule
 
 // {
 //   data: {},
@@ -66,6 +71,12 @@ const actionMap = {
     return update(state, {
       data: { $set: data },
       group: { $set: group }
+    })
+  },
+  [updateAction.fulfilled] (state, { payload: { body } }) {
+    const updated = body.new
+    return update(state, {
+      data: { [updated._id]: { $set: updated } }
     })
   }
 }

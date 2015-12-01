@@ -2,7 +2,7 @@ import React, { Component, PropTypes as T } from 'react'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { Spinner } from '../../components'
+import { Spinner, ScrollPanel } from '../../components'
 import { Request } from '../../redux/modules'
 import { resolvePropByPath } from '../../utils'
 import { spreadStatus } from '../../redux/dataFetch'
@@ -102,28 +102,38 @@ class ProjectDetail extends Component {
     const { name: companyName = '', clientId = '' } = companyVector.val || {}
 
     return (
-      <div className="project-detail">
+      <ScrollPanel className="project-detail">
         <h2>
           <Link to={`/info/c/${companyId}`}>{`${companyName} (${clientId})`}</Link> - {`${name}`}
         </h2>
-        <div className="project-info">
-          <div className="label-col">
-            <div><label>Assembly Name</label></div>
-            <div><label>Source Code</label></div>
-            <div><label>Version</label></div>
-            <div><label>Start Date</label></div>
-            <div><label>Last Update Date</label></div>
-            <div><label>Type</label></div>
-          </div>
-          <div className="info-col">
-            <div>{assemblyName}</div>
-            <div>{sourceCode}</div>
-            <div>{currentVersion}</div>
-            <div>{moment(startDate).format('YYYY-MM-DD')}</div>
-            <div>{moment(lastUpdateDate).format('YYYY-MM-DD')}</div>
-            <div>{toProjectType(projectVector.val)}</div>
-          </div>
-        </div>
+        <table className="table">
+          <tbody>
+            <tr>
+              <td width="240"><label>Assembly Name</label></td>
+              <td>{assemblyName}</td>
+            </tr>
+            <tr>
+              <td><label>Source Code</label></td>
+              <td>{sourceCode}</td>
+            </tr>
+            <tr>
+              <td><label>Version</label></td>
+              <td>{currentVersion}</td>
+            </tr>
+            <tr>
+              <td><label>Start Date</label></td>
+              <td>{moment(startDate).format('YYYY-MM-DD')}</td>
+            </tr>
+            <tr>
+              <td><label>Last Update Date</label></td>
+              <td>{moment(lastUpdateDate).format('YYYY-MM-DD')}</td>
+            </tr>
+            <tr>
+              <td><label>Type</label></td>
+              <td>{toProjectType(projectVector.val)}</td>
+            </tr>
+          </tbody>
+        </table>
         <table className="table mt-15">
           <thead>
             <tr className="active">
@@ -142,7 +152,7 @@ class ProjectDetail extends Component {
             </tr>
           </tbody>
         </table>
-      </div>
+      </ScrollPanel>
     )
   }
 
