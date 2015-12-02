@@ -9,7 +9,7 @@ import promiseMiddleware from 'redux-promise-middleware'
 import createLogger from 'redux-logger'
 import cacheablePromise from './middlewares/cacheablePromise'
 import thenablePromise from './middlewares/thenablePromise'
-import apiMiddleWare from './middlewares/apiMiddleWare'
+import apiMiddleWare from './middlewares/apiMiddleware'
 import combineActionMiddleware from './middlewares/combineActionMiddleware'
 
 import rootReducer from './modules/reducer'
