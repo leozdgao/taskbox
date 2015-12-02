@@ -26,13 +26,18 @@ const LOAD_ONE_COMPANY = '@@company/LOAD_ONE_COMPANY'
 const loadCompanyAsyncActions = constructAsyncActionTypes(LOAD_ONE_COMPANY)
 const loadCompanyReducer = createActionReducer(loadCompanyAsyncActions)
 
+const ADD_ONE_COMPANY = '@@company/ADD_ONE_COMPANY'
+const addCompanyAsyncActions = constructAsyncActionTypes(ADD_ONE_COMPANY)
+const addCompanyReducer = createActionReducer(addCompanyAsyncActions)
+
 const EDIT_ONE_COMPANY = '@@company/EDIT_ONE_COMPANY'
 const editCompanyAsyncActions = constructAsyncActionTypes(EDIT_ONE_COMPANY)
 const editCompanyReducer = createActionReducer(editCompanyAsyncActions)
 
-const ADD_ONE_COMPANY = '@@company/ADD_ONE_COMPANY'
-const addCompanyAsyncActions = constructAsyncActionTypes(ADD_ONE_COMPANY)
-const addCompanyReducer = createActionReducer(addCompanyAsyncActions)
+const REMOVE_ONE_COMPANY = '@@company/REMOVE_ONE_COMPANY'
+const removeCompanyAsyncActions = constructAsyncActionTypes(REMOVE_ONE_COMPANY)
+const removeCompanyReducer = createActionReducer(removeCompanyAsyncActions)
+
 
 //
 // Action Types
@@ -41,7 +46,8 @@ export const actionTypes = {
   loadOne: loadCompanyAsyncActions,
   loadGroup: loadCompanyGroupAsyncActions,
   update: editCompanyAsyncActions,
-  add: addCompanyAsyncActions
+  add: addCompanyAsyncActions,
+  remove: removeCompanyAsyncActions
 }
 
 //
@@ -51,7 +57,8 @@ export default combineReducers({
   loadOne: loadCompanyReducer,
   loadGroup: loadCompanyGroupReducer,
   update: editCompanyReducer,
-  add: addCompanyReducer
+  add: addCompanyReducer,
+  remove: removeCompanyReducer
 })
 
 //
@@ -61,7 +68,8 @@ export const actionCreators = {
   loadAll,
   loadGroup,
   update,
-  add
+  add,
+  remove
 }
 
 function loadAll () {
@@ -129,5 +137,14 @@ function add (body) {
     method: 'POST',
     body,
     endPoint: COMPANY_API_URL
+  }
+}
+
+function remove (id) {
+  const url = `${COMPANY_API_URL}/${id}`
+  return {
+    type: REMOVE_ONE_COMPANY,
+    method: 'DELETE',
+    endPoint: url
   }
 }

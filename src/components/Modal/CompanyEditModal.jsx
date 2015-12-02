@@ -12,15 +12,17 @@ class CompanyEditModal extends Component {
   static propTypes = {
     isRequesting: T.bool,
     isShowed: T.bool,
+    isFailed: T.bool,
     onHide: T.func,
-    onSubmit: T.func,
+    onFormSubmit: T.func,
     body: T.object
   }
 
   static defaultProps = {
     isShowed: false,
+    isFailed: false,
     onHide: () => {},
-    // onSubmit: () => {}
+    onFormSubmit: () => {}
   }
 
   render () {

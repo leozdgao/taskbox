@@ -42,6 +42,7 @@ export { default as ChangeAvatarModal } from './Modal/ChangeAvatarModal'
 export { default as ConfirmLeaveModal } from './Modal/ConfirmLeaveModal'
 export { default as NewTaskModal } from './Modal/NewTaskModal'
 export { default as CompanyEditModal } from './Modal/CompanyEditModal'
+export { default as ConfirmTextModal } from './Modal/ConfirmTextModal'
 
 // hoc
 export { default as dataDependence } from './DataDependence/dataDependence'

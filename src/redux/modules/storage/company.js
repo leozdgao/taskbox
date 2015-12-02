@@ -1,14 +1,16 @@
 import update from 'react-addons-update'
 import findIndex from 'lodash/array/findIndex'
 import forEach from 'lodash/collection/forEach'
+import reduce from 'lodash/collection/reduce'
 import createReducer from '../../createReducer'
 import { CompanyModule } from '../request'
-import { isInGroup, safePush, safeIndexOf } from '../../../utils'
+import { isInGroup, safePush, safeIndexOf, removeFromArray } from '../../../utils'
 
 const {
   actionTypes: {
     loadOne, loadAll, loadGroup,
-    update: updateAction, add: addAction
+    update: updateAction, add: addAction,
+    remove: removeAction
   },
   companyGroup
 }  = CompanyModule
@@ -104,6 +106,28 @@ const actionMap = {
     return update(state, {
       data: { [body._id]: { $set: body } },
       group: { $set: group }
+    })
+  },
+  [removeAction.fulfilled] (state, { payload: { body } }) {
+    const id = body._id
+    const removeId = removeFromArray(id)
+
+    return update(state, {
+      data: {
+        $apply: data => {
+          delete data[id]
+          return data
+        }
+      },
+      group: {
+        $apply: data => {
+          reduce(data, (acc, val, key) => {
+            acc[key] = removeId(val)
+            return acc
+          }, {})
+          return data
+        }
+      }
     })
   }
 }

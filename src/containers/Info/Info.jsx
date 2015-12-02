@@ -3,8 +3,13 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import sortBy from 'lodash/collection/sortBy'
 import reduce from 'lodash/collection/reduce'
-import { PageHeading, TreeView, IBox, ScrollPanel } from '../../components'
+import {
+  PageHeading, TreeView, IBox,
+  ScrollPanel, OverlayTrigger,
+  Tooltip, CompanyEditModal
+} from '../../components'
 import { Request } from '../../redux/modules'
+import { spreadStatus } from '../../redux/dataFetch'
 import { isDefined, resolveProp, always, diff, resolvePropByPath } from '../../utils'
 import './info.less'
 
@@ -14,6 +19,7 @@ const { actionCreators: ProjectActionCreators } = ProjectModule
 
 const mapStateToProps = state => {
   const resolveState = resolvePropByPath(state)
+  const addCompanyReqState = resolveState('request.company.add')
   const companyData = resolveState('storage.company.data')
   const projectData = resolveState('storage.project.data')
   const group = resolveState('storage.company.group')
@@ -23,11 +29,15 @@ const mapStateToProps = state => {
       acc[groupKey] = sortBy(arr.map(resolveProp(companyData)).filter(isDefined), 'name')
       return acc
     }, {}),
-    projectData
+    projectData,
+    addCompanyReqState: {
+      ...spreadStatus(addCompanyReqState)
+    }
   }
 }
 const mapActionToProps = {
   loadGroup: CompanyActionCreators.loadGroup,
+  addCompany: CompanyActionCreators.add,
   loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany
 }
 
@@ -39,19 +49,27 @@ export default class Info extends Component {
 
   static propTypes = {
     children: T.any,
+    addCompany: T.func,
     loadGroup: T.func,
     loadProjectUnderCompany: T.func,
     group: T.object,
-    projectData: T.object
+    projectData: T.object,
+    addCompanyReqState: T.object
   }
 
-  constructor (props, context) {
-    super(props, context)
+  state = {
+    collapsedCompanyGroup: companyGroup.map(always(false)),
+    loadingCompanyGroup: companyGroup.map(always(false)),
+    collapsedCompany: [],
+    modalShowed: false
+  }
 
-    this.state = {
-      collapsedCompanyGroup: companyGroup.map(always(false)),
-      loadingCompanyGroup: companyGroup.map(always(false)),
-      collapsedCompany: []
+  componentWillReceiveProps (nextProps) {
+    const { addCompanyReqState } = this.props
+    const { addCompanyReqState: nextAddCompanyReqState } = nextProps
+
+    if (!addCompanyReqState.isFulfilled && nextAddCompanyReqState.isFulfilled) {
+      this.setState({ modalShowed: false })
     }
   }
 
@@ -63,7 +81,10 @@ export default class Info extends Component {
     const {
       collapsedCompanyGroup
     } = this.state
-    const { group: groupData } = this.props
+    const { group: groupData, addCompanyReqState } = this.props
+    const tooltip = (
+      <Tooltip placement='right'>Add company</Tooltip>
+    )
 
     return (
       <div>
@@ -74,6 +95,12 @@ export default class Info extends Component {
         <div className="info-content">
           <div className="row">
             <div className="info-tree">
+              <div className="info-tree-head">
+                <h4 className="inline-block mr-15"><i className="fa fa-building-o"></i> Companies</h4>
+                <OverlayTrigger event='hover' placement='right' overlay={tooltip}>
+                  <a className="pointer" onClick={() => this.setState({ modalShowed: true })}><i className="fa fa-plus"></i></a>
+                </OverlayTrigger>
+              </div>
               <ScrollPanel scrollTopAfterUpdate={false}>
                 <div>
                   {companyGroup.map((group, i) => {
@@ -100,6 +127,8 @@ export default class Info extends Component {
             </div>
           </div>
         </div>
+        <CompanyEditModal isShowed={this.state.modalShowed} isRequesting={addCompanyReqState.isPending}
+          onHide={() => this.setState({ modalShowed: false })} onFormSubmit={this.props.addCompany} />
       </div>
     )
   }
@@ -178,9 +207,5 @@ export default class Info extends Component {
     this.setState({
       collapsedCompany: anotherCopy
     })
-  }
-
-  _handleProjectEntryClick ({ _id }) {
-
   }
 }

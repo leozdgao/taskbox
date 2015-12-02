@@ -1,9 +1,13 @@
 import React, { Component, PropTypes as T } from 'react'
-import { Link } from 'react-router'
+import { Link, History } from 'react-router'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import sortBy from 'lodash/collection/sortBy'
-import { Spinner, OverlayTrigger, Tooltip, CompanyEditModal, ScrollPanel } from '../../components'
+import reactMixin from 'react-mixin'
+import {
+  Spinner, OverlayTrigger, Tooltip,
+  ConfirmTextModal, CompanyEditModal, ScrollPanel
+} from '../../components'
 import { Request } from '../../redux/modules'
 import { spreadStatus } from '../../redux/dataFetch'
 import { isDefined, resolveProp, resolvePropByPath } from '../../utils'
@@ -18,10 +22,11 @@ function mapStateToProps (state, props) {
   const resolveState = resolvePropByPath(state)
   const companyReqState = resolveState('request.company.loadOne')
   const companyData = resolveState('storage.company.data')
-  const projectUnderCompanyReqState = resolveState('request.project.loadProjectUnderCompany')
   const projectData = resolveState('storage.project.data')
 
+  const projectUnderCompanyReqState = resolveState('request.project.loadProjectUnderCompany')
   const companyUpdateState = resolveState('request.company.update')
+  const companyRemoveState = resolveState('request.company.remove')
 
   const currentCompany = companyData[cid]
   const projectsUnderCompany = currentCompany &&
@@ -38,6 +43,9 @@ function mapStateToProps (state, props) {
     },
     companyUpdateState: {
       ...spreadStatus(companyUpdateState)
+    },
+    companyRemoveState: {
+      ...spreadStatus(companyRemoveState)
     }
   }
 }
@@ -45,13 +53,15 @@ function mapStateToProps (state, props) {
 const mapActionToProps = {
   loadCompany: CompanyActionCreators.loadOne,
   loadProjectUnderCompany: ProjectActionCreators.loadProjectUnderCompany,
-  updateCompany: CompanyActionCreators.update
+  updateCompany: CompanyActionCreators.update,
+  removeCompany: CompanyActionCreators.remove
 }
 
 @connect(
   mapStateToProps,
   mapActionToProps
 )
+@reactMixin.decorate(History)
 class CompanyDetail extends Component {
 
   static displayName = "CompanyDetail"
@@ -61,14 +71,17 @@ class CompanyDetail extends Component {
     companyVector: T.object,
     projectUnderCompanyVector: T.object,
     companyUpdateState: T.object,
+    companyRemoveState: T.object,
 
     loadCompany: T.func,
     loadProjectUnderCompany: T.func,
-    updateCompany: T.func
+    updateCompany: T.func,
+    removeCompany: T.func
   }
 
   state = {
     editModalShowed: false,
+    removeModalShowed: false,
     addProjectModalShowed: false
   }
 
@@ -78,12 +91,14 @@ class CompanyDetail extends Component {
       params: { cid },
       companyVector,
       loadProjectUnderCompany,
-      companyUpdateState
+      companyUpdateState,
+      companyRemoveState
     } = this.props
     const {
       params: { cid: nextCid },
       companyVector: nextCompanyVector,
-      companyUpdateState: nextCompanyUpdateState
+      companyUpdateState: nextCompanyUpdateState,
+      companyRemoveState: nextCompanyRemoveState
     } = nextProps
 
     if (cid !== nextCid) {
@@ -98,6 +113,15 @@ class CompanyDetail extends Component {
         // hide modal after update company
         this.setState({
           editModalShowed: false
+        })
+      }
+
+      if (!companyRemoveState.isFulfilled && nextCompanyRemoveState.isFulfilled) {
+        this.setState({
+          removeModalShowed: false
+        }, () => {
+          // redirect
+          this.history.pushState(null, `/info`)
         })
       }
     }
@@ -130,13 +154,19 @@ class CompanyDetail extends Component {
   }
 
   _getCompanyDetail () {
-    const { companyVector, projectUnderCompanyVector, companyUpdateState } = this.props
+    const { companyVector, projectUnderCompanyVector,
+      companyUpdateState, companyRemoveState } = this.props
+    if (!companyVector.val) return null
+    
     const { name, clientId, projects } = companyVector.val
     const addTooltip = (
       <Tooltip placement='bottom'>Add project</Tooltip>
     )
     const editTooltip = (
       <Tooltip placement='bottom'>Edit company</Tooltip>
+    )
+    const removeTooltip = (
+      <Tooltip placement='bottom'>Remove company</Tooltip>
     )
 
     return (
@@ -150,6 +180,11 @@ class CompanyDetail extends Component {
             <OverlayTrigger event='hover' placement='bottom' overlay={editTooltip}>
               <a className="head-icon" onClick={() => this.setState({ editModalShowed: true })}>
                 <i className="fa fa-pencil-square-o"></i>
+              </a>
+            </OverlayTrigger>
+            <OverlayTrigger event='hover' placement='bottom' overlay={removeTooltip}>
+              <a className="head-icon" onClick={() => this.setState({ removeModalShowed: true })}>
+                <i className="fa fa-trash-o"></i>
               </a>
             </OverlayTrigger>
           </div>
@@ -182,6 +217,14 @@ class CompanyDetail extends Component {
           isRequesting={companyUpdateState.isPending} isFailed={companyUpdateState.isRejected}
           onHide={() => this.setState({ editModalShowed: false })}
           onFormSubmit={::this._updateCompany} />
+        <ConfirmTextModal
+          isShowed={this.state.removeModalShowed}
+          isRequesting={companyRemoveState.isPending} isFailed={companyRemoveState.isRejected}
+          onHide={() => this.setState({ removeModalShowed: false })}
+          keyText={name} onSubmit={::this._removeCompany}
+          >
+          Please re-type the name of this company: <b>{name}</b>
+        </ConfirmTextModal>
       </ScrollPanel>
     )
   }
@@ -199,6 +242,11 @@ class CompanyDetail extends Component {
   _updateCompany (body) {
     const { companyVector: { val }, updateCompany } = this.props
     updateCompany(val._id, body)
+  }
+
+  _removeCompany () {
+    const { companyVector: { val }, removeCompany } = this.props
+    removeCompany(val._id)
   }
 }
 

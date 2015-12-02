@@ -67,7 +67,7 @@ class NewPost extends Component {
 
   componentWillReceiveProps (nextProps) {
     const { publishStatus } = this.props
-    const { publishStatus:nextPublishStatus, lastPublishedPostId } = nextProps
+    const { publishStatus: nextPublishStatus, lastPublishedPostId } = nextProps
 
     if (publishStatus.isPending && nextPublishStatus.isFulfilled) {
       this._confirmToLeave = true
