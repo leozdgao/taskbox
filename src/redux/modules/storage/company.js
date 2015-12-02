@@ -1,12 +1,14 @@
 import update from 'react-addons-update'
 import findIndex from 'lodash/array/findIndex'
+import forEach from 'lodash/collection/forEach'
 import createReducer from '../../createReducer'
 import { CompanyModule } from '../request'
 import { isInGroup, safePush, safeIndexOf } from '../../../utils'
 
 const {
   actionTypes: {
-    loadOne, loadAll, loadGroup, update: updateAction
+    loadOne, loadAll, loadGroup,
+    update: updateAction, add: addAction
   },
   companyGroup
 }  = CompanyModule
@@ -23,6 +25,7 @@ const initGroup = companyGroup.reduce((ret, { key }) => {
 
 const initState = { data: {}, group: initGroup }
 
+// Util function
 const groupCompany = (ret = {}, company) => {
   const groupIndex = findIndex(companyGroup, ({ from, to }) => {
     return isInGroup(from, to)(company.name)
@@ -36,6 +39,15 @@ const groupCompany = (ret = {}, company) => {
   }
 
   return ret
+}
+
+const reGroupCompanies = companies => {
+  let group = initGroup
+  forEach(companies, company => {
+    group = groupCompany(group, company)
+  })
+
+  return group
 }
 
 const actionMap = {
@@ -75,8 +87,23 @@ const actionMap = {
   },
   [updateAction.fulfilled] (state, { payload: { body } }) {
     const updated = body.new
+    const { ...copy } = state.data
+    copy[updated._id] = updated
+    const group = reGroupCompanies(copy)
+
     return update(state, {
-      data: { [updated._id]: { $set: updated } }
+      data: { [updated._id]: { $set: updated } },
+      group: { $set: group }
+    })
+  },
+  [addAction.fulfilled] (state, { payload: { body } }) {
+    const { ...copy } = state.data
+    copy[body._id] = body
+    const group = reGroupCompanies(copy)
+
+    return update(state, {
+      data: { [body._id]: { $set: body } },
+      group: { $set: group }
     })
   }
 }

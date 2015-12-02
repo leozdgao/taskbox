@@ -32,7 +32,7 @@ const editCompanyReducer = createActionReducer(editCompanyAsyncActions)
 
 const ADD_ONE_COMPANY = '@@company/ADD_ONE_COMPANY'
 const addCompanyAsyncActions = constructAsyncActionTypes(ADD_ONE_COMPANY)
-const addCOmpanyReducer = createActionReducer(addCompanyAsyncActions)
+const addCompanyReducer = createActionReducer(addCompanyAsyncActions)
 
 //
 // Action Types
@@ -40,7 +40,8 @@ export const actionTypes = {
   loadAll: loadAllCompanyAsyncActions,
   loadOne: loadCompanyAsyncActions,
   loadGroup: loadCompanyGroupAsyncActions,
-  update: editCompanyAsyncActions
+  update: editCompanyAsyncActions,
+  add: addCompanyAsyncActions
 }
 
 //
@@ -50,13 +51,17 @@ export default combineReducers({
   loadOne: loadCompanyReducer,
   loadGroup: loadCompanyGroupReducer,
   update: editCompanyReducer,
-
+  add: addCompanyReducer
 })
 
 //
 // Action Creators
 export const actionCreators = {
-  loadOne, loadAll, loadGroup, update
+  loadOne,
+  loadAll,
+  loadGroup,
+  update,
+  add
 }
 
 function loadAll () {
@@ -115,5 +120,14 @@ function update (id, body) {
       }
     },
     endPoint: url
+  }
+}
+
+function add (body) {
+  return {
+    type: ADD_ONE_COMPANY,
+    method: 'POST',
+    body,
+    endPoint: COMPANY_API_URL
   }
 }
