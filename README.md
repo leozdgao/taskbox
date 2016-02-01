@@ -1,25 +1,3 @@
-# chatbox
+# TaskBox
 
-> Another boilerplate for personal usage
-
-Extend [counter examples](https://github.com/rackt/redux/tree/master/examples/counter) with [react-router](). And use [chai](https://github.com/chaijs/chai) and [sinon](https://github.com/cjohansen/Sinon.JS/) instand of [expect](https://github.com/mjackson/expect).
-
-
-## Start
-
-```sh
-npm start
-```
-
-## Testing
-
-```sh
-npm test
-```
-
-note: jsdom >= v4.0 only work on io.js
-
-
-## License
-
-MIT © [leozdgao](http://no)
+由于2015年12月项目组毫无征兆的解散，此项目暂停开发。
